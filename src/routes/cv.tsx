@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Printer } from "lucide-react";
 import { cv, type WorkItem } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
+import mePhoto from "@/assets/me.webp";
 
 export const Route = createFileRoute("/cv")({
   head: () => ({
