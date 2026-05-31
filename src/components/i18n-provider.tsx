@@ -31,6 +31,11 @@ function HtmlLangSync() {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
+  // Force "es" on the server every render so SSR is deterministic and matches
+  // the first client paint (i18n is a module singleton shared across requests).
+  if (typeof window === "undefined" && i18n.language !== "es") {
+    i18n.changeLanguage("es");
+  }
   return (
     <I18nextProvider i18n={i18n}>
       <HtmlLangSync />
