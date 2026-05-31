@@ -105,20 +105,18 @@ function ContactPage() {
           <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t("contact.preferred")}</p>
         </Reveal>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {cv.basics.profiles.map((p, i) => {
-            const Icon = p.network.toLowerCase().includes("linkedin") ? Linkedin : Github;
-            return (
-              <Reveal key={p.network} delay={i * 0.04}>
-                <a
-                  href={p.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group flex h-full items-center justify-between rounded-2xl border border-hairline bg-surface/40 p-5 transition-colors hover:bg-surface"
-                >
-                  <span className="flex items-center gap-4">
-                    <span className="grid size-10 shrink-0 place-items-center rounded-full border border-hairline bg-background">
-                      <Icon className="size-4" />
-                    </span>
+          {cv.basics.profiles.map((p, i) => (
+            <Reveal key={p.network} delay={i * 0.04}>
+              <a
+                href={p.url}
+                target="_blank"
+                rel="noreferrer"
+                className="group flex h-full items-center justify-between rounded-2xl border border-hairline bg-surface/40 p-5 transition-colors hover:bg-surface"
+              >
+                <span className="flex items-center gap-4">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full border border-hairline bg-background font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                    {p.network.slice(0, 2)}
+                  </span>
                     <span>
                       <span className="block font-display text-xl leading-tight">{p.network}</span>
                       <span className="block font-mono text-xs text-muted-foreground">@{p.username}</span>
