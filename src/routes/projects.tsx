@@ -7,13 +7,13 @@ import { Reveal } from "@/components/reveal";
 export const Route = createFileRoute("/projects")({
   head: () => ({
     meta: [
-      { title: "Projects — Ubaldo Santos" },
+      { title: "Projects — Ubaldo Santos Patón" },
       { name: "description", content: "Selected projects: Nubric, MathType SDK, MS Office Add-in, ROTRAFU 2.0." },
-      { property: "og:title", content: "Projects — Ubaldo Santos" },
+      { property: "og:title", content: "Projects — Ubaldo Santos Patón" },
       { property: "og:description", content: "A selection of representative work." },
-      { property: "og:url", content: "/projects" },
+      { property: "og:url", content: "https://ubaldo.is-a.dev/projects" },
     ],
-    links: [{ rel: "canonical", href: "/projects" }],
+    links: [{ rel: "canonical", href: "https://ubaldo.is-a.dev/projects" }],
   }),
   component: ProjectsPage,
 });

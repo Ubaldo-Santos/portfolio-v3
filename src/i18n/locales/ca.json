@@ -4,6 +4,7 @@
     "experience": "Experiència",
     "projects": "Projectes",
     "skills": "Skills",
+    "ai": "IA",
     "contact": "Contacte",
     "cv": "CV"
   },
@@ -16,7 +17,11 @@
     "openMenu": "Obrir menú",
     "closeMenu": "Tancar menú",
     "toggleTheme": "Canviar tema",
-    "language": "Idioma"
+    "language": "Idioma",
+    "copy": "Copiar",
+    "copied": "Copiat",
+    "writeMe": "Escriu-me",
+    "callMe": "Truca'm"
   },
   "home": {
     "available": "Disponible per col·laboracions",
@@ -55,6 +60,25 @@
     "education": "Educació",
     "spokenLanguages": "Idiomes"
   },
+  "ai": {
+    "title": "IA en el meu dia a dia",
+    "subtitle": "Com configuro i faig servir eines d'IA en producte: criteris, integracions i plantilles.",
+    "philosophyTitle": "Filosofia",
+    "philosophy": "La IA és un copilot, no el pilot. La faig servir per accelerar l'exploració, generar boilerplate i revisar codi — sempre amb criteri humà, tests i revisions abans de fer merge.",
+    "copilotTitle": "GitHub Copilot — configuració a nivell d'organització",
+    "copilotDesc": "Política sensata per a equips: privacitat, models disponibles, repos permesos i límits de context.",
+    "cursorTitle": "Cursor CLI i editor",
+    "cursorDesc": "Regles de projecte, comandes slash i agents versionats al repo. La consola es queda fora del flux per no trencar el focus.",
+    "openrouterTitle": "OpenRouter",
+    "openrouterDesc": "Una sola API key per enrutar a múltiples models (Claude, GPT, DeepSeek, Gemini) amb fallback i observabilitat.",
+    "mcpTitle": "MCP — Model Context Protocol",
+    "mcpDesc": "Connectors estandarditzats entre el model i les dades reals: Jira, Linear, GitHub, bases de dades. Menys copy-paste, més context.",
+    "skillsTitle": "Skills",
+    "skillsDesc": "Procediments reusables desats al repo: com obrir un PR, com escriure migracions, com revisar accessibilitat. L'agent els aplica només quan toca.",
+    "stackTitle": "El meu stack d'IA",
+    "providersTitle": "Proveïdors",
+    "tipTitle": "Bones pràctiques"
+  },
   "contact": {
     "title": "Parlem",
     "subtitle": "Explica'm en què estàs treballant.",
@@ -62,7 +86,9 @@
     "phone": "Telèfon",
     "location": "Ubicació",
     "social": "Xarxes",
-    "ctaEmail": "Enviar correu"
+    "ctaEmail": "Enviar correu",
+    "availability": "Responc en menys de 24 h en dies laborables.",
+    "preferred": "Preferiblement per correu per a converses tècniques; LinkedIn per a presentacions."
   },
   "cv": {
     "title": "Currículum",
@@ -78,6 +104,10 @@
   },
   "footer": {
     "rights": "Tots els drets reservats",
-    "builtWith": "Construït amb TanStack Start i Tailwind"
+    "builtWith": "Construït amb TanStack Start i Tailwind",
+    "konami": "Pista: prova el codi Konami."
+  },
+  "easter": {
+    "unlocked": "Mode lab activat. Gaudeix del verd llima."
   }
 }

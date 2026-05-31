@@ -1,12 +1,32 @@
 import { useEffect, type ReactNode } from "react";
 import { I18nextProvider, useTranslation } from "react-i18next";
-import i18n from "@/i18n";
+import i18n, { detectClientLang } from "@/i18n";
 
 function HtmlLangSync() {
   const { i18n: i } = useTranslation();
+  // After hydration, switch to the user's preferred language (localStorage / navigator).
   useEffect(() => {
-    document.documentElement.lang = i.language?.slice(0, 2) || "es";
-  }, [i.language]);
+    const target = detectClientLang();
+    if (target !== i.language) {
+      i.changeLanguage(target);
+    }
+  }, [i]);
+  // Persist + sync <html lang>
+  useEffect(() => {
+    const onChange = (lng: string) => {
+      try {
+        window.localStorage.setItem("lang", lng.slice(0, 2));
+      } catch {
+        /* ignore */
+      }
+      document.documentElement.lang = lng.slice(0, 2);
+    };
+    onChange(i.language);
+    i.on("languageChanged", onChange);
+    return () => {
+      i.off("languageChanged", onChange);
+    };
+  }, [i]);
   return null;
 }
 

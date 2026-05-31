@@ -8,13 +8,13 @@ import { MapPin, ExternalLink } from "lucide-react";
 export const Route = createFileRoute("/experience")({
   head: () => ({
     meta: [
-      { title: "Experience — Ubaldo Santos" },
-      { name: "description", content: "Professional experience of Ubaldo Santos: Wiris (Nubric, MathType SDK), Rotrafu, Prime IT." },
-      { property: "og:title", content: "Experience — Ubaldo Santos" },
+      { title: "Experience — Ubaldo Santos Patón" },
+      { name: "description", content: "Professional experience of Ubaldo Santos Patón: Wiris (Nubric, MathType SDK), Rotrafu, Prime IT." },
+      { property: "og:title", content: "Experience — Ubaldo Santos Patón" },
       { property: "og:description", content: "Trajectory in product and engineering." },
-      { property: "og:url", content: "/experience" },
+      { property: "og:url", content: "https://ubaldo.is-a.dev/experience" },
     ],
-    links: [{ rel: "canonical", href: "/experience" }],
+    links: [{ rel: "canonical", href: "https://ubaldo.is-a.dev/experience" }],
   }),
   component: ExperiencePage,
 });
