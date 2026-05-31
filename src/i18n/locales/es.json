@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "experience": "Experiencia",
+    "projects": "Proyectos",
+    "skills": "Skills",
+    "contact": "Contacto",
+    "cv": "CV"
+  },
+  "actions": {
+    "printCv": "Imprimir CV",
+    "downloadCv": "Descargar CV",
+    "viewCv": "Ver CV",
+    "viewProject": "Ver más",
+    "contactMe": "Contáctame",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "toggleTheme": "Cambiar tema",
+    "language": "Idioma"
+  },
+  "home": {
+    "available": "Disponible para colaboraciones",
+    "scrollHint": "Desplázate",
+    "currentRole": "Actualmente",
+    "atWiris": "En Wiris, equipo de Assessment, desarrollando Nubric en Laravel.",
+    "selectedWork": "Trabajo seleccionado",
+    "selectedWorkSub": "Proyectos en los que he construido producto real.",
+    "stack": "Stack principal",
+    "based": "Barcelona"
+  },
+  "experience": {
+    "title": "Experiencia",
+    "subtitle": "Trayectoria profesional en producto e ingeniería.",
+    "work": "Trabajo",
+    "trainee": "Prácticas y formación",
+    "present": "Actualidad",
+    "highlights": "Aspectos destacados",
+    "stack": "Stack"
+  },
+  "projects": {
+    "title": "Proyectos",
+    "subtitle": "Una selección del trabajo más representativo.",
+    "active": "En curso",
+    "archived": "Archivado"
+  },
+  "skills": {
+    "title": "Skills y educación",
+    "subtitle": "Herramientas, prácticas e idiomas con los que trabajo.",
+    "languages": "Lenguajes",
+    "frameworks": "Frameworks y librerías",
+    "databases": "Bases de datos",
+    "practices": "Prácticas",
+    "tooling": "Tooling",
+    "integrations": "Integraciones",
+    "education": "Educación",
+    "spokenLanguages": "Idiomas"
+  },
+  "contact": {
+    "title": "Hablemos",
+    "subtitle": "Cuéntame en qué estás trabajando.",
+    "email": "Email",
+    "phone": "Teléfono",
+    "location": "Ubicación",
+    "social": "Social",
+    "ctaEmail": "Enviar email"
+  },
+  "cv": {
+    "title": "Currículum",
+    "subtitle": "Versión optimizada para impresión y parsers ATS.",
+    "printHint": "Pulsa imprimir y guarda como PDF.",
+    "profile": "Perfil",
+    "experience": "Experiencia profesional",
+    "education": "Educación",
+    "skills": "Skills",
+    "languages": "Idiomas",
+    "projects": "Proyectos",
+    "links": "Enlaces"
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados",
+    "builtWith": "Construido con TanStack Start y Tailwind"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "home": "Inici",
+    "experience": "Experiència",
+    "projects": "Projectes",
+    "skills": "Skills",
+    "contact": "Contacte",
+    "cv": "CV"
+  },
+  "actions": {
+    "printCv": "Imprimir CV",
+    "downloadCv": "Descarregar CV",
+    "viewCv": "Veure CV",
+    "viewProject": "Veure més",
+    "contactMe": "Contacta'm",
+    "openMenu": "Obrir menú",
+    "closeMenu": "Tancar menú",
+    "toggleTheme": "Canviar tema",
+    "language": "Idioma"
+  },
+  "home": {
+    "available": "Disponible per col·laboracions",
+    "scrollHint": "Desplaça't",
+    "currentRole": "Actualment",
+    "atWiris": "A Wiris, equip d'Assessment, desenvolupant Nubric en Laravel.",
+    "selectedWork": "Treball seleccionat",
+    "selectedWorkSub": "Projectes on he construït producte real.",
+    "stack": "Stack principal",
+    "based": "Barcelona"
+  },
+  "experience": {
+    "title": "Experiència",
+    "subtitle": "Trajectòria professional en producte i enginyeria.",
+    "work": "Feina",
+    "trainee": "Pràctiques i formació",
+    "present": "Actualitat",
+    "highlights": "Aspectes destacats",
+    "stack": "Stack"
+  },
+  "projects": {
+    "title": "Projectes",
+    "subtitle": "Una selecció del treball més representatiu.",
+    "active": "En curs",
+    "archived": "Arxivat"
+  },
+  "skills": {
+    "title": "Skills i educació",
+    "subtitle": "Eines, pràctiques i idiomes amb què treballo.",
+    "languages": "Llenguatges",
+    "frameworks": "Frameworks i llibreries",
+    "databases": "Bases de dades",
+    "practices": "Pràctiques",
+    "tooling": "Tooling",
+    "integrations": "Integracions",
+    "education": "Educació",
+    "spokenLanguages": "Idiomes"
+  },
+  "contact": {
+    "title": "Parlem",
+    "subtitle": "Explica'm en què estàs treballant.",
+    "email": "Correu",
+    "phone": "Telèfon",
+    "location": "Ubicació",
+    "social": "Xarxes",
+    "ctaEmail": "Enviar correu"
+  },
+  "cv": {
+    "title": "Currículum",
+    "subtitle": "Versió optimitzada per a impressió i parsers ATS.",
+    "printHint": "Prem imprimir i desa com a PDF.",
+    "profile": "Perfil",
+    "experience": "Experiència professional",
+    "education": "Educació",
+    "skills": "Skills",
+    "languages": "Idiomes",
+    "projects": "Projectes",
+    "links": "Enllaços"
+  },
+  "footer": {
+    "rights": "Tots els drets reservats",
+    "builtWith": "Construït amb TanStack Start i Tailwind"
+  }
+}
