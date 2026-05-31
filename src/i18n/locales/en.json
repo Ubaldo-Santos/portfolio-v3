@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "home": "Home",
+    "experience": "Experience",
+    "projects": "Projects",
+    "skills": "Skills",
+    "contact": "Contact",
+    "cv": "CV"
+  },
+  "actions": {
+    "printCv": "Print CV",
+    "downloadCv": "Download CV",
+    "viewCv": "View CV",
+    "viewProject": "View more",
+    "contactMe": "Get in touch",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "toggleTheme": "Toggle theme",
+    "language": "Language"
+  },
+  "home": {
+    "available": "Available for collaborations",
+    "scrollHint": "Scroll",
+    "currentRole": "Currently",
+    "atWiris": "At Wiris, Assessment team, building Nubric in Laravel.",
+    "selectedWork": "Selected work",
+    "selectedWorkSub": "Projects where I've shipped real product.",
+    "stack": "Core stack",
+    "based": "Barcelona"
+  },
+  "experience": {
+    "title": "Experience",
+    "subtitle": "Professional path in product and engineering.",
+    "work": "Work",
+    "trainee": "Internships & training",
+    "present": "Present",
+    "highlights": "Highlights",
+    "stack": "Stack"
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "A selection of representative work.",
+    "active": "Ongoing",
+    "archived": "Archived"
+  },
+  "skills": {
+    "title": "Skills & education",
+    "subtitle": "Tools, practices and languages I work with.",
+    "languages": "Languages",
+    "frameworks": "Frameworks & libraries",
+    "databases": "Databases",
+    "practices": "Practices",
+    "tooling": "Tooling",
+    "integrations": "Integrations",
+    "education": "Education",
+    "spokenLanguages": "Spoken languages"
+  },
+  "contact": {
+    "title": "Let's talk",
+    "subtitle": "Tell me what you're working on.",
+    "email": "Email",
+    "phone": "Phone",
+    "location": "Location",
+    "social": "Social",
+    "ctaEmail": "Send email"
+  },
+  "cv": {
+    "title": "Résumé",
+    "subtitle": "Optimized for print and ATS parsers.",
+    "printHint": "Hit print and save as PDF.",
+    "profile": "Profile",
+    "experience": "Professional experience",
+    "education": "Education",
+    "skills": "Skills",
+    "languages": "Languages",
+    "projects": "Projects",
+    "links": "Links"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "builtWith": "Built with TanStack Start and Tailwind"
+  }
+}
