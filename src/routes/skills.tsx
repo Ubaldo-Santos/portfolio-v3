@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { Bot, Terminal, Workflow, Plug, BookOpen, Sparkles } from "lucide-react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
 import { Reveal } from "@/components/reveal";
@@ -7,10 +8,10 @@ import { Reveal } from "@/components/reveal";
 export const Route = createFileRoute("/skills")({
   head: () => ({
     meta: [
-      { title: "Skills & Education — Ubaldo Santos Patón" },
-      { name: "description", content: "Languages, frameworks, practices, education and spoken languages." },
-      { property: "og:title", content: "Skills & Education — Ubaldo Santos Patón" },
-      { property: "og:description", content: "Tools, practices and languages I work with." },
+      { title: "Skills & AI — Ubaldo Santos Patón" },
+      { name: "description", content: "Stack principal (PHP/Laravel, TypeScript/Vue), prácticas, educación, idiomas y cómo integro IA en mi día a día y en producto." },
+      { property: "og:title", content: "Skills & AI — Ubaldo Santos Patón" },
+      { property: "og:description", content: "Stack, prácticas e IA aplicada en producto." },
       { property: "og:url", content: "https://ubaldo.is-a.dev/skills" },
     ],
     links: [{ rel: "canonical", href: "https://ubaldo.is-a.dev/skills" }],
