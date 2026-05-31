@@ -75,13 +75,13 @@ function Home() {
         {/* Marquee-style ticker */}
         <div className="border-y border-hairline bg-surface/50 py-4 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-2 px-5 sm:px-8">
-            <span>TypeScript</span>
+            <span>PHP · Laravel</span>
             <span aria-hidden>·</span>
-            <span>PHP / Laravel</span>
+            <span>TypeScript · Vue</span>
             <span aria-hidden>·</span>
-            <span>Vue · Deno · Node</span>
+            <span>Deno · Node</span>
             <span aria-hidden>·</span>
-            <span>Edtech · SDK · Integrations</span>
+            <span>Edtech · SDK · AI</span>
             <span aria-hidden>·</span>
             <span>{t("home.based")}</span>
           </div>
