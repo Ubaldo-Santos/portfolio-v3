@@ -39,7 +39,7 @@ export interface EducationItem {
 
 export const cv = {
   basics: {
-    name: "Ubaldo Santos",
+    name: "Ubaldo Santos Patón",
     label: {
       es: "Ingeniero de Software Full-Stack · TypeScript · PHP · Laravel · Vue",
       ca: "Enginyer de Programari Full-Stack · TypeScript · PHP · Laravel · Vue",

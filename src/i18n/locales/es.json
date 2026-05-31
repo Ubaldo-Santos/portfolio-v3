@@ -4,6 +4,7 @@
     "experience": "Experiencia",
     "projects": "Proyectos",
     "skills": "Skills",
+    "ai": "IA",
     "contact": "Contacto",
     "cv": "CV"
   },
@@ -16,7 +17,11 @@
     "openMenu": "Abrir menú",
     "closeMenu": "Cerrar menú",
     "toggleTheme": "Cambiar tema",
-    "language": "Idioma"
+    "language": "Idioma",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "writeMe": "Escríbeme",
+    "callMe": "Llámame"
   },
   "home": {
     "available": "Disponible para colaboraciones",
@@ -55,6 +60,25 @@
     "education": "Educación",
     "spokenLanguages": "Idiomas"
   },
+  "ai": {
+    "title": "IA en mi día a día",
+    "subtitle": "Cómo configuro y uso herramientas de IA en producto: criterios, integraciones y plantillas.",
+    "philosophyTitle": "Filosofía",
+    "philosophy": "La IA es un copiloto, no un piloto. La uso para acelerar la exploración, generar boilerplate y revisar código — siempre con criterio humano, tests y revisiones antes de mergear.",
+    "copilotTitle": "GitHub Copilot — configuración a nivel organización",
+    "copilotDesc": "Política sensata para equipos: privacidad, modelos disponibles, repos permitidos y limites de contexto.",
+    "cursorTitle": "Cursor CLI y editor",
+    "cursorDesc": "Reglas de proyecto, comandos slash y agentes versionados en el repo. La consola se queda fuera del flujo para no romper el foco.",
+    "openrouterTitle": "OpenRouter",
+    "openrouterDesc": "Una sola API key para enrutar a múltiples modelos (Claude, GPT, DeepSeek, Gemini) con fallback y observabilidad.",
+    "mcpTitle": "MCP — Model Context Protocol",
+    "mcpDesc": "Conectores estandarizados entre el modelo y los datos reales: Jira, Linear, GitHub, bases de datos. Menos copy-paste, más contexto.",
+    "skillsTitle": "Skills",
+    "skillsDesc": "Procedimientos reusables guardados en el repo: cómo crear un PR, cómo escribir migraciones, cómo revisar accesibilidad. El agente los aplica solo cuando aplica.",
+    "stackTitle": "Mi stack de IA",
+    "providersTitle": "Proveedores",
+    "tipTitle": "Buenas prácticas"
+  },
   "contact": {
     "title": "Hablemos",
     "subtitle": "Cuéntame en qué estás trabajando.",
@@ -62,7 +86,9 @@
     "phone": "Teléfono",
     "location": "Ubicación",
     "social": "Social",
-    "ctaEmail": "Enviar email"
+    "ctaEmail": "Enviar email",
+    "availability": "Respondo en menos de 24 h en días laborables.",
+    "preferred": "Preferiblemente por email para conversaciones técnicas; LinkedIn para presentaciones."
   },
   "cv": {
     "title": "Currículum",
@@ -78,6 +104,10 @@
   },
   "footer": {
     "rights": "Todos los derechos reservados",
-    "builtWith": "Construido con TanStack Start y Tailwind"
+    "builtWith": "Construido con TanStack Start y Tailwind",
+    "konami": "Tip: prueba el código Konami."
+  },
+  "easter": {
+    "unlocked": "Modo lab activado. Disfruta del verde lima."
   }
 }

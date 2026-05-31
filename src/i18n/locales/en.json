@@ -4,6 +4,7 @@
     "experience": "Experience",
     "projects": "Projects",
     "skills": "Skills",
+    "ai": "AI",
     "contact": "Contact",
     "cv": "CV"
   },
@@ -16,7 +17,11 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "toggleTheme": "Toggle theme",
-    "language": "Language"
+    "language": "Language",
+    "copy": "Copy",
+    "copied": "Copied",
+    "writeMe": "Email me",
+    "callMe": "Call me"
   },
   "home": {
     "available": "Available for collaborations",
@@ -55,6 +60,25 @@
     "education": "Education",
     "spokenLanguages": "Spoken languages"
   },
+  "ai": {
+    "title": "AI in my daily work",
+    "subtitle": "How I configure and use AI tools in product: criteria, integrations and templates.",
+    "philosophyTitle": "Philosophy",
+    "philosophy": "AI is a copilot, not the pilot. I use it to accelerate exploration, generate boilerplate and review code — always with human judgement, tests and reviews before merging.",
+    "copilotTitle": "GitHub Copilot — org-level configuration",
+    "copilotDesc": "Sensible policy for teams: privacy, allowed models, permitted repos and context limits.",
+    "cursorTitle": "Cursor CLI & editor",
+    "cursorDesc": "Project rules, slash commands and agents versioned in the repo. The CLI stays out of the way so focus is preserved.",
+    "openrouterTitle": "OpenRouter",
+    "openrouterDesc": "One API key to route across multiple models (Claude, GPT, DeepSeek, Gemini) with fallback and observability.",
+    "mcpTitle": "MCP — Model Context Protocol",
+    "mcpDesc": "Standardized connectors between the model and real data: Jira, Linear, GitHub, databases. Less copy-paste, more context.",
+    "skillsTitle": "Skills",
+    "skillsDesc": "Reusable procedures stored in the repo: how to open a PR, how to write migrations, how to review accessibility. The agent applies them only when relevant.",
+    "stackTitle": "My AI stack",
+    "providersTitle": "Providers",
+    "tipTitle": "Good practices"
+  },
   "contact": {
     "title": "Let's talk",
     "subtitle": "Tell me what you're working on.",
@@ -62,7 +86,9 @@
     "phone": "Phone",
     "location": "Location",
     "social": "Social",
-    "ctaEmail": "Send email"
+    "ctaEmail": "Send email",
+    "availability": "I reply within 24 h on business days.",
+    "preferred": "Email is best for technical conversations; LinkedIn for intros."
   },
   "cv": {
     "title": "Résumé",
@@ -78,6 +104,10 @@
   },
   "footer": {
     "rights": "All rights reserved",
-    "builtWith": "Built with TanStack Start and Tailwind"
+    "builtWith": "Built with TanStack Start and Tailwind",
+    "konami": "Tip: try the Konami code."
+  },
+  "easter": {
+    "unlocked": "Lab mode unlocked. Enjoy the lime green."
   }
 }
