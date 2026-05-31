@@ -7,13 +7,13 @@ import { Reveal } from "@/components/reveal";
 export const Route = createFileRoute("/skills")({
   head: () => ({
     meta: [
-      { title: "Skills & Education — Ubaldo Santos" },
+      { title: "Skills & Education — Ubaldo Santos Patón" },
       { name: "description", content: "Languages, frameworks, practices, education and spoken languages." },
-      { property: "og:title", content: "Skills & Education — Ubaldo Santos" },
+      { property: "og:title", content: "Skills & Education — Ubaldo Santos Patón" },
       { property: "og:description", content: "Tools, practices and languages I work with." },
-      { property: "og:url", content: "/skills" },
+      { property: "og:url", content: "https://ubaldo.is-a.dev/skills" },
     ],
-    links: [{ rel: "canonical", href: "/skills" }],
+    links: [{ rel: "canonical", href: "https://ubaldo.is-a.dev/skills" }],
   }),
   component: SkillsPage,
 });
