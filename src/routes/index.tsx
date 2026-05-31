@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowUpRight, Printer } from "lucide-react";
 import { motion } from "motion/react";
 import { cv } from "@/data/cv";
+import mePhoto from "@/assets/me.webp";
 import { currentLang, formatPeriod } from "@/lib/format";
 import { Reveal } from "@/components/reveal";
 
