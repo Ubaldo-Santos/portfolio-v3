@@ -1,86 +1,74 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Editorial-style custom cursor: a small dot + a larger ring that lags behind.
- * Expands on hover over interactive elements. Hidden on touch / coarse pointers.
- *
- * Interactive elements are detected via tag (a, button, [role=button], input, etc.)
- * or by adding `data-cursor="hover"` (label optional via `data-cursor-label`).
+ * Subtle editorial cursor: small inverted dot + thin outline ring that lags.
+ * On hover (links/buttons) the ring grows slightly. On click it pulses.
+ * Disabled on touch/coarse pointers.
  */
 export function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const [enabled, setEnabled] = useState(false);
   const [hovering, setHovering] = useState(false);
-  const [label, setLabel] = useState<string | null>(null);
+  const [pressed, setPressed] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const fine = window.matchMedia("(pointer: fine)").matches;
-    if (!fine) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
     setEnabled(true);
 
-    let mouseX = 0;
-    let mouseY = 0;
-    let ringX = 0;
-    let ringY = 0;
-    let raf = 0;
+    let mx = 0,
+      my = 0,
+      rx = 0,
+      ry = 0,
+      raf = 0;
 
     const onMove = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+      mx = e.clientX;
+      my = e.clientY;
       if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+        dotRef.current.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%)`;
       }
     };
-
     const tick = () => {
-      ringX += (mouseX - ringX) * 0.18;
-      ringY += (mouseY - ringY) * 0.18;
+      rx += (mx - rx) * 0.2;
+      ry += (my - ry) * 0.2;
       if (ringRef.current) {
-        ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+        ringRef.current.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
       }
       raf = requestAnimationFrame(tick);
     };
 
-    const isInteractive = (el: Element | null): HTMLElement | null => {
-      if (!el) return null;
-      const target = (el as HTMLElement).closest?.(
+    const isInteractive = (el: Element | null) =>
+      (el as HTMLElement | null)?.closest?.(
         'a, button, [role="button"], input, textarea, select, label, summary, [data-cursor="hover"]',
-      );
-      return (target as HTMLElement) ?? null;
-    };
+      ) as HTMLElement | null;
 
     const onOver = (e: MouseEvent) => {
-      const target = isInteractive(e.target as Element);
-      if (target) {
-        setHovering(true);
-        setLabel(target.dataset.cursorLabel ?? null);
-      }
+      if (isInteractive(e.target as Element)) setHovering(true);
     };
     const onOut = (e: MouseEvent) => {
-      const target = isInteractive(e.target as Element);
-      if (target) {
-        setHovering(false);
-        setLabel(null);
-      }
+      if (isInteractive(e.target as Element)) setHovering(false);
     };
+    const onDown = () => setPressed(true);
+    const onUp = () => setPressed(false);
     const onLeave = () => {
       if (dotRef.current) dotRef.current.style.opacity = "0";
       if (ringRef.current) ringRef.current.style.opacity = "0";
     };
     const onEnter = () => {
       if (dotRef.current) dotRef.current.style.opacity = "1";
-      if (ringRef.current) ringRef.current.style.opacity = "1";
+      if (ringRef.current) ringRef.current.style.opacity = "0.6";
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseover", onOver);
     window.addEventListener("mouseout", onOut);
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("mouseup", onUp);
     document.documentElement.addEventListener("mouseleave", onLeave);
     document.documentElement.addEventListener("mouseenter", onEnter);
     raf = requestAnimationFrame(tick);
-
     document.documentElement.classList.add("has-custom-cursor");
 
     return () => {
@@ -88,6 +76,8 @@ export function CustomCursor() {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
       window.removeEventListener("mouseout", onOut);
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mouseup", onUp);
       document.documentElement.removeEventListener("mouseleave", onLeave);
       document.documentElement.removeEventListener("mouseenter", onEnter);
       document.documentElement.classList.remove("has-custom-cursor");
@@ -95,6 +85,8 @@ export function CustomCursor() {
   }, []);
 
   if (!enabled) return null;
+
+  const ringSize = pressed ? 18 : hovering ? 44 : 26;
 
   return (
     <div className="no-print pointer-events-none fixed inset-0 z-[100]" aria-hidden>
@@ -105,21 +97,15 @@ export function CustomCursor() {
       />
       <div
         ref={ringRef}
-        className="fixed left-0 top-0 flex items-center justify-center rounded-full border border-foreground mix-blend-difference"
+        className="fixed left-0 top-0 rounded-full border border-foreground mix-blend-difference"
         style={{
-          width: hovering ? (label ? 72 : 40) : 28,
-          height: hovering ? (label ? 72 : 40) : 28,
+          width: ringSize,
+          height: ringSize,
+          opacity: 0.6,
           transition:
-            "width 250ms cubic-bezier(.4,0,.2,1), height 250ms cubic-bezier(.4,0,.2,1), opacity 200ms, background-color 200ms",
-          backgroundColor: hovering && !label ? "var(--foreground)" : "transparent",
+            "width 180ms cubic-bezier(.4,0,.2,1), height 180ms cubic-bezier(.4,0,.2,1), opacity 180ms",
         }}
-      >
-        {label && (
-          <span className="font-mono text-[10px] uppercase tracking-widest text-foreground">
-            {label}
-          </span>
-        )}
-      </div>
+      />
     </div>
   );
 }
