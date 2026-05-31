@@ -114,6 +114,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
+        <CustomCursor />
         <div className="flex min-h-screen flex-col">
           <Header />
           <main className="flex-1">
