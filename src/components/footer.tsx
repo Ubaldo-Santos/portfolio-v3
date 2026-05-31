@@ -24,9 +24,6 @@ export function Footer() {
         </div>
         <div className="text-left sm:text-right">
           <div className="font-mono text-[11px] uppercase tracking-widest">{t("footer.builtWith")}</div>
-          <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground/70">
-            {t("footer.konami")}
-          </div>
         </div>
       </div>
     </footer>

@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Moon, Sun, Printer, Menu, X } from "lucide-react";
-import { useRef, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { SUPPORTED_LANGS, type Lang } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -21,34 +20,12 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const currentLang = (i18n.language?.slice(0, 2) as Lang) || "es";
 
-  // Easter egg: click the accent dot 7 times to enable lab mode for 12 s.
-  const clicksRef = useRef(0);
-  const timerRef = useRef<number | null>(null);
-  const onLogoDotClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    clicksRef.current += 1;
-    if (timerRef.current) window.clearTimeout(timerRef.current);
-    timerRef.current = window.setTimeout(() => (clicksRef.current = 0), 1500);
-    if (clicksRef.current >= 7) {
-      clicksRef.current = 0;
-      document.documentElement.classList.add("lab-mode");
-      toast.success(t("easter.unlocked"));
-      window.setTimeout(() => document.documentElement.classList.remove("lab-mode"), 12000);
-    }
-  };
-
   return (
     <header className="no-print sticky top-0 z-50 border-b border-hairline bg-background/70 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
-        <Link to="/" className="group flex items-center gap-2 font-display text-2xl leading-none tracking-tight">
-          <button
-            type="button"
-            onClick={onLogoDotClick}
-            aria-label="Ubaldo"
-            className="size-2 rounded-full bg-accent transition-transform group-hover:scale-125"
-          />
-          <span>Ubaldo</span>
-          <span className="italic text-muted-foreground">Santos</span>
+        <Link to="/" className="flex items-baseline gap-2 font-display leading-none tracking-tight">
+          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Portfolio</span>
+          <span className="text-xl">Ubaldo Santos</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
