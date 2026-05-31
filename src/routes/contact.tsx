@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Mail, Phone, MapPin, Printer, ArrowUpRight, Copy, Check, AtSign } from "lucide-react";
+import { Mail, Phone, MapPin, Printer, ArrowUpRight, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { cv } from "@/data/cv";
 import { currentLang } from "@/lib/format";
