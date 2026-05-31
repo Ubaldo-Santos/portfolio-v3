@@ -170,3 +170,12 @@
   }
 }
 
+/* Easter-egg "lab mode": cycle the accent through electric lime */
+html.lab-mode {
+  --accent: oklch(0.9 0.22 130);
+  --ring: oklch(0.9 0.22 130);
+}
+html.lab-mode body {
+  transition: background-color 600ms ease;
+}
+

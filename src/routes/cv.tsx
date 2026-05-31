@@ -7,13 +7,14 @@ import { currentLang, formatPeriod } from "@/lib/format";
 export const Route = createFileRoute("/cv")({
   head: () => ({
     meta: [
-      { title: "CV — Ubaldo Santos" },
-      { name: "description", content: "Printable, ATS-friendly résumé of Ubaldo Santos." },
-      { property: "og:title", content: "CV — Ubaldo Santos" },
+      { title: "CV — Ubaldo Santos Patón" },
+      { name: "description", content: "Printable, ATS-friendly résumé of Ubaldo Santos Patón." },
+      { property: "og:title", content: "CV — Ubaldo Santos Patón" },
       { property: "og:description", content: "Hit print and save as PDF." },
-      { property: "og:url", content: "/cv" },
+      { property: "og:url", content: "https://ubaldo.is-a.dev/cv" },
+      { name: "robots", content: "noindex, follow" },
     ],
-    links: [{ rel: "canonical", href: "/cv" }],
+    links: [{ rel: "canonical", href: "https://ubaldo.is-a.dev/cv" }],
   }),
   component: CvPage,
 });
