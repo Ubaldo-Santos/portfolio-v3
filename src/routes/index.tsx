@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
 import { Reveal } from "@/components/reveal";
+import mePhoto from "@/assets/me.webp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
