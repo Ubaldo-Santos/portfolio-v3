@@ -3,19 +3,19 @@ import { useTranslation } from "react-i18next";
 import { ArrowUpRight, Printer } from "lucide-react";
 import { motion } from "motion/react";
 import { cv } from "@/data/cv";
-import mePhoto from "@/assets/me.webp";
 import { currentLang, formatPeriod } from "@/lib/format";
 import { Reveal } from "@/components/reveal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Ubaldo Santos — Full-Stack Software Engineer" },
+      { title: "Ubaldo Santos Patón — Full-Stack Software Engineer" },
       { name: "description", content: "Full-stack software engineer (TypeScript, PHP/Laravel, Vue). Currently at Wiris building Nubric, a math assessment platform." },
-      { property: "og:title", content: "Ubaldo Santos — Full-Stack Software Engineer" },
+      { property: "og:title", content: "Ubaldo Santos Patón — Full-Stack Software Engineer" },
       { property: "og:description", content: "Portfolio, projects and résumé." },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: "https://ubaldo.is-a.dev/" },
     ],
+    links: [{ rel: "canonical", href: "https://ubaldo.is-a.dev/" }],
   }),
   component: Home,
 });
@@ -42,35 +42,13 @@ function Home() {
             {t("home.available")}
           </motion.div>
 
-          <div className="mt-8 flex flex-col-reverse items-start gap-8 sm:mt-10 sm:flex-row sm:items-end sm:justify-between">
-            <h1 className="font-display text-[clamp(3rem,9vw,8rem)] leading-[0.95] tracking-tight">
-              <span className="block">Ubaldo</span>
-              <span className="block italic text-muted-foreground">Santos</span>
-            </h1>
-            <motion.figure
-              initial={{ opacity: 0, scale: 0.9, rotate: -3 }}
-              animate={{ opacity: 1, scale: 1, rotate: 2 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ rotate: -1, scale: 1.03 }}
-              className="group relative shrink-0"
-              data-cursor="hover"
-            >
-              <div className="absolute -inset-2 -z-10 rounded-md bg-accent/30 blur-xl transition-opacity duration-500 group-hover:opacity-100 sm:opacity-60" aria-hidden />
-              <img
-                src={mePhoto}
-                alt="Ubaldo Santos"
-                width={160}
-                height={200}
-                loading="eager"
-                className="size-32 rounded-md border border-hairline object-cover shadow-2xl saturate-[0.95] transition-all duration-500 group-hover:saturate-100 sm:size-40"
-              />
-              <figcaption className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-hairline bg-background px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                BCN · 2025
-              </figcaption>
-            </motion.figure>
-          </div>
+          <h1 className="mt-10 font-display text-[clamp(3rem,11vw,10rem)] leading-[0.9] tracking-tight">
+            <span className="block">Ubaldo</span>
+            <span className="block italic text-muted-foreground">Santos</span>
+            <span className="block text-foreground/70">Patón</span>
+          </h1>
 
-          <div className="mt-10 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
+          <div className="mt-12 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
             <p className="max-w-2xl text-balance text-xl leading-relaxed sm:text-2xl">
               {cv.basics.tagline[lang]}{" "}
               <span className="text-muted-foreground">{cv.basics.summary[lang].split("\n")[0]}</span>
@@ -98,13 +76,13 @@ function Home() {
         <div className="border-y border-hairline bg-surface/50 py-4 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-2 px-5 sm:px-8">
             <span>TypeScript</span>
-            <span>·</span>
+            <span aria-hidden>·</span>
             <span>PHP / Laravel</span>
-            <span>·</span>
+            <span aria-hidden>·</span>
             <span>Vue · Deno · Node</span>
-            <span>·</span>
+            <span aria-hidden>·</span>
             <span>Edtech · SDK · Integrations</span>
-            <span>·</span>
+            <span aria-hidden>·</span>
             <span>{t("home.based")}</span>
           </div>
         </div>
