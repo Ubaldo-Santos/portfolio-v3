@@ -192,12 +192,41 @@
   }
 }
 
-/* Easter-egg "lab mode": cycle the accent through electric lime */
-html.lab-mode {
-  --accent: oklch(0.9 0.22 130);
-  --ring: oklch(0.9 0.22 130);
+/* Konami easter-egg: celebratory ripple burst + brief page shimmer */
+.konami-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 95;
+  overflow: hidden;
 }
-html.lab-mode body {
-  transition: background-color 600ms ease;
+.konami-burst {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  margin-top: -4px;
+  border-radius: 9999px;
+  border: 2px solid color-mix(in oklab, var(--accent) 80%, transparent);
+  background: color-mix(in oklab, var(--accent) 25%, transparent);
+  animation: konami-burst 1600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+@keyframes konami-burst {
+  0%   { transform: scale(0.4); opacity: 0; }
+  15%  { opacity: 1; }
+  100% { transform: scale(28); opacity: 0; }
+}
+html.konami-celebrate {
+  animation: konami-shimmer 2200ms ease-in-out;
+}
+@keyframes konami-shimmer {
+  0%, 100% { filter: none; }
+  25%      { filter: hue-rotate(40deg) saturate(1.15); }
+  60%      { filter: hue-rotate(-25deg) saturate(1.1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.konami-celebrate { animation: none; }
+  .konami-burst { animation: none; opacity: 0; }
 }
 
