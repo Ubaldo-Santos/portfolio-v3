@@ -160,3 +160,13 @@
 .print-only {
   display: none;
 }
+
+/* Custom cursor: hide native cursor on fine-pointer devices only */
+@media (pointer: fine) {
+  html.has-custom-cursor,
+  html.has-custom-cursor body,
+  html.has-custom-cursor * {
+    cursor: none !important;
+  }
+}
+

@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/components/i18n-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { CustomCursor } from "@/components/custom-cursor";
 
 function NotFoundComponent() {
   return (
@@ -113,6 +114,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
+        <CustomCursor />
         <div className="flex min-h-screen flex-col">
           <Header />
           <main className="flex-1">

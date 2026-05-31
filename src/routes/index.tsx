@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowUpRight, Printer } from "lucide-react";
 import { motion } from "motion/react";
 import { cv } from "@/data/cv";
+import mePhoto from "@/assets/me.webp";
 import { currentLang, formatPeriod } from "@/lib/format";
 import { Reveal } from "@/components/reveal";
 
@@ -41,10 +42,33 @@ function Home() {
             {t("home.available")}
           </motion.div>
 
-          <h1 className="mt-8 font-display text-[clamp(3rem,9vw,8rem)] leading-[0.95] tracking-tight">
-            <span className="block">Ubaldo</span>
-            <span className="block italic text-muted-foreground">Santos</span>
-          </h1>
+          <div className="mt-8 flex flex-col-reverse items-start gap-8 sm:mt-10 sm:flex-row sm:items-end sm:justify-between">
+            <h1 className="font-display text-[clamp(3rem,9vw,8rem)] leading-[0.95] tracking-tight">
+              <span className="block">Ubaldo</span>
+              <span className="block italic text-muted-foreground">Santos</span>
+            </h1>
+            <motion.figure
+              initial={{ opacity: 0, scale: 0.9, rotate: -3 }}
+              animate={{ opacity: 1, scale: 1, rotate: 2 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ rotate: -1, scale: 1.03 }}
+              className="group relative shrink-0"
+              data-cursor="hover"
+            >
+              <div className="absolute -inset-2 -z-10 rounded-md bg-accent/30 blur-xl transition-opacity duration-500 group-hover:opacity-100 sm:opacity-60" aria-hidden />
+              <img
+                src={mePhoto}
+                alt="Ubaldo Santos"
+                width={160}
+                height={200}
+                loading="eager"
+                className="size-32 rounded-md border border-hairline object-cover shadow-2xl saturate-[0.95] transition-all duration-500 group-hover:saturate-100 sm:size-40"
+              />
+              <figcaption className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-hairline bg-background px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                BCN · 2025
+              </figcaption>
+            </motion.figure>
+          </div>
 
           <div className="mt-10 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
             <p className="max-w-2xl text-balance text-xl leading-relaxed sm:text-2xl">
