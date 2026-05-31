@@ -117,16 +117,15 @@ function ContactPage() {
                   <span className="grid size-10 shrink-0 place-items-center rounded-full border border-hairline bg-background font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                     {p.network.slice(0, 2)}
                   </span>
-                    <span>
-                      <span className="block font-display text-xl leading-tight">{p.network}</span>
-                      <span className="block font-mono text-xs text-muted-foreground">@{p.username}</span>
-                    </span>
+                  <span>
+                    <span className="block font-display text-xl leading-tight">{p.network}</span>
+                    <span className="block font-mono text-xs text-muted-foreground">@{p.username}</span>
                   </span>
-                  <ArrowUpRight className="size-5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                </a>
-              </Reveal>
-            );
-          })}
+                </span>
+                <ArrowUpRight className="size-5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </a>
+            </Reveal>
+          ))}
         </div>
       </section>
     </div>
