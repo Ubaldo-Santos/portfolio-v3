@@ -12,7 +12,6 @@ const navItems = [
   { to: "/experience", key: "experience" },
   { to: "/projects", key: "projects" },
   { to: "/skills", key: "skills" },
-  { to: "/ai", key: "ai" },
   { to: "/contact", key: "contact" },
 ] as const;
 

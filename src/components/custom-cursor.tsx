@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
+type Ripple = { id: number; x: number; y: number };
+
 /**
  * Subtle editorial cursor: small inverted dot + thin outline ring that lags.
- * On hover (links/buttons) the ring grows slightly. On click it pulses.
+ * On hover (links/buttons) the ring grows slightly. On click it emits a ripple
+ * wave in the accent color from the click position.
  * Disabled on touch/coarse pointers.
  */
 export function CustomCursor() {
@@ -11,6 +14,8 @@ export function CustomCursor() {
   const [enabled, setEnabled] = useState(false);
   const [hovering, setHovering] = useState(false);
   const [pressed, setPressed] = useState(false);
+  const [ripples, setRipples] = useState<Ripple[]>([]);
+  const rippleIdRef = useRef(0);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -50,7 +55,14 @@ export function CustomCursor() {
     const onOut = (e: MouseEvent) => {
       if (isInteractive(e.target as Element)) setHovering(false);
     };
-    const onDown = () => setPressed(true);
+    const onDown = (e: MouseEvent) => {
+      setPressed(true);
+      const id = ++rippleIdRef.current;
+      setRipples((rs) => [...rs, { id, x: e.clientX, y: e.clientY }]);
+      window.setTimeout(() => {
+        setRipples((rs) => rs.filter((r) => r.id !== id));
+      }, 700);
+    };
     const onUp = () => setPressed(false);
     const onLeave = () => {
       if (dotRef.current) dotRef.current.style.opacity = "0";
@@ -106,6 +118,15 @@ export function CustomCursor() {
             "width 180ms cubic-bezier(.4,0,.2,1), height 180ms cubic-bezier(.4,0,.2,1), opacity 180ms",
         }}
       />
+      {ripples.map((r) => (
+        <span
+          key={r.id}
+          className="cursor-ripple fixed left-0 top-0 rounded-full"
+          style={{
+            transform: `translate3d(${r.x}px, ${r.y}px, 0) translate(-50%, -50%)`,
+          }}
+        />
+      ))}
     </div>
   );
 }
