@@ -110,13 +110,10 @@
   }
 }
 
-@utility font-display {
+.font-display {
   font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: -0.02em;
-}
-@utility font-mono {
-  font-family: var(--font-mono);
 }
 
 /* Reveal-on-scroll animation handled with motion; provide reduced-motion fallback */
