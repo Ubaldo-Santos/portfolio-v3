@@ -29,7 +29,22 @@ function Home() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="mx-auto max-w-6xl px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:pt-36">
+        {/* Decorative photo blended into the background */}
+        <div className="pointer-events-none absolute inset-0 -z-0" aria-hidden>
+          <div className="absolute -right-[10%] top-[6%] h-[78%] w-[55%] sm:w-[42%] lg:w-[36%]">
+            <img
+              src={mePhoto}
+              alt=""
+              className="size-full object-cover object-center opacity-25 mix-blend-luminosity grayscale contrast-110 [mask-image:radial-gradient(60%_70%_at_55%_45%,black_30%,transparent_85%)]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-background/40 to-background" />
+            <div className="absolute -inset-x-10 -top-10 h-40 bg-gradient-to-b from-background to-transparent" />
+            <div className="absolute -inset-x-10 -bottom-10 h-40 bg-gradient-to-t from-background to-transparent" />
+            <div className="absolute right-10 top-10 size-40 rounded-full bg-accent/15 blur-3xl" />
+          </div>
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-6xl px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:pt-36">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
