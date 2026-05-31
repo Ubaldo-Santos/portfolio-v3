@@ -44,25 +44,35 @@ function CvPage() {
 
       <article className="mx-auto max-w-4xl bg-background px-6 py-10 sm:px-12 sm:py-14 print:px-0 print:py-0">
         {/* Header */}
-        <header className="cv-block">
-          <h1 className="text-3xl font-semibold print:text-[22pt]">{cv.basics.name}</h1>
-          <p className="mt-1 text-base text-muted-foreground print:text-[11pt] print:text-black">
-            {cv.basics.label[lang]}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground print:text-[10pt] print:text-black">
-            <span>{cv.basics.email}</span>
-            <span aria-hidden>·</span>
-            <span>{cv.basics.phone}</span>
-            <span aria-hidden>·</span>
-            <span>{cv.basics.location[lang]}</span>
-            <span aria-hidden>·</span>
-            <span>{cv.basics.url}</span>
-            {cv.basics.profiles.map((p) => (
-              <span key={p.network} className="inline-flex gap-1">
-                <span aria-hidden>·</span>
-                <span>{p.network}: {p.url.replace(/^https?:\/\//, "")}</span>
-              </span>
-            ))}
+        <header className="cv-block flex items-start gap-5">
+          <img
+            src={mePhoto}
+            alt={cv.basics.name}
+            width={72}
+            height={72}
+            loading="eager"
+            className="size-[72px] shrink-0 rounded-full object-cover ring-1 ring-black/10 print:size-[64px]"
+          />
+          <div className="min-w-0 flex-1">
+            <h1 className="text-3xl font-semibold print:text-[22pt]">{cv.basics.name}</h1>
+            <p className="mt-1 text-base text-muted-foreground print:text-[11pt] print:text-black">
+              {cv.basics.label[lang]}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground print:text-[10pt] print:text-black">
+              <span>{cv.basics.email}</span>
+              <span aria-hidden>·</span>
+              <span>{cv.basics.phone}</span>
+              <span aria-hidden>·</span>
+              <span>{cv.basics.location[lang]}</span>
+              <span aria-hidden>·</span>
+              <span>{cv.basics.url}</span>
+              {cv.basics.profiles.map((p) => (
+                <span key={p.network} className="inline-flex gap-1">
+                  <span aria-hidden>·</span>
+                  <span>{p.network}: {p.url.replace(/^https?:\/\//, "")}</span>
+                </span>
+              ))}
+            </div>
           </div>
         </header>
 
