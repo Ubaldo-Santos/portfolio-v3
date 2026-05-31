@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Mail, Phone, MapPin, Printer, ArrowUpRight, Copy, Check, Linkedin, Github } from "lucide-react";
+import { Mail, Phone, MapPin, Printer, ArrowUpRight, Copy, Check, AtSign } from "lucide-react";
 import { useState } from "react";
 import { cv } from "@/data/cv";
 import { currentLang } from "@/lib/format";
@@ -109,11 +109,9 @@ function ContactPage() {
                 className="group flex items-center justify-between rounded-2xl border border-hairline bg-surface/40 p-5 transition-colors hover:bg-surface"
               >
                 <div className="flex items-center gap-3">
-                  {p.network === "LinkedIn" ? (
-                    <Linkedin className="size-5 text-muted-foreground" aria-hidden />
-                  ) : (
-                    <Github className="size-5 text-muted-foreground" aria-hidden />
-                  )}
+                  <span aria-hidden className="grid size-9 place-items-center rounded-full border border-hairline bg-background font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    {p.network.slice(0, 2)}
+                  </span>
                   <div>
                     <div className="font-display text-xl">{p.network}</div>
                     <div className="font-mono text-xs text-muted-foreground">@{p.username}</div>
