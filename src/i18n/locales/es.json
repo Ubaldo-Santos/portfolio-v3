@@ -93,9 +93,7 @@
   "cv": {
     "title": "Currículum",
     "subtitle": "Versión optimizada para impresión y parsers ATS.",
-    "printHint": "Descarga el PDF con un clic.",
-    "generatingPdf": "Generando PDF…",
-    "downloadError": "No se pudo generar el PDF. Inténtalo de nuevo.",
+    "printHint": "Pulsa imprimir y guarda como PDF.",
     "profile": "Perfil",
     "experience": "Experiencia profesional",
     "education": "Educación",

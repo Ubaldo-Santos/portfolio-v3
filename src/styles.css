@@ -146,6 +146,7 @@
     color: #000000 !important;
     font-size: 10.5pt;
     font-family: Georgia, "Times New Roman", serif;
+    overflow: visible !important;
   }
   .no-print,
   [data-sonner-toaster] {
@@ -157,6 +158,19 @@
   a {
     color: #000 !important;
     text-decoration: none !important;
+  }
+  #cv-article {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #cv-article ul {
+    list-style-position: outside;
+    padding-left: 1.25rem;
+    margin-left: 0;
+  }
+  #cv-article ul li {
+    display: list-item;
   }
   h1, h2, h3 {
     page-break-after: avoid;
