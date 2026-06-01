@@ -147,7 +147,8 @@
     font-size: 10.5pt;
     font-family: Georgia, "Times New Roman", serif;
   }
-  .no-print {
+  .no-print,
+  [data-sonner-toaster] {
     display: none !important;
   }
   .print-only {

@@ -93,9 +93,7 @@
   "cv": {
     "title": "Résumé",
     "subtitle": "Optimized for print and ATS parsers.",
-    "printHint": "Download the PDF in one click.",
-    "generatingPdf": "Generating PDF…",
-    "downloadError": "Could not generate the PDF. Please try again.",
+    "printHint": "Hit print and save as PDF.",
     "profile": "Profile",
     "experience": "Professional experience",
     "education": "Education",
