@@ -114,12 +114,8 @@ function Home() {
             </div>
           </div>
 
-          {/* Bottom row: scroll hint */}
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-            <ArrowDown className="size-3 animate-bounce" />
-            {t("home.scrollHint")}
-          </div>
         </div>
+
 
         {/* Marquee-style ticker — pinned to bottom of hero */}
         <div className="relative z-10 border-y border-hairline bg-surface/50 py-3 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
