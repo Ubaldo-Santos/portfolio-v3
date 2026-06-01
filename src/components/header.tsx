@@ -13,6 +13,7 @@ const navItems = [
   { to: "/projects", key: "projects" },
   { to: "/skills", key: "skills" },
   { to: "/contact", key: "contact" },
+  { to: "/cv", key: "cv" },
 ] as const;
 
 export function Header() {
@@ -74,8 +75,6 @@ export function Header() {
           >
             {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </button>
-
-
 
           <button
             onClick={() => setOpen((o) => !o)}
