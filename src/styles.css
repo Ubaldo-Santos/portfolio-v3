@@ -238,3 +238,28 @@ html.konami-celebrate {
   .konami-burst { animation: none; opacity: 0; }
 }
 
+/* Neon-lime glow for the primary CV download CTA */
+.btn-neon-cv {
+  position: relative;
+  background: color-mix(in oklab, var(--accent) 18%, var(--background));
+  color: var(--foreground);
+  border: 1px solid color-mix(in oklab, var(--accent) 70%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--accent) 25%, transparent),
+    0 0 14px color-mix(in oklab, var(--accent) 55%, transparent),
+    0 0 30px color-mix(in oklab, var(--accent) 30%, transparent);
+  transition: box-shadow 220ms ease, transform 220ms ease, background-color 220ms ease;
+}
+.btn-neon-cv:hover {
+  background: color-mix(in oklab, var(--accent) 28%, var(--background));
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--accent) 40%, transparent),
+    0 0 22px color-mix(in oklab, var(--accent) 75%, transparent),
+    0 0 48px color-mix(in oklab, var(--accent) 45%, transparent);
+  transform: translateY(-1px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-neon-cv { transition: none; }
+  .btn-neon-cv:hover { transform: none; }
+}
+
