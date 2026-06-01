@@ -71,13 +71,6 @@ export function Header() {
             {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </button>
 
-          <Link
-            to="/cv"
-            className="ml-1 hidden items-center gap-1.5 rounded-full bg-foreground px-3.5 py-2 text-xs font-medium uppercase tracking-wider text-background transition-opacity hover:opacity-90 sm:inline-flex"
-          >
-            <Printer className="size-3.5" />
-            {t("actions.printCv")}
-          </Link>
 
           <button
             onClick={() => setOpen((o) => !o)}
