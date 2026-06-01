@@ -62,8 +62,9 @@ function Home() {
           </motion.div>
 
           {/* Name block — centered vertically */}
-          <div className="flex flex-1 flex-col justify-center py-10 sm:py-14">
-            <h1 className="font-display text-[clamp(3rem,13vw,11rem)] leading-[0.86] tracking-tight">
+          <div className="flex flex-1 flex-col justify-center py-8 sm:py-10">
+            <h1 className="font-display text-[clamp(2.75rem,12vw,10rem)] leading-[0.86] tracking-tight">
+
               <span className="block">Ubaldo</span>
               <span className="font-display-italic block text-muted-foreground">Santos Patón</span>
             </h1>
