@@ -23,8 +23,7 @@ export async function downloadCv(filename = "ubaldo-santos-paton-cv.pdf") {
         backgroundColor: "#ffffff",
       },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      pagebreak: { mode: ["css", "legacy"] },
-    })
+    } as never)
     .from(target)
     .save();
 }
