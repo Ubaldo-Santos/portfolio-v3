@@ -118,16 +118,6 @@ function Section({ title, items, lang }: { title: string; items: readonly WorkIt
                               </span>
                             ))}
                           </div>
-                          {idx === 0 && group.length > 1 && (
-                            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-hairline bg-muted/40 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                              <span className="size-1 rounded-full bg-accent" aria-hidden />
-                              {lang === "es"
-                                ? "Cambio interno de equipo"
-                                : lang === "ca"
-                                  ? "Canvi intern d'equip"
-                                  : "Internal team change"}
-                            </div>
-                          )}
                         </li>
                       ))}
                     </ol>
