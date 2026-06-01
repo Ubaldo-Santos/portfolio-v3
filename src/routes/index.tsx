@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ArrowUpRight, Printer } from "lucide-react";
+import { ArrowUpRight, ArrowDown } from "lucide-react";
 import { motion } from "motion/react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
@@ -29,48 +29,97 @@ function Home() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="relative z-10 mx-auto max-w-6xl px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:pt-36">
+        {/* Soft accent wash */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-40 right-[-10%] size-[680px] rounded-full bg-accent/20 blur-[140px]"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute bottom-0 left-[-10%] size-[420px] rounded-full bg-accent/10 blur-[120px]"
+        />
+
+        <div className="relative z-10 mx-auto max-w-6xl px-5 pb-28 pt-20 sm:px-8 sm:pt-28 lg:pt-36">
+          {/* Top meta row */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground"
+            transition={{ duration: 0.5 }}
+            className="flex flex-wrap items-center justify-between gap-4 font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground"
           >
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
-              <span className="relative inline-flex size-2 rounded-full bg-accent" />
-            </span>
-            {t("home.available")}
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+                <span className="relative inline-flex size-2 rounded-full bg-accent" />
+              </span>
+              {t("home.available")}
+            </div>
+            <div className="hidden items-center gap-2 sm:flex">
+              <span>↳ {t("home.based")}</span>
+              <span aria-hidden>·</span>
+              <span>2026</span>
+            </div>
           </motion.div>
 
-          <h1 className="mt-10 font-display text-[clamp(3rem,10vw,9rem)] leading-[0.9] tracking-tight">
-            <span className="block">Ubaldo</span>
-            <span className="block italic text-muted-foreground">Santos</span>
-            <span className="block text-foreground/70">Patón</span>
-          </h1>
+          {/* Name block */}
+          <div className="mt-14">
+            <h1 className="font-display text-[clamp(3.25rem,11.5vw,10.5rem)] leading-[0.88] tracking-tight">
+              <span className="block">Ubaldo</span>
+              <span className="font-display-italic block text-muted-foreground">Santos Patón</span>
+            </h1>
+          </div>
 
+          {/* Divider */}
+          <div className="mt-16 h-px w-full bg-hairline" />
 
-          <div className="mt-12 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
-            <p className="max-w-2xl text-balance text-xl leading-relaxed sm:text-2xl">
-              {cv.basics.tagline[lang]}{" "}
-              <span className="text-muted-foreground">{cv.basics.summary[lang].split("\n")[0]}</span>
-            </p>
-            <div className="space-y-6 border-l border-hairline pl-6">
-              <div>
-                <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                  {t("home.currentRole")}
-                </div>
-                <div className="mt-2 text-base">{t("home.atWiris")}</div>
+          {/* Fractioned info grid */}
+          <div className="grid gap-x-10 gap-y-12 pt-10 sm:grid-cols-12">
+            {/* Role / now */}
+            <div className="sm:col-span-4">
+              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                01 — {t("home.currentRole")}
               </div>
-              <div className="flex flex-wrap gap-2 pt-2">
-                <Link to="/cv" className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm text-background transition-opacity hover:opacity-90">
-                  <Printer className="size-4" /> {t("actions.printCv")}
+              <p className="mt-4 text-base leading-relaxed">{t("home.atWiris")}</p>
+            </div>
+
+            {/* Tagline */}
+            <div className="sm:col-span-5">
+              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                02 — {lang === "es" ? "Qué hago" : lang === "ca" ? "Què faig" : "What I do"}
+              </div>
+              <p className="font-display mt-4 text-2xl leading-snug text-balance sm:text-3xl">
+                {cv.basics.tagline[lang]}
+              </p>
+            </div>
+
+            {/* Contact / CTA */}
+            <div className="sm:col-span-3">
+              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                03 — {lang === "es" ? "Contacto" : lang === "ca" ? "Contacte" : "Reach out"}
+              </div>
+              <div className="mt-4 flex flex-col gap-3">
+                <Link
+                  to="/contact"
+                  className="group inline-flex items-center justify-between gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3"
+                >
+                  {t("actions.contactMe")}
+                  <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </Link>
-                <Link to="/contact" className="inline-flex items-center gap-2 rounded-full border border-hairline px-4 py-2 text-sm transition-colors hover:bg-surface">
-                  {t("actions.contactMe")} <ArrowUpRight className="size-4" />
+                <Link
+                  to="/cv"
+                  className="group inline-flex items-center gap-1.5 px-1 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                >
+                  {t("actions.viewCv")}
+                  <ArrowUpRight className="size-3.5 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Scroll hint */}
+          <div className="mt-20 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+            <ArrowDown className="size-3 animate-bounce" />
+            {t("home.scrollHint")}
           </div>
         </div>
 
