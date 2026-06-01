@@ -98,14 +98,6 @@ export function Header() {
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
-            <Link
-              to="/cv"
-              onClick={() => setOpen(false)}
-              className="mt-2 flex items-center gap-2 rounded-md bg-foreground px-3 py-3 text-base text-background"
-            >
-              <Printer className="size-4" />
-              {t("actions.printCv")}
-            </Link>
             <div className="mt-3 flex items-center gap-2 px-3 pb-2">
               <span className="text-xs uppercase tracking-wider text-muted-foreground">{t("actions.language")}</span>
               {SUPPORTED_LANGS.map((lng) => (
