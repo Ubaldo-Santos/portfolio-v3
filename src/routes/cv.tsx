@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Printer } from "lucide-react";
+import { Loader2, Printer } from "lucide-react";
+import { toast } from "sonner";
 import { cv, type WorkItem } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
+import { downloadCv } from "@/lib/download-cv";
 
 export const Route = createFileRoute("/cv")({
   head: () => ({
@@ -10,7 +13,7 @@ export const Route = createFileRoute("/cv")({
       { title: "CV — Ubaldo Santos Patón" },
       { name: "description", content: "Printable, ATS-friendly résumé of Ubaldo Santos Patón." },
       { property: "og:title", content: "CV — Ubaldo Santos Patón" },
-      { property: "og:description", content: "Hit print and save as PDF." },
+      { property: "og:description", content: "One-click PDF download." },
       { property: "og:url", content: "https://ubaldo.is-a.dev/cv" },
       { name: "robots", content: "noindex, follow" },
     ],
@@ -22,6 +25,18 @@ export const Route = createFileRoute("/cv")({
 function CvPage() {
   const { t, i18n } = useTranslation();
   const lang = currentLang(i18n.language);
+  const [exporting, setExporting] = useState(false);
+
+  async function handleExportPdf() {
+    setExporting(true);
+    try {
+      await downloadCv();
+    } catch {
+      toast.error(t("cv.downloadError"));
+    } finally {
+      setExporting(false);
+    }
+  }
 
   return (
     <div className="bg-background">
@@ -36,11 +51,17 @@ function CvPage() {
           </div>
           <button
             type="button"
-            onClick={() => window.print()}
-            className="btn-neon-cv inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium uppercase tracking-wider"
+            onClick={handleExportPdf}
+            disabled={exporting}
+            aria-busy={exporting}
+            className="btn-neon-cv inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium uppercase tracking-wider disabled:pointer-events-none disabled:opacity-60"
           >
-            <Printer className="size-3.5" aria-hidden />
-            <span>{t("actions.printCv")}</span>
+            {exporting ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            ) : (
+              <Printer className="size-3.5" aria-hidden />
+            )}
+            <span>{exporting ? t("cv.generatingPdf") : t("actions.printCv")}</span>
           </button>
         </div>
       </div>
