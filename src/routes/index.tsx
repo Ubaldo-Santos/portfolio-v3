@@ -29,21 +29,6 @@ function Home() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden">
-        {/* Decorative photo blended into the background */}
-        <div className="pointer-events-none absolute inset-0 -z-0" aria-hidden>
-          <div className="absolute -right-[10%] top-[6%] h-[78%] w-[55%] sm:w-[42%] lg:w-[36%]">
-            <img
-              src={mePhoto}
-              alt=""
-              className="size-full object-cover object-center opacity-25 mix-blend-luminosity grayscale contrast-110 [mask-image:radial-gradient(60%_70%_at_55%_45%,black_30%,transparent_85%)]"
-            />
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-background/40 to-background" />
-            <div className="absolute -inset-x-10 -top-10 h-40 bg-gradient-to-b from-background to-transparent" />
-            <div className="absolute -inset-x-10 -bottom-10 h-40 bg-gradient-to-t from-background to-transparent" />
-            <div className="absolute right-10 top-10 size-40 rounded-full bg-accent/15 blur-3xl" />
-          </div>
-        </div>
-
         <div className="relative z-10 mx-auto max-w-6xl px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:pt-36">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -58,11 +43,36 @@ function Home() {
             {t("home.available")}
           </motion.div>
 
-          <h1 className="mt-10 font-display text-[clamp(3rem,11vw,10rem)] leading-[0.9] tracking-tight">
-            <span className="block">Ubaldo</span>
-            <span className="block italic text-muted-foreground">Santos</span>
-            <span className="block text-foreground/70">Patón</span>
-          </h1>
+          <div className="mt-10 grid items-center gap-10 lg:grid-cols-[1fr_auto]">
+            <h1 className="font-display text-[clamp(3rem,10vw,9rem)] leading-[0.9] tracking-tight">
+              <span className="block">Ubaldo</span>
+              <span className="block italic text-muted-foreground">Santos</span>
+              <span className="block text-foreground/70">Patón</span>
+            </h1>
+
+            {/* Portrait — colored, integrated, close to the name */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="relative mx-auto hidden sm:block"
+            >
+              <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-accent/25 blur-2xl" aria-hidden />
+              <div className="absolute -bottom-3 -right-3 -z-10 size-full rounded-[1.6rem] border border-hairline" aria-hidden />
+              <img
+                src={mePhoto}
+                alt="Retrato de Ubaldo Santos Patón"
+                width={260}
+                height={320}
+                loading="eager"
+                decoding="async"
+                className="relative size-[200px] rounded-[1.6rem] object-cover object-center shadow-xl ring-1 ring-hairline sm:size-[240px] lg:size-[280px]"
+              />
+              <div className="pointer-events-none absolute -bottom-2 left-3 rounded-full border border-hairline bg-background/90 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground backdrop-blur">
+                Barcelona · ES
+              </div>
+            </motion.div>
+          </div>
 
           <div className="mt-12 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
             <p className="max-w-2xl text-balance text-xl leading-relaxed sm:text-2xl">
@@ -87,6 +97,7 @@ function Home() {
             </div>
           </div>
         </div>
+
 
         {/* Marquee-style ticker */}
         <div className="border-y border-hairline bg-surface/50 py-4 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
