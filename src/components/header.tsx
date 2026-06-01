@@ -71,7 +71,13 @@ export function Header() {
           >
             {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </button>
-
+          <button
+            onClick={() => downloadCv()}
+            className="btn-neon-cv ml-1 hidden items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider sm:inline-flex"
+          >
+            <Download className="size-3.5" />
+            {t("actions.downloadCv")}
+          </button>
 
           <button
             onClick={() => setOpen((o) => !o)}
