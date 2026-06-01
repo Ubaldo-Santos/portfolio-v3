@@ -25,18 +25,24 @@ function CvPage() {
 
   return (
     <div className="bg-background">
-      {/* Screen-only toolbar */}
+      {/* Screen-only toolbar — aligned with navbar height */}
       <div className="no-print sticky top-16 z-40 border-b border-hairline bg-background/80 backdrop-blur">
-        <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-5 py-3 sm:px-8">
-          <div>
-            <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{t("cv.title")}</div>
-            <div className="text-sm text-muted-foreground">{t("cv.printHint")}</div>
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
+          <div className="flex items-baseline gap-3">
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+              {t("cv.title")}
+            </div>
+            <div className="hidden text-xs text-muted-foreground sm:block">· {t("cv.printHint")}</div>
           </div>
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm text-background hover:opacity-90"
+            className="group inline-flex items-center gap-2 rounded-full border border-hairline bg-surface/60 px-4 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-accent hover:bg-accent/15"
           >
-            <Printer className="size-4" /> {t("actions.printCv")}
+            <Printer className="size-3.5" />
+            <span>{t("actions.printCv")}</span>
+            <kbd className="hidden rounded border border-hairline bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline">
+              ⌘P
+            </kbd>
           </button>
         </div>
       </div>

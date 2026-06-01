@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Moon, Sun, Printer, Menu, X } from "lucide-react";
+import { Moon, Sun, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { SUPPORTED_LANGS, type Lang } from "@/i18n";
@@ -71,13 +71,6 @@ export function Header() {
             {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </button>
 
-          <Link
-            to="/cv"
-            className="ml-1 hidden items-center gap-1.5 rounded-full bg-foreground px-3.5 py-2 text-xs font-medium uppercase tracking-wider text-background transition-opacity hover:opacity-90 sm:inline-flex"
-          >
-            <Printer className="size-3.5" />
-            {t("actions.printCv")}
-          </Link>
 
           <button
             onClick={() => setOpen((o) => !o)}
@@ -105,14 +98,6 @@ export function Header() {
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
-            <Link
-              to="/cv"
-              onClick={() => setOpen(false)}
-              className="mt-2 flex items-center gap-2 rounded-md bg-foreground px-3 py-3 text-base text-background"
-            >
-              <Printer className="size-4" />
-              {t("actions.printCv")}
-            </Link>
             <div className="mt-3 flex items-center gap-2 px-3 pb-2">
               <span className="text-xs uppercase tracking-wider text-muted-foreground">{t("actions.language")}</span>
               {SUPPORTED_LANGS.map((lng) => (

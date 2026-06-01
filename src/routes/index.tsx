@@ -28,7 +28,7 @@ function Home() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden">
+      <section className="relative flex min-h-[100svh] flex-col overflow-hidden">
         {/* Soft accent wash */}
         <div
           aria-hidden
@@ -39,13 +39,13 @@ function Home() {
           className="pointer-events-none absolute bottom-0 left-[-10%] size-[420px] rounded-full bg-accent/10 blur-[120px]"
         />
 
-        <div className="relative z-10 mx-auto max-w-6xl px-5 pb-28 pt-20 sm:px-8 sm:pt-28 lg:pt-36">
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 pb-10 pt-8 sm:px-8 sm:pb-14 sm:pt-12">
           {/* Top meta row */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex flex-wrap items-center justify-between gap-4 font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground"
+            className="flex flex-wrap items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground sm:text-[11px]"
           >
             <div className="flex items-center gap-2.5">
               <span className="relative flex size-2">
@@ -61,80 +61,76 @@ function Home() {
             </div>
           </motion.div>
 
-          {/* Name block */}
-          <div className="mt-14">
-            <h1 className="font-display text-[clamp(3.25rem,11.5vw,10.5rem)] leading-[0.88] tracking-tight">
+          {/* Name block — centered vertically */}
+          <div className="flex flex-1 flex-col justify-center py-10 sm:py-14">
+            <h1 className="font-display text-[clamp(3rem,13vw,11rem)] leading-[0.86] tracking-tight">
               <span className="block">Ubaldo</span>
               <span className="font-display-italic block text-muted-foreground">Santos Patón</span>
             </h1>
-          </div>
 
-          {/* Divider */}
-          <div className="mt-16 h-px w-full bg-hairline" />
+            {/* Divider */}
+            <div className="mt-10 h-px w-full bg-hairline sm:mt-14" />
 
-          {/* Fractioned info grid */}
-          <div className="grid gap-x-10 gap-y-12 pt-10 sm:grid-cols-12">
-            {/* Role / now */}
-            <div className="sm:col-span-4">
-              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                01 — {t("home.currentRole")}
+            {/* Fractioned info grid */}
+            <div className="grid gap-x-10 gap-y-10 pt-8 sm:grid-cols-12 sm:gap-y-12 sm:pt-10">
+              <div className="sm:col-span-4">
+                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                  01 — {t("home.currentRole")}
+                </div>
+                <p className="mt-3 text-sm leading-relaxed sm:mt-4 sm:text-base">{t("home.atWiris")}</p>
               </div>
-              <p className="mt-4 text-base leading-relaxed">{t("home.atWiris")}</p>
-            </div>
 
-            {/* Tagline */}
-            <div className="sm:col-span-5">
-              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                02 — {lang === "es" ? "Qué hago" : lang === "ca" ? "Què faig" : "What I do"}
+              <div className="sm:col-span-5">
+                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                  02 — {lang === "es" ? "Qué hago" : lang === "ca" ? "Què faig" : "What I do"}
+                </div>
+                <p className="font-display mt-3 text-xl leading-snug text-balance sm:mt-4 sm:text-2xl lg:text-3xl">
+                  {cv.basics.tagline[lang]}
+                </p>
               </div>
-              <p className="font-display mt-4 text-2xl leading-snug text-balance sm:text-3xl">
-                {cv.basics.tagline[lang]}
-              </p>
-            </div>
 
-            {/* Contact / CTA */}
-            <div className="sm:col-span-3">
-              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                03 — {lang === "es" ? "Contacto" : lang === "ca" ? "Contacte" : "Reach out"}
-              </div>
-              <div className="mt-4 flex flex-col gap-3">
-                <Link
-                  to="/contact"
-                  className="group inline-flex items-center justify-between gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3"
-                >
-                  {t("actions.contactMe")}
-                  <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                </Link>
-                <Link
-                  to="/cv"
-                  className="group inline-flex items-center gap-1.5 px-1 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-                >
-                  {t("actions.viewCv")}
-                  <ArrowUpRight className="size-3.5 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                </Link>
+              <div className="sm:col-span-3">
+                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                  03 — {lang === "es" ? "Contacto" : lang === "ca" ? "Contacte" : "Reach out"}
+                </div>
+                <div className="mt-3 flex flex-col items-start gap-3 sm:mt-4">
+                  <Link
+                    to="/contact"
+                    className="group inline-flex items-center justify-between gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3"
+                  >
+                    {t("actions.contactMe")}
+                    <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </Link>
+                  <Link
+                    to="/cv"
+                    className="group inline-flex items-center gap-1.5 px-1 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                  >
+                    {t("actions.viewCv")}
+                    <ArrowUpRight className="size-3.5 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Scroll hint */}
-          <div className="mt-20 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+          {/* Bottom row: scroll hint */}
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
             <ArrowDown className="size-3 animate-bounce" />
             {t("home.scrollHint")}
           </div>
         </div>
 
-
-        {/* Marquee-style ticker */}
-        <div className="border-y border-hairline bg-surface/50 py-4 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-2 px-5 sm:px-8">
+        {/* Marquee-style ticker — pinned to bottom of hero */}
+        <div className="relative z-10 border-y border-hairline bg-surface/50 py-3 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 sm:px-8">
             <span>PHP · Laravel</span>
-            <span aria-hidden>·</span>
+            <span aria-hidden className="hidden sm:inline">·</span>
             <span>TypeScript · Vue</span>
-            <span aria-hidden>·</span>
+            <span aria-hidden className="hidden sm:inline">·</span>
             <span>Deno · Node</span>
-            <span aria-hidden>·</span>
+            <span aria-hidden className="hidden sm:inline">·</span>
             <span>Edtech · SDK · AI</span>
-            <span aria-hidden>·</span>
+            <span aria-hidden className="hidden sm:inline">·</span>
             <span>{t("home.based")}</span>
           </div>
         </div>
