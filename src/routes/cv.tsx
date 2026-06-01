@@ -45,7 +45,7 @@ function CvPage() {
         </div>
       </div>
 
-      <article className="mx-auto max-w-4xl bg-background px-6 py-10 sm:px-12 sm:py-14 print:px-0 print:py-0">
+      <article id="cv-article" className="mx-auto max-w-4xl bg-background px-6 py-10 sm:px-12 sm:py-14 print:px-0 print:py-0">
         {/* Header */}
         <header className="cv-block">
           <h1 className="text-3xl font-semibold print:text-[22pt]">{cv.basics.name}</h1>
