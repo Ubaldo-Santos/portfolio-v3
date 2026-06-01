@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
 import { Reveal } from "@/components/reveal";
-import mePhoto from "@/assets/me.webp";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -43,33 +43,11 @@ function Home() {
             {t("home.available")}
           </motion.div>
 
-          <div className="mt-10 grid items-center gap-10 lg:grid-cols-[1fr_auto]">
-            <h1 className="font-display text-[clamp(3rem,10vw,9rem)] leading-[0.9] tracking-tight">
-              <span className="block">Ubaldo</span>
-              <span className="block italic text-muted-foreground">Santos</span>
-              <span className="block text-foreground/70">Patón</span>
-            </h1>
-
-            {/* Portrait — large, blended into the background */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-              className="relative mx-auto hidden sm:block"
-            >
-              <div className="absolute -inset-10 -z-10 rounded-full bg-accent/30 blur-3xl" aria-hidden />
-              <div className="absolute -inset-6 -z-10 rounded-full bg-gradient-to-br from-accent/20 via-transparent to-foreground/10 blur-2xl" aria-hidden />
-              <img
-                src={mePhoto}
-                alt="Retrato de Ubaldo Santos Patón"
-                width={520}
-                height={520}
-                loading="eager"
-                decoding="async"
-                className="relative size-[280px] object-cover object-center sm:size-[360px] lg:size-[440px] xl:size-[480px] [mask-image:radial-gradient(closest-side,black_55%,transparent_95%)]"
-              />
-            </motion.div>
-          </div>
+          <h1 className="mt-10 font-display text-[clamp(3rem,10vw,9rem)] leading-[0.9] tracking-tight">
+            <span className="block">Ubaldo</span>
+            <span className="block italic text-muted-foreground">Santos</span>
+            <span className="block text-foreground/70">Patón</span>
+          </h1>
 
 
           <div className="mt-12 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
