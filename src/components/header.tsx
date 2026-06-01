@@ -24,9 +24,12 @@ export function Header() {
   return (
     <header className="no-print sticky top-0 z-50 border-b border-hairline bg-background/70 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
-        <Link to="/" className="flex items-baseline gap-2 font-display leading-none tracking-tight">
-          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Portfolio</span>
-          <span className="text-xl">Ubaldo Santos</span>
+        <Link to="/" className="group flex items-center gap-2.5 leading-none" aria-label="Ubaldo Santos — Portfolio">
+          <Logo className="size-8 text-foreground transition-transform group-hover:rotate-[8deg]" />
+          <span className="hidden flex-col sm:flex">
+            <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground">Portfolio</span>
+            <span className="font-display text-base tracking-tight">Ubaldo Santos</span>
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
