@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Moon, Sun, Menu, X, Download } from "lucide-react";
-import { downloadCv } from "@/lib/download-cv";
+import { Moon, Sun, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { SUPPORTED_LANGS, type Lang } from "@/i18n";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/logo";
 
 const navItems = [
   { to: "/", key: "home" },
@@ -24,9 +24,12 @@ export function Header() {
   return (
     <header className="no-print sticky top-0 z-50 border-b border-hairline bg-background/70 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
-        <Link to="/" className="flex items-baseline gap-2 font-display leading-none tracking-tight">
-          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Portfolio</span>
-          <span className="text-xl">Ubaldo Santos</span>
+        <Link to="/" className="group flex items-center gap-2.5 leading-none" aria-label="Ubaldo Santos — Portfolio">
+          <Logo className="size-8 text-foreground transition-transform group-hover:rotate-[8deg]" />
+          <span className="hidden flex-col sm:flex">
+            <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground">Portfolio</span>
+            <span className="font-display text-base tracking-tight">Ubaldo Santos</span>
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
@@ -71,13 +74,8 @@ export function Header() {
           >
             {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </button>
-          <button
-            onClick={() => downloadCv()}
-            className="btn-neon-cv ml-1 hidden items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider sm:inline-flex"
-          >
-            <Download className="size-3.5" />
-            {t("actions.downloadCv")}
-          </button>
+
+
 
           <button
             onClick={() => setOpen((o) => !o)}
@@ -105,16 +103,8 @@ export function Header() {
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
-            <button
-              onClick={() => {
-                setOpen(false);
-                downloadCv();
-              }}
-              className="btn-neon-cv mt-2 flex items-center justify-center gap-2 rounded-full px-3 py-3 text-sm font-medium uppercase tracking-wider"
-            >
-              <Download className="size-4" />
-              {t("actions.downloadCv")}
-            </button>
+
+
             <div className="mt-3 flex items-center gap-2 px-3 pb-2">
               <span className="text-xs uppercase tracking-wider text-muted-foreground">{t("actions.language")}</span>
 
