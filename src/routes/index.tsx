@@ -39,7 +39,7 @@ function Home() {
           className="pointer-events-none absolute bottom-0 left-[-10%] size-[420px] rounded-full bg-accent/10 blur-[120px]"
         />
 
-        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 pb-10 pt-8 sm:px-8 sm:pb-14 sm:pt-12">
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-10">
           {/* Top meta row */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
