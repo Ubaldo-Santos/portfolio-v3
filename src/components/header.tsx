@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Moon, Sun, Menu, X } from "lucide-react";
+import { Moon, Sun, Menu, X, Download } from "lucide-react";
+import { downloadCv } from "@/lib/download-cv";
 import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { SUPPORTED_LANGS, type Lang } from "@/i18n";
@@ -70,7 +71,13 @@ export function Header() {
           >
             {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </button>
-
+          <button
+            onClick={() => downloadCv()}
+            className="btn-neon-cv ml-1 hidden items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider sm:inline-flex"
+          >
+            <Download className="size-3.5" />
+            {t("actions.downloadCv")}
+          </button>
 
           <button
             onClick={() => setOpen((o) => !o)}
@@ -98,8 +105,19 @@ export function Header() {
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
+            <button
+              onClick={() => {
+                setOpen(false);
+                downloadCv();
+              }}
+              className="btn-neon-cv mt-2 flex items-center justify-center gap-2 rounded-full px-3 py-3 text-sm font-medium uppercase tracking-wider"
+            >
+              <Download className="size-4" />
+              {t("actions.downloadCv")}
+            </button>
             <div className="mt-3 flex items-center gap-2 px-3 pb-2">
               <span className="text-xs uppercase tracking-wider text-muted-foreground">{t("actions.language")}</span>
+
               {SUPPORTED_LANGS.map((lng) => (
                 <button
                   key={lng}

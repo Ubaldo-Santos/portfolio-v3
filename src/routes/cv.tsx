@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Printer } from "lucide-react";
+import { Download } from "lucide-react";
 import { cv, type WorkItem } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
+import { downloadCv } from "@/lib/download-cv";
 
 export const Route = createFileRoute("/cv")({
   head: () => ({
@@ -35,19 +36,16 @@ function CvPage() {
             <div className="hidden text-xs text-muted-foreground sm:block">· {t("cv.printHint")}</div>
           </div>
           <button
-            onClick={() => window.print()}
-            className="group inline-flex items-center gap-2 rounded-full border border-hairline bg-surface/60 px-4 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-accent hover:bg-accent/15"
+            onClick={() => downloadCv()}
+            className="btn-neon-cv inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium uppercase tracking-wider"
           >
-            <Printer className="size-3.5" />
-            <span>{t("actions.printCv")}</span>
-            <kbd className="hidden rounded border border-hairline bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline">
-              ⌘P
-            </kbd>
+            <Download className="size-3.5" />
+            <span>{t("actions.downloadCv")}</span>
           </button>
         </div>
       </div>
 
-      <article className="mx-auto max-w-4xl bg-background px-6 py-10 sm:px-12 sm:py-14 print:px-0 print:py-0">
+      <article id="cv-article" className="mx-auto max-w-4xl bg-background px-6 py-10 sm:px-12 sm:py-14 print:px-0 print:py-0">
         {/* Header */}
         <header className="cv-block">
           <h1 className="text-3xl font-semibold print:text-[22pt]">{cv.basics.name}</h1>

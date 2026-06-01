@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ArrowUpRight, ArrowDown } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
@@ -39,7 +39,7 @@ function Home() {
           className="pointer-events-none absolute bottom-0 left-[-10%] size-[420px] rounded-full bg-accent/10 blur-[120px]"
         />
 
-        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 pb-10 pt-8 sm:px-8 sm:pb-14 sm:pt-12">
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-10">
           {/* Top meta row */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -62,8 +62,9 @@ function Home() {
           </motion.div>
 
           {/* Name block — centered vertically */}
-          <div className="flex flex-1 flex-col justify-center py-10 sm:py-14">
-            <h1 className="font-display text-[clamp(3rem,13vw,11rem)] leading-[0.86] tracking-tight">
+          <div className="flex flex-1 flex-col justify-center py-8 sm:py-10">
+            <h1 className="font-display text-[clamp(2.75rem,12vw,10rem)] leading-[0.86] tracking-tight">
+
               <span className="block">Ubaldo</span>
               <span className="font-display-italic block text-muted-foreground">Santos Patón</span>
             </h1>
@@ -113,12 +114,8 @@ function Home() {
             </div>
           </div>
 
-          {/* Bottom row: scroll hint */}
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-            <ArrowDown className="size-3 animate-bounce" />
-            {t("home.scrollHint")}
-          </div>
         </div>
+
 
         {/* Marquee-style ticker — pinned to bottom of hero */}
         <div className="relative z-10 border-y border-hairline bg-surface/50 py-3 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
