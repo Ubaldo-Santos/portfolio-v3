@@ -105,8 +105,19 @@ export function Header() {
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
+            <button
+              onClick={() => {
+                setOpen(false);
+                downloadCv();
+              }}
+              className="btn-neon-cv mt-2 flex items-center justify-center gap-2 rounded-full px-3 py-3 text-sm font-medium uppercase tracking-wider"
+            >
+              <Download className="size-4" />
+              {t("actions.downloadCv")}
+            </button>
             <div className="mt-3 flex items-center gap-2 px-3 pb-2">
               <span className="text-xs uppercase tracking-wider text-muted-foreground">{t("actions.language")}</span>
+
               {SUPPORTED_LANGS.map((lng) => (
                 <button
                   key={lng}
