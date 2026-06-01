@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Download } from "lucide-react";
+import { Printer } from "lucide-react";
 import { cv, type WorkItem } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
-import { downloadCv } from "@/lib/download-cv";
 
 export const Route = createFileRoute("/cv")({
   head: () => ({
@@ -36,11 +35,12 @@ function CvPage() {
             <div className="hidden text-xs text-muted-foreground sm:block">· {t("cv.printHint")}</div>
           </div>
           <button
-            onClick={() => downloadCv()}
+            type="button"
+            onClick={() => window.print()}
             className="btn-neon-cv inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium uppercase tracking-wider"
           >
-            <Download className="size-3.5" />
-            <span>{t("actions.downloadCv")}</span>
+            <Printer className="size-3.5" aria-hidden />
+            <span>{t("actions.printCv")}</span>
           </button>
         </div>
       </div>
