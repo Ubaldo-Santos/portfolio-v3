@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Printer } from "lucide-react";
+import { Download } from "lucide-react";
 import { cv, type WorkItem } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
+import { downloadCv } from "@/lib/download-cv";
 
 export const Route = createFileRoute("/cv")({
   head: () => ({
