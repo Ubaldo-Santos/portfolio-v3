@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Moon, Sun, Menu, X, Download } from "lucide-react";
-import { downloadCv } from "@/lib/download-cv";
+import { Moon, Sun, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { SUPPORTED_LANGS, type Lang } from "@/i18n";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/logo";
 
 const navItems = [
   { to: "/", key: "home" },
