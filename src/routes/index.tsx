@@ -50,29 +50,27 @@ function Home() {
               <span className="block text-foreground/70">Patón</span>
             </h1>
 
-            {/* Portrait — colored, integrated, close to the name */}
+            {/* Portrait — large, blended into the background */}
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
               className="relative mx-auto hidden sm:block"
             >
-              <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-accent/25 blur-2xl" aria-hidden />
-              <div className="absolute -bottom-3 -right-3 -z-10 size-full rounded-[1.6rem] border border-hairline" aria-hidden />
+              <div className="absolute -inset-10 -z-10 rounded-full bg-accent/30 blur-3xl" aria-hidden />
+              <div className="absolute -inset-6 -z-10 rounded-full bg-gradient-to-br from-accent/20 via-transparent to-foreground/10 blur-2xl" aria-hidden />
               <img
                 src={mePhoto}
                 alt="Retrato de Ubaldo Santos Patón"
-                width={260}
-                height={320}
+                width={520}
+                height={520}
                 loading="eager"
                 decoding="async"
-                className="relative size-[200px] rounded-[1.6rem] object-cover object-center shadow-xl ring-1 ring-hairline sm:size-[240px] lg:size-[280px]"
+                className="relative size-[280px] object-cover object-center sm:size-[360px] lg:size-[440px] xl:size-[480px] [mask-image:radial-gradient(closest-side,black_55%,transparent_95%)]"
               />
-              <div className="pointer-events-none absolute -bottom-2 left-3 rounded-full border border-hairline bg-background/90 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground backdrop-blur">
-                Barcelona · ES
-              </div>
             </motion.div>
           </div>
+
 
           <div className="mt-12 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
             <p className="max-w-2xl text-balance text-xl leading-relaxed sm:text-2xl">
