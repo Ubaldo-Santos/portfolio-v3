@@ -10,6 +10,7 @@ import { PrimaryStack } from "@/components/primary-stack";
 import { WorkTitle } from "@/components/work-title";
 import { PageHeaderBlock, SectionIndex } from "@/components/page-shell";
 import { TechRibbon } from "@/components/tech-ribbon";
+import { Cta } from "@/components/ui/cta";
 
 export const Route = createFileRoute("/")({
   head: () => routeHead("home", "/"),
@@ -25,14 +26,10 @@ function Home() {
     <div>
       {/* Hero */}
       <section className="relative flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden">
-        {/* Soft accent wash — lighter on mobile so the hero does not read too green */}
+        {/* Single, restrained accent wash — punto, no lavado */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-32 right-[-20%] size-[320px] rounded-full bg-accent/[0.07] blur-[80px] sm:-top-40 sm:right-[-10%] sm:size-[680px] sm:bg-accent/20 sm:blur-[140px]"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute bottom-0 left-[-20%] size-[240px] rounded-full bg-accent/[0.04] blur-[70px] sm:left-[-10%] sm:size-[420px] sm:bg-accent/10 sm:blur-[120px]"
+          className="pointer-events-none absolute -top-24 right-[-12%] size-[420px] rounded-full bg-accent/[0.06] blur-[120px] sm:size-[560px] sm:bg-accent/[0.10]"
         />
 
         <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-10">
@@ -85,20 +82,18 @@ function Home() {
               <div className="sm:col-span-3">
                 <SectionIndex index="03" label={t("home.reachOut")} />
                 <div className="mt-3 flex flex-col items-start gap-3 sm:mt-4">
-                  <Link
-                    to="/contact"
-                    className="group inline-flex items-center justify-between gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3"
-                  >
-                    {t("actions.contactMe")}
-                    <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                  </Link>
-                  <Link
-                    to="/cv"
-                    className="group inline-flex items-center gap-1.5 px-1 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-                  >
-                    {t("actions.viewCv")}
-                    <ArrowUpRight className="size-3.5 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                  </Link>
+                  <Cta asChild variant="primary" size="md">
+                    <Link to="/contact">
+                      {t("actions.contactMe")}
+                      <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                    </Link>
+                  </Cta>
+                  <Cta asChild variant="ghost" size="sm">
+                    <Link to="/cv">
+                      {t("actions.viewCv")}
+                      <ArrowUpRight className="size-3.5 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                    </Link>
+                  </Cta>
                 </div>
               </div>
             </div>
@@ -176,7 +171,7 @@ function Home() {
           <Reveal delay={0.1}>
             <Link
               to="/skills"
-              className="group mt-12 flex items-center justify-between gap-6 rounded-3xl border border-hairline bg-background/60 p-6 transition-colors hover:bg-background sm:p-8"
+              className="group mt-12 flex items-center justify-between gap-6 rounded-2xl border border-hairline bg-background/60 p-6 transition-colors hover:bg-background sm:p-8"
             >
               <PrimaryStack />
               <ArrowUpRight className="size-6 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
