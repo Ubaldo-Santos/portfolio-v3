@@ -16,10 +16,11 @@ export const Route = createFileRoute("/contact")({
 
 function socialIcon(network: string) {
   const n = network.toLowerCase();
-  if (n.includes("linkedin")) return <Linkedin className="size-5" />;
-  if (n.includes("github")) return <Github className="size-5" />;
+  if (n.includes("linkedin")) return <Link2 className="size-5" />;
+  if (n.includes("github")) return <Globe className="size-5" />;
   return <Globe className="size-5" />;
 }
+
 
 function ContactPage() {
   const { t, i18n } = useTranslation();
