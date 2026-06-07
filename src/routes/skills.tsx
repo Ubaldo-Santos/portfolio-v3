@@ -3,47 +3,19 @@ import { useTranslation } from "react-i18next";
 import { Sparkles } from "lucide-react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
+import { routeHead } from "@/lib/seo";
 import { Reveal } from "@/components/reveal";
+import { PageHeader, PageShell } from "@/components/page-shell";
 
 export const Route = createFileRoute("/skills")({
-  head: () => ({
-    meta: [
-      { title: "Skills & AI — Ubaldo Santos Patón" },
-      { name: "description", content: "Stack principal (PHP/Laravel y TypeScript/Vue), prácticas, educación, idiomas e IA aplicada en producto." },
-      { property: "og:title", content: "Skills & AI — Ubaldo Santos Patón" },
-      { property: "og:description", content: "Stack, prácticas e IA aplicada en producto." },
-      { property: "og:url", content: "https://ubaldo.is-a.dev/skills" },
-    ],
-    links: [{ rel: "canonical", href: "https://ubaldo.is-a.dev/skills" }],
-  }),
+  head: () => routeHead("skills", "/skills"),
   component: SkillsPage,
 });
-
-const AI_COPY = {
-  es: {
-    kicker: "IA en mi día a día y en producto",
-    title: "Skills + IA",
-    body: "Uso IA como copiloto a diario (GitHub Copilot a nivel organización, Cursor CLI con reglas en el repo, OpenRouter para enrutar a varios modelos con fallback, MCP para conectar el modelo a datos reales). También la he integrado en producto, no solo en mi editor.",
-    tags: ["GitHub Copilot (org)", "Cursor CLI", "OpenRouter", "MCP", "Agent Skills"],
-  },
-  ca: {
-    kicker: "IA al meu dia a dia i al producte",
-    title: "Skills + IA",
-    body: "Faig servir IA com a copilot a diari (GitHub Copilot a nivell d'organització, Cursor CLI amb regles al repo, OpenRouter per enrutar a diversos models amb fallback, MCP per connectar el model a dades reals). També l'he integrada en producte, no només al meu editor.",
-    tags: ["GitHub Copilot (org)", "Cursor CLI", "OpenRouter", "MCP", "Agent Skills"],
-  },
-  en: {
-    kicker: "AI in my workflow and in product",
-    title: "Skills + AI",
-    body: "I use AI as a copilot daily (GitHub Copilot at the org level, Cursor CLI with rules versioned in the repo, OpenRouter to route between models with fallback, MCP to connect the model to real data). I've also shipped AI into product, not just my editor.",
-    tags: ["GitHub Copilot (org)", "Cursor CLI", "OpenRouter", "MCP", "Agent Skills"],
-  },
-} as const;
 
 function SkillsPage() {
   const { t, i18n } = useTranslation();
   const lang = currentLang(i18n.language);
-  const aiCopy = AI_COPY[lang];
+  const aiTags = t("skills.aiCallout.tags", { returnObjects: true }) as string[];
 
   const groups = [
     { key: "languages", items: cv.skills.languages },
@@ -55,19 +27,14 @@ function SkillsPage() {
   ] as const;
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
-      {/* Hero */}
-      <Reveal>
-        <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">03 / Skills</div>
-        <h1 className="mt-2 font-display text-6xl sm:text-7xl">{t("skills.title")}</h1>
-        <p className="mt-3 max-w-xl text-lg text-muted-foreground">{t("skills.subtitle")}</p>
-      </Reveal>
+    <PageShell>
+      <PageHeader page="skills" subtitle={t("skills.subtitle")} />
 
       {/* Primary stack callout */}
       <Reveal delay={0.04}>
         <div className="mt-12 grid gap-4 rounded-3xl border border-hairline bg-surface/40 p-6 sm:p-8 md:grid-cols-[auto_1fr] md:items-center">
           <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
-            {lang === "en" ? "Primary stack" : lang === "ca" ? "Stack principal" : "Stack principal"}
+            {t("skills.primaryStack")}
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-display text-2xl sm:text-3xl">
             <span>PHP</span>
@@ -109,14 +76,20 @@ function SkillsPage() {
           <header>
             <div className="flex items-center gap-2 text-accent">
               <Sparkles className="size-4" aria-hidden />
-              <span className="font-mono text-[11px] uppercase tracking-[0.25em]">{aiCopy.kicker}</span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.25em]">
+                {t("skills.aiCallout.kicker")}
+              </span>
             </div>
-            <h2 className="mt-3 font-display text-4xl leading-[1.05] sm:text-5xl">{aiCopy.title}</h2>
+            <h2 className="mt-3 font-display text-4xl leading-[1.05] sm:text-5xl">
+              {t("skills.aiCallout.title")}
+            </h2>
           </header>
           <div>
-            <p className="text-base leading-relaxed text-foreground/90 sm:text-lg">{aiCopy.body}</p>
+            <p className="text-base leading-relaxed text-foreground/90 sm:text-lg">
+              {t("skills.aiCallout.body")}
+            </p>
             <ul className="mt-5 flex flex-wrap gap-1.5">
-              {aiCopy.tags.map((tag) => (
+              {aiTags.map((tag) => (
                 <li key={tag}>
                   <span className="inline-flex rounded-full border border-accent/40 bg-background px-2.5 py-1 text-xs">
                     {tag}
@@ -131,7 +104,9 @@ function SkillsPage() {
       {/* Education */}
       <section className="mt-20">
         <Reveal>
-          <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">{t("skills.education")}</h2>
+          <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
+            {t("skills.education")}
+          </h2>
         </Reveal>
         <ol className="mt-6 space-y-4">
           {cv.education.map((ed, i) => (
@@ -156,7 +131,9 @@ function SkillsPage() {
       {/* Spoken languages */}
       <section className="mt-16">
         <Reveal>
-          <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">{t("skills.spokenLanguages")}</h2>
+          <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
+            {t("skills.spokenLanguages")}
+          </h2>
         </Reveal>
         <ul className="mt-6 grid gap-3 sm:grid-cols-3">
           {cv.languages.map((l) => (
@@ -165,11 +142,13 @@ function SkillsPage() {
               className="flex items-center justify-between rounded-2xl border border-hairline bg-surface/30 px-4 py-3"
             >
               <span className="font-display text-xl">{l.name[lang]}</span>
-              <span className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{l.level[lang]}</span>
+              <span className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                {l.level[lang]}
+              </span>
             </li>
           ))}
         </ul>
       </section>
-    </div>
+    </PageShell>
   );
 }

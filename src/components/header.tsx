@@ -12,8 +12,8 @@ const navItems = [
   { to: "/experience", key: "experience" },
   { to: "/projects", key: "projects" },
   { to: "/skills", key: "skills" },
-  { to: "/contact", key: "contact" },
   { to: "/cv", key: "cv" },
+  { to: "/contact", key: "contact" },
 ] as const;
 
 export function Header() {
@@ -25,15 +25,21 @@ export function Header() {
   return (
     <header className="no-print sticky top-0 z-50 border-b border-hairline bg-background/70 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
-        <Link to="/" className="group flex items-center gap-2.5 leading-none" aria-label="Ubaldo Santos — Portfolio">
+        <Link
+          to="/"
+          className="group flex items-center gap-2.5 leading-none"
+          aria-label={t("a11y.homeLink")}
+        >
           <Logo className="size-8 text-foreground transition-transform group-hover:rotate-[8deg]" />
           <span className="hidden flex-col sm:flex">
-            <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground">Portfolio</span>
-            <span className="font-display text-base tracking-tight">Ubaldo Santos</span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground">
+              {t("brand.portfolio")}
+            </span>
+            <span className="font-display text-base tracking-tight">{t("brand.shortName")}</span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
+        <nav className="hidden items-center gap-1 md:flex" aria-label={t("a11y.mainNav")}>
           {navItems.map((item) => (
             <Link
               key={item.to}
@@ -59,7 +65,9 @@ export function Header() {
                 onClick={() => i18n.changeLanguage(lng)}
                 className={cn(
                   "rounded-full px-2.5 py-1 transition-colors",
-                  currentLang === lng ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
+                  currentLang === lng
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
                 aria-pressed={currentLang === lng}
               >
@@ -69,7 +77,7 @@ export function Header() {
           </div>
 
           <button
-            onClick={toggle}
+            onClick={(event) => toggle(event)}
             aria-label={t("actions.toggleTheme")}
             className="rounded-full border border-hairline bg-surface p-2 text-muted-foreground transition-colors hover:text-foreground"
           >
@@ -89,7 +97,10 @@ export function Header() {
 
       {open && (
         <div className="border-t border-hairline bg-background md:hidden">
-          <nav className="mx-auto flex max-w-6xl flex-col px-5 py-3 sm:px-8" aria-label="Mobile">
+          <nav
+            className="mx-auto flex max-w-6xl flex-col px-5 py-3 sm:px-8"
+            aria-label={t("a11y.mobileNav")}
+          >
             {navItems.map((item) => (
               <Link
                 key={item.to}
@@ -103,9 +114,10 @@ export function Header() {
               </Link>
             ))}
 
-
             <div className="mt-3 flex items-center gap-2 px-3 pb-2">
-              <span className="text-xs uppercase tracking-wider text-muted-foreground">{t("actions.language")}</span>
+              <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                {t("actions.language")}
+              </span>
 
               {SUPPORTED_LANGS.map((lng) => (
                 <button

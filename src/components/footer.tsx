@@ -14,7 +14,13 @@ export function Footer() {
         </div>
         <div className="flex flex-wrap justify-start gap-x-5 gap-y-2 sm:justify-center">
           {cv.basics.profiles.map((p) => (
-            <a key={p.network} href={p.url} target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground">
+            <a
+              key={p.network}
+              href={p.url}
+              target="_blank"
+              rel="noreferrer"
+              className="transition-colors hover:text-foreground"
+            >
               {p.network}
             </a>
           ))}
@@ -23,7 +29,9 @@ export function Footer() {
           </a>
         </div>
         <div className="text-left sm:text-right">
-          <div className="font-mono text-[11px] uppercase tracking-widest">{t("footer.builtWith")}</div>
+          <div className="font-mono text-[11px] uppercase tracking-widest">
+            {t("footer.builtWith")}
+          </div>
         </div>
       </div>
     </footer>

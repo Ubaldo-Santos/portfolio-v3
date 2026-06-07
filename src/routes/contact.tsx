@@ -4,19 +4,12 @@ import { Mail, Phone, MapPin, Printer, ArrowUpRight, Copy, Check } from "lucide-
 import { useState, type ReactNode } from "react";
 import { cv } from "@/data/cv";
 import { currentLang } from "@/lib/format";
+import { routeHead } from "@/lib/seo";
 import { Reveal } from "@/components/reveal";
+import { PageHeader, PageShell } from "@/components/page-shell";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "Contacto — Ubaldo Santos Patón" },
-      { name: "description", content: "Contacta con Ubaldo Santos Patón: email, teléfono, LinkedIn y GitHub." },
-      { property: "og:title", content: "Contacto — Ubaldo Santos Patón" },
-      { property: "og:description", content: "Hablemos." },
-      { property: "og:url", content: "https://ubaldo.is-a.dev/contact" },
-    ],
-    links: [{ rel: "canonical", href: "https://ubaldo.is-a.dev/contact" }],
-  }),
+  head: () => routeHead("contact", "/contact"),
   component: ContactPage,
 });
 
@@ -25,13 +18,8 @@ function ContactPage() {
   const lang = currentLang(i18n.language);
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
-      {/* Header */}
-      <Reveal>
-        <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">06 / Contact</div>
-        <h1 className="mt-2 font-display text-6xl leading-[0.95] sm:text-8xl">{t("contact.title")}</h1>
-        <p className="mt-4 max-w-xl text-lg text-muted-foreground">{t("contact.subtitle")}</p>
-      </Reveal>
+    <PageShell>
+      <PageHeader page="contact" subtitle={t("contact.subtitle")} />
 
       {/* Primary email — full-width feature card */}
       <Reveal delay={0.04}>
@@ -52,7 +40,9 @@ function ContactPage() {
                 {cv.basics.email}
                 <ArrowUpRight className="size-7 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </a>
-              <p className="mt-4 max-w-md text-sm text-muted-foreground">{t("contact.availability")}</p>
+              <p className="mt-4 max-w-md text-sm text-muted-foreground">
+                {t("contact.availability")}
+              </p>
             </div>
             <div className="flex flex-wrap gap-2 lg:justify-end">
               <a
@@ -61,7 +51,11 @@ function ContactPage() {
               >
                 <Mail className="size-4" /> {t("actions.writeMe")}
               </a>
-              <CopyButton value={cv.basics.email} label={t("actions.copy")} doneLabel={t("actions.copied")} />
+              <CopyButton
+                value={cv.basics.email}
+                label={t("actions.copy")}
+                doneLabel={t("actions.copied")}
+              />
             </div>
           </div>
         </div>
@@ -101,7 +95,9 @@ function ContactPage() {
       {/* Social — uniform 2-up grid */}
       <section className="mt-16">
         <Reveal>
-          <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">{t("contact.social")}</h2>
+          <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
+            {t("contact.social")}
+          </h2>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t("contact.preferred")}</p>
         </Reveal>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -119,7 +115,9 @@ function ContactPage() {
                   </span>
                   <span>
                     <span className="block font-display text-xl leading-tight">{p.network}</span>
-                    <span className="block font-mono text-xs text-muted-foreground">@{p.username}</span>
+                    <span className="block font-mono text-xs text-muted-foreground">
+                      @{p.username}
+                    </span>
                   </span>
                 </span>
                 <ArrowUpRight className="size-5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -128,7 +126,7 @@ function ContactPage() {
           ))}
         </div>
       </section>
-    </div>
+    </PageShell>
   );
 }
 
@@ -201,7 +199,15 @@ function InfoCard({
   return <div className={cls}>{body}</div>;
 }
 
-function CopyButton({ value, label, doneLabel }: { value: string; label: string; doneLabel: string }) {
+function CopyButton({
+  value,
+  label,
+  doneLabel,
+}: {
+  value: string;
+  label: string;
+  doneLabel: string;
+}) {
   const [done, setDone] = useState(false);
   return (
     <button
