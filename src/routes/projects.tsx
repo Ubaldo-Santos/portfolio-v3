@@ -16,6 +16,8 @@ function ProjectsPage() {
   const { t, i18n } = useTranslation();
   const lang = currentLang(i18n.language);
 
+  const activeProjects = cv.projects.filter((p) => p.active);
+
   return (
     <PageShell>
       <PageHeader page="projects" subtitle={t("projects.subtitle")} />
