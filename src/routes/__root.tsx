@@ -20,7 +20,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { CustomCursor } from "@/components/custom-cursor";
 import { PageTransition } from "@/components/page-transition";
-import { EasterEgg } from "@/components/easter-egg";
+
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -146,7 +146,7 @@ function RootComponent() {
       <I18nProvider>
         <SkipLink />
         <CustomCursor />
-        <EasterEgg />
+        
         <Toaster position="bottom-right" />
         <div className="flex min-h-dvh flex-col">
           <Header />
