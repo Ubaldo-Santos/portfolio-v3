@@ -152,7 +152,12 @@ export const translations = {
       konami: "Tip: prueba el código Konami.",
     },
     easter: {
-      unlocked: "¡Konami activado! Bienvenido al portfolio versión arcade.",
+      unlocked: "¡Konami activado! Lluvia de gatitos incoming.",
+      konamiCode: "↑ ↑ ↓ ↓ ← → ← → B A",
+      boardLabel: "Tablero de gatitos",
+      close: "Cerrar tablero de gatitos",
+      dragHint: "Arrastra las fotos · Esc o ✕ para cerrar",
+      loading: "Preparando gatitos…",
     },
     errors: {
       loadTitle: "Esta página no se ha cargado",
@@ -315,7 +320,12 @@ export const translations = {
       konami: "Pista: prova el codi Konami.",
     },
     easter: {
-      unlocked: "Konami activat! Benvingut al portfolio versió arcade.",
+      unlocked: "Konami activat! Pluja de gatets incoming.",
+      konamiCode: "↑ ↑ ↓ ↓ ← → ← → B A",
+      boardLabel: "Tauler de gatets",
+      close: "Tancar el tauler de gatets",
+      dragHint: "Arrossega les fotos · Esc o ✕ per tancar",
+      loading: "Preparant gatets…",
     },
     errors: {
       loadTitle: "Aquesta pàgina no s'ha carregat",
@@ -477,7 +487,12 @@ export const translations = {
       konami: "Tip: try the Konami code.",
     },
     easter: {
-      unlocked: "Konami unlocked! Welcome to the arcade-mode portfolio.",
+      unlocked: "Konami unlocked! Incoming kitty sticker rain.",
+      konamiCode: "↑ ↑ ↓ ↓ ← → ← → B A",
+      boardLabel: "Kitty photo board",
+      close: "Close kitty board",
+      dragHint: "Drag the photos · Esc or ✕ to close",
+      loading: "Loading kitties…",
     },
     errors: {
       loadTitle: "This page didn't load",

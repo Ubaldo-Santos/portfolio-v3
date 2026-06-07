@@ -1,83 +1,35 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-
-const SEQ = [
-  "ArrowUp",
-  "ArrowUp",
-  "ArrowDown",
-  "ArrowDown",
-  "ArrowLeft",
-  "ArrowRight",
-  "ArrowLeft",
-  "ArrowRight",
-  "b",
-  "a",
-];
-
+import { KonamiCatRain } from "@/components/konami-cat-rain";
+import { createKonamiKeyHandler, flashKonamiCelebrate } from "@/lib/konami-code";
 /**
- * Easter egg: the Konami code (↑ ↑ ↓ ↓ ← → ← → B A) launches a celebratory
- * burst of accent-colored ripples across the viewport, briefly inverts the
- * page, and shakes the title. Fully accessible — respects prefers-reduced-motion.
+ * Easter egg: Konami code (↑ ↑ ↓ ↓ ← → ← → B A) triggers a brief shimmer,
+ * a toast, and a draggable cat-photo board overlay.
  */
 export function EasterEgg() {
   const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const openRef = useRef(false);
+  openRef.current = open;
 
   useEffect(() => {
-    let idx = 0;
+    const onKey = createKonamiKeyHandler(() => {
+      if (openRef.current) return;
 
-    const trigger = () => {
-      const html = document.documentElement;
-      if (html.classList.contains("konami-celebrate")) return;
-
-      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      html.classList.add("konami-celebrate");
-      window.setTimeout(() => html.classList.remove("konami-celebrate"), 2200);
-
+      flashKonamiCelebrate();
       toast.success(t("easter.unlocked"), {
-        description: "↑ ↑ ↓ ↓ ← → ← → B A",
+        description: t("easter.konamiCode"),
         duration: 4000,
       });
+      setOpen(true);
+    });
 
-      if (reduced) return;
-
-      // Burst of ripples from random points along the viewport
-      const layer = document.createElement("div");
-      layer.className = "konami-layer";
-      document.body.appendChild(layer);
-
-      const points = 14;
-      for (let i = 0; i < points; i++) {
-        const r = document.createElement("span");
-        r.className = "konami-burst";
-        const x = Math.random() * window.innerWidth;
-        const y = Math.random() * window.innerHeight;
-        r.style.left = `${x}px`;
-        r.style.top = `${y}px`;
-        r.style.animationDelay = `${Math.random() * 350}ms`;
-        layer.appendChild(r);
-      }
-
-      window.setTimeout(() => layer.remove(), 2400);
-    };
-
-    const onKey = (e: KeyboardEvent) => {
-      const k = e.key;
-      const expected = SEQ[idx];
-      if (k === expected || (expected.length === 1 && k.toLowerCase() === expected)) {
-        idx++;
-        if (idx === SEQ.length) {
-          idx = 0;
-          trigger();
-        }
-      } else {
-        idx = k === SEQ[0] ? 1 : 0;
-      }
-    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [t]);
 
-  return null;
+  if (!open) return null;
+
+  return <KonamiCatRain onDismiss={() => setOpen(false)} />;
 }
