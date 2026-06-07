@@ -1,17 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Mail, Phone, MapPin, Printer, ArrowUpRight, Copy, Check } from "lucide-react";
+import { Mail, Phone, MapPin, ArrowUpRight, Copy, Check, Globe, FileText, Link2 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { cv } from "@/data/cv";
 import { currentLang } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
 import { Reveal } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
+import { Cta } from "@/components/ui/cta";
 
 export const Route = createFileRoute("/contact")({
   head: () => routeHead("contact", "/contact"),
   component: ContactPage,
 });
+
+function socialIcon(network: string) {
+  const n = network.toLowerCase();
+  if (n.includes("linkedin")) return <Link2 className="size-5" />;
+  if (n.includes("github")) return <Globe className="size-5" />;
+  return <Globe className="size-5" />;
+}
+
 
 function ContactPage() {
   const { t, i18n } = useTranslation();
@@ -21,21 +30,17 @@ function ContactPage() {
     <PageShell>
       <PageHeader page="contact" subtitle={t("contact.subtitle")} />
 
-      {/* Primary email — full-width feature card */}
+      {/* Primary email — full-width feature card, sin wash accent */}
       <Reveal delay={0.04}>
-        <div className="group relative mt-12 overflow-hidden rounded-3xl border border-hairline bg-surface/40 p-8 sm:p-12">
-          <div
-            className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-accent/20 blur-3xl transition-opacity duration-500 group-hover:opacity-80"
-            aria-hidden
-          />
-          <div className="relative grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end">
+        <div className="mt-12 rounded-2xl border border-hairline bg-surface/40 p-8 sm:p-12">
+          <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end">
             <div>
               <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                 {t("contact.ctaEmail")}
               </div>
               <a
                 href={`mailto:${cv.basics.email}`}
-                className="mt-3 flex items-center gap-3 break-all font-display text-3xl underline-offset-4 hover:underline sm:text-5xl"
+                className="group mt-3 flex items-center gap-3 break-all font-display text-3xl underline-offset-4 hover:underline sm:text-5xl"
               >
                 {cv.basics.email}
                 <ArrowUpRight className="size-7 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -45,12 +50,11 @@ function ContactPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2 lg:justify-end">
-              <a
-                href={`mailto:${cv.basics.email}`}
-                className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm text-background hover:opacity-90"
-              >
-                <Mail className="size-4" /> {t("actions.writeMe")}
-              </a>
+              <Cta asChild variant="primary" size="sm">
+                <a href={`mailto:${cv.basics.email}`}>
+                  <Mail className="size-4" /> {t("actions.writeMe")}
+                </a>
+              </Cta>
               <CopyButton
                 value={cv.basics.email}
                 label={t("actions.copy")}
@@ -83,11 +87,10 @@ function ContactPage() {
           <InfoCard
             as={Link}
             to="/cv"
-            icon={<Printer className="size-4" />}
+            icon={<FileText className="size-4" />}
             label={t("cv.title")}
-            value={t("actions.printCv")}
+            value={t("actions.viewCv")}
             action="→"
-            highlight
           />
         </Reveal>
       </div>
@@ -110,8 +113,8 @@ function ContactPage() {
                 className="group flex h-full items-center justify-between rounded-2xl border border-hairline bg-surface/40 p-5 transition-colors hover:bg-surface"
               >
                 <span className="flex items-center gap-4">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full border border-hairline bg-background font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                    {p.network.slice(0, 2)}
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full border border-hairline bg-background text-muted-foreground transition-colors group-hover:text-foreground">
+                    {socialIcon(p.network)}
                   </span>
                   <span>
                     <span className="block font-display text-xl leading-tight">{p.network}</span>
@@ -130,7 +133,6 @@ function ContactPage() {
   );
 }
 
-/** Uniform info card. Same height, padding, radius across the row. */
 function InfoCard({
   as: As,
   icon,
@@ -139,7 +141,6 @@ function InfoCard({
   action,
   href,
   to,
-  highlight,
 }: {
   as?: typeof Link;
   icon: ReactNode;
@@ -148,33 +149,20 @@ function InfoCard({
   action?: string;
   href?: string;
   to?: string;
-  highlight?: boolean;
 }) {
-  const base =
-    "group flex h-full min-h-[112px] flex-col justify-between rounded-2xl border p-5 transition-colors";
-  const variant = highlight
-    ? "border-foreground bg-foreground text-background hover:opacity-90"
-    : "border-hairline bg-surface/40 hover:bg-surface";
-  const cls = `${base} ${variant}`;
+  const cls =
+    "group flex h-full min-h-[112px] flex-col justify-between rounded-2xl border border-hairline bg-surface/40 p-5 transition-colors hover:bg-surface";
 
   const body = (
     <>
-      <div
-        className={`flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest ${
-          highlight ? "text-background/80" : "text-muted-foreground"
-        }`}
-      >
+      <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
         {icon}
         <span>{label}</span>
       </div>
       <div className="mt-3 flex items-end justify-between gap-3">
         <span className="font-display text-lg leading-tight">{value}</span>
         {action && (
-          <span
-            className={`font-mono text-[10px] uppercase tracking-widest ${
-              highlight ? "text-background/80" : "text-muted-foreground"
-            }`}
-          >
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors group-hover:text-foreground">
             {action}
           </span>
         )}
@@ -182,20 +170,8 @@ function InfoCard({
     </>
   );
 
-  if (As && to) {
-    return (
-      <As to={to} className={cls}>
-        {body}
-      </As>
-    );
-  }
-  if (href) {
-    return (
-      <a href={href} className={cls}>
-        {body}
-      </a>
-    );
-  }
+  if (As && to) return <As to={to} className={cls}>{body}</As>;
+  if (href) return <a href={href} className={cls}>{body}</a>;
   return <div className={cls}>{body}</div>;
 }
 
@@ -210,7 +186,9 @@ function CopyButton({
 }) {
   const [done, setDone] = useState(false);
   return (
-    <button
+    <Cta
+      variant="outline"
+      size="sm"
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(value);
@@ -220,11 +198,10 @@ function CopyButton({
           /* ignore */
         }
       }}
-      className="inline-flex items-center gap-2 rounded-full border border-hairline bg-background px-4 py-2 text-sm transition-colors hover:bg-surface"
       aria-label={label}
     >
       {done ? <Check className="size-4 text-accent" /> : <Copy className="size-4" />}
       {done ? doneLabel : label}
-    </button>
+    </Cta>
   );
 }

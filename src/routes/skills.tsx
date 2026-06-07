@@ -7,6 +7,7 @@ import { routeHead } from "@/lib/seo";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { PrimaryStack } from "@/components/primary-stack";
 import { PageHeader, PageShell } from "@/components/page-shell";
+import { Chip } from "@/components/ui/chip";
 
 export const Route = createFileRoute("/skills")({
   head: () => routeHead("skills", "/skills"),
@@ -34,7 +35,7 @@ function SkillsPage() {
 
       {/* Primary stack callout */}
       <Reveal delay={0.04}>
-        <div className="mt-12 grid gap-4 rounded-3xl border border-hairline bg-surface/40 p-6 sm:p-8 md:grid-cols-[auto_1fr] md:items-center">
+        <div className="mt-12 grid gap-4 rounded-2xl border border-hairline bg-surface/40 p-6 sm:p-8 md:grid-cols-[auto_1fr] md:items-center">
           <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
             {t("skills.primaryStack")}
           </div>
@@ -53,9 +54,7 @@ function SkillsPage() {
               <ul className="mt-3 flex flex-wrap gap-1.5">
                 {g.items.map((s) => (
                   <li key={s}>
-                    <span className="inline-flex rounded-full border border-hairline bg-background px-2.5 py-1 text-xs">
-                      {s}
-                    </span>
+                    <Chip variant="neutral" size="sm">{s}</Chip>
                   </li>
                 ))}
               </ul>
@@ -64,12 +63,12 @@ function SkillsPage() {
         ))}
       </RevealGroup>
 
-      {/* AI — single editorial block, no card grid */}
+      {/* AI — editorial block, sin gradient accent */}
       <Reveal delay={0.05}>
-        <section className="mt-20 grid gap-10 rounded-3xl border border-accent/40 bg-gradient-to-br from-accent/10 via-background to-background p-8 sm:p-12 md:grid-cols-[1fr_1.4fr]">
+        <section className="mt-20 grid gap-10 rounded-2xl border border-hairline bg-surface/40 p-8 sm:p-12 md:grid-cols-[1fr_1.4fr]">
           <header>
-            <div className="flex items-center gap-2 text-accent">
-              <Sparkles className="size-4" aria-hidden />
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Sparkles className="size-4 text-accent" aria-hidden />
               <span className="font-mono text-[11px] uppercase tracking-[0.25em]">
                 {t("skills.aiCallout.kicker")}
               </span>
@@ -85,9 +84,7 @@ function SkillsPage() {
             <ul className="mt-5 flex flex-wrap gap-1.5">
               {aiTags.map((tag) => (
                 <li key={tag}>
-                  <span className="inline-flex rounded-full border border-accent/40 bg-background px-2.5 py-1 text-xs">
-                    {tag}
-                  </span>
+                  <Chip variant="neutral" size="sm">{tag}</Chip>
                 </li>
               ))}
             </ul>

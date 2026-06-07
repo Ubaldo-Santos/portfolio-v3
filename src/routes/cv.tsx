@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ArrowUpRight, Printer } from "lucide-react";
+import { Download } from "lucide-react";
 import { cv, type WorkItem } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
 import { Reveal } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
+import { Cta } from "@/components/ui/cta";
+import { downloadCv } from "@/lib/download-cv";
 
 export const Route = createFileRoute("/cv")({
   head: () => routeHead("cv", "/cv", { noIndex: true }),
@@ -23,15 +25,8 @@ function CvPage() {
     ...cv.basics.profiles.map((p) => `${p.network}: ${p.url.replace(/^https?:\/\//, "")}`),
   ];
 
-  const handlePrint = () => {
-    const originalTitle = document.title;
-    const restoreTitle = () => {
-      document.title = originalTitle;
-    };
-
-    document.title = `Ubaldo Santos - ${formatPrintDate(new Date())}`;
-    window.addEventListener("afterprint", restoreTitle, { once: true });
-    window.print();
+  const handleDownload = () => {
+    void downloadCv();
   };
 
   return (
@@ -44,21 +39,20 @@ function CvPage() {
             <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
               {t("cv.printHint")}
             </p>
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="group inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3 sm:w-auto"
+            <Cta
+              variant="outline"
+              size="md"
+              onClick={handleDownload}
+              className="w-full shrink-0 sm:w-auto"
             >
-              <Printer className="size-4" aria-hidden />
-              {t("actions.printCv")}
-              <ArrowUpRight
-                className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                aria-hidden
-              />
-            </button>
+              <Download className="size-4" aria-hidden />
+              {t("actions.downloadCv") ?? t("actions.printCv")}
+            </Cta>
           </div>
         </Reveal>
       </PageShell>
+
+
 
       <article id="cv-article" className="mx-auto">
         <header className="cv-block cv-header">
@@ -193,12 +187,3 @@ function Job({ w, lang }: { w: WorkItem; lang: ReturnType<typeof currentLang> })
   );
 }
 
-function formatPrintDate(date: Date): string {
-  return new Intl.DateTimeFormat("es-ES", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  })
-    .format(date)
-    .replaceAll("/", "-");
-}
