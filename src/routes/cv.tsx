@@ -47,7 +47,7 @@ function CvPage() {
             <button
               type="button"
               onClick={handlePrint}
-              className="group inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3 sm:w-auto"
+              className="group inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border border-hairline bg-background px-5 py-3 text-sm text-foreground transition-colors hover:bg-surface hover:gap-3 sm:w-auto"
             >
               <Printer className="size-4" aria-hidden />
               {t("actions.printCv")}
