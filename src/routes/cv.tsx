@@ -1,76 +1,81 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Printer } from "lucide-react";
+import { ArrowUpRight, Printer } from "lucide-react";
 import { cv, type WorkItem } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
+import { routeHead } from "@/lib/seo";
+import { Reveal } from "@/components/reveal";
+import { PageHeader, PageShell } from "@/components/page-shell";
 
 export const Route = createFileRoute("/cv")({
-  head: () => ({
-    meta: [
-      { title: "CV — Ubaldo Santos Patón" },
-      { name: "description", content: "Printable, ATS-friendly résumé of Ubaldo Santos Patón." },
-      { property: "og:title", content: "CV — Ubaldo Santos Patón" },
-      { property: "og:description", content: "Hit print and save as PDF." },
-      { property: "og:url", content: "https://ubaldo.is-a.dev/cv" },
-      { name: "robots", content: "noindex, follow" },
-    ],
-    links: [{ rel: "canonical", href: "https://ubaldo.is-a.dev/cv" }],
-  }),
+  head: () => routeHead("cv", "/cv", { noIndex: true }),
   component: CvPage,
 });
 
 function CvPage() {
   const { t, i18n } = useTranslation();
   const lang = currentLang(i18n.language);
+  const contactItems = [
+    cv.basics.email,
+    cv.basics.phone,
+    cv.basics.location[lang],
+    cv.basics.url,
+    ...cv.basics.profiles.map((p) => `${p.network}: ${p.url.replace(/^https?:\/\//, "")}`),
+  ];
+
+  const handlePrint = () => {
+    const originalTitle = document.title;
+    const restoreTitle = () => {
+      document.title = originalTitle;
+    };
+
+    document.title = `Ubaldo Santos - ${formatPrintDate(new Date())}`;
+    window.addEventListener("afterprint", restoreTitle, { once: true });
+    window.print();
+  };
 
   return (
-    <div className="bg-background">
-      {/* Screen-only toolbar — aligned with navbar height */}
-      <div className="no-print sticky top-16 z-40 border-b border-hairline bg-background/80 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
-          <div className="flex items-baseline gap-3">
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-              {t("cv.title")}
-            </div>
-            <div className="hidden text-xs text-muted-foreground sm:block">· {t("cv.printHint")}</div>
-          </div>
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="btn-neon-cv inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium uppercase tracking-wider"
-          >
-            <Printer className="size-3.5" aria-hidden />
-            <span>{t("actions.printCv")}</span>
-          </button>
-        </div>
-      </div>
+    <div className="bg-background py-8 print:bg-white print:py-0">
+      <PageShell className="no-print">
+        <PageHeader page="cv" subtitle={t("cv.subtitle")} />
 
-      <article id="cv-article" className="mx-auto max-w-4xl bg-background px-6 py-10 sm:px-12 sm:py-14 print:px-0 print:py-0">
-        {/* Header */}
-        <header className="cv-block">
-          <h1 className="text-3xl font-semibold print:text-[22pt]">{cv.basics.name}</h1>
-          <p className="mt-1 text-base text-muted-foreground print:text-[11pt] print:text-black">
-            {cv.basics.label[lang]}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground print:text-[10pt] print:text-black">
-            <span>{cv.basics.email}</span>
-            <span aria-hidden>·</span>
-            <span>{cv.basics.phone}</span>
-            <span aria-hidden>·</span>
-            <span>{cv.basics.location[lang]}</span>
-            <span aria-hidden>·</span>
-            <span>{cv.basics.url}</span>
-            {cv.basics.profiles.map((p) => (
-              <span key={p.network} className="inline-flex gap-1">
-                <span aria-hidden>·</span>
-                <span>{p.network}: {p.url.replace(/^https?:\/\//, "")}</span>
+        <Reveal delay={0.04} onMount>
+          <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-hairline bg-surface/40 p-5 sm:mt-10 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6">
+            <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+              {t("cv.printHint")}
+            </p>
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="group inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3 sm:w-auto"
+            >
+              <Printer className="size-4" aria-hidden />
+              {t("actions.printCv")}
+              <ArrowUpRight
+                className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            </button>
+          </div>
+        </Reveal>
+      </PageShell>
+
+      <article id="cv-article" className="mx-auto">
+        <header className="cv-block cv-header">
+          <h1>{cv.basics.name}</h1>
+          <p>{cv.basics.label[lang]}</p>
+          <div className="cv-contact-line">
+            {contactItems.map((item, index) => (
+              <span key={item} className="cv-contact-item">
+                {index > 0 ? <span aria-hidden>·</span> : null}
+                <span>{item}</span>
               </span>
             ))}
           </div>
         </header>
 
         <Section title={t("cv.profile")}>
-          <p className="text-sm leading-relaxed print:text-[10.5pt]">{cv.basics.summary[lang]}</p>
+          <p className="leading-relaxed">{cv.basics.summary[lang]}</p>
         </Section>
 
         <Section title={t("cv.experience")}>
@@ -83,50 +88,64 @@ function CvPage() {
           {cv.education.map((ed) => (
             <div key={ed.institution + ed.startDate} className="cv-block mb-3 last:mb-0">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 className="text-base font-semibold print:text-[11pt]">
+                <h3>
                   {ed.studyType[lang]} — {ed.institution}
                 </h3>
-                <span className="font-mono text-xs text-muted-foreground print:text-[9.5pt] print:text-black">
+                <span className="font-mono text-xs">
                   {formatPeriod(ed.startDate, ed.endDate, lang)}
                 </span>
               </div>
-              <div className="text-sm text-muted-foreground print:text-[10pt] print:text-black">{ed.area[lang]}</div>
-              <p className="mt-1 text-sm print:text-[10pt]">{ed.summary[lang]}</p>
+              <div className="cv-meta">{ed.area[lang]}</div>
+              <p className="mt-1">{ed.summary[lang]}</p>
             </div>
           ))}
         </Section>
 
         <Section title={t("cv.skills")}>
-          <ul className="space-y-1 text-sm print:text-[10pt]">
-            <li><strong>{t("skills.languages")}:</strong> {cv.skills.languages.join(", ")}</li>
-            <li><strong>{t("skills.frameworks")}:</strong> {cv.skills.frameworks.join(", ")}</li>
-            <li><strong>{t("skills.databases")}:</strong> {cv.skills.databases.join(", ")}</li>
-            <li><strong>{t("skills.practices")}:</strong> {cv.skills.practices.join(", ")}</li>
-            <li><strong>{t("skills.tooling")}:</strong> {cv.skills.tooling.join(", ")}</li>
-            <li><strong>{t("skills.integrations")}:</strong> {cv.skills.integrations.join(", ")}</li>
+          <ul className="space-y-1">
+            <li>
+              <strong>{t("skills.languages")}:</strong> {cv.skills.languages.join(", ")}
+            </li>
+            <li>
+              <strong>{t("skills.frameworks")}:</strong> {cv.skills.frameworks.join(", ")}
+            </li>
+            <li>
+              <strong>{t("skills.databases")}:</strong> {cv.skills.databases.join(", ")}
+            </li>
+            <li>
+              <strong>{t("skills.practices")}:</strong> {cv.skills.practices.join(", ")}
+            </li>
+            <li>
+              <strong>{t("skills.tooling")}:</strong> {cv.skills.tooling.join(", ")}
+            </li>
+            <li>
+              <strong>{t("skills.integrations")}:</strong> {cv.skills.integrations.join(", ")}
+            </li>
           </ul>
         </Section>
 
         <Section title={t("cv.languages")}>
-          <ul className="space-y-1 text-sm print:text-[10pt]">
-            {cv.languages.map((l) => (
-              <li key={l.name[lang]}>
-                <strong>{l.name[lang]}:</strong> {l.level[lang]}
-              </li>
-            ))}
-          </ul>
+          <p>{cv.languages.map((l) => `${l.name[lang]} (${l.level[lang]})`).join(" · ")}</p>
         </Section>
 
         <Section title={t("cv.projects")}>
           {cv.projects.map((p) => (
             <div key={p.name} className="cv-block mb-2 last:mb-0">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 className="text-base font-semibold print:text-[11pt]">{p.name}</h3>
-                <span className="font-mono text-xs text-muted-foreground print:text-[9.5pt] print:text-black">
+                <h3>
+                  {p.url ? (
+                    <a href={p.url} target="_blank" rel="noreferrer">
+                      {p.name}
+                    </a>
+                  ) : (
+                    p.name
+                  )}
+                </h3>
+                <span className="font-mono text-xs">
                   {formatPeriod(p.startDate, p.endDate, lang)}
                 </span>
               </div>
-              <p className="text-sm print:text-[10pt]">{p.description[lang]}</p>
+              <p>{p.description[lang]}</p>
             </div>
           ))}
         </Section>
@@ -137,38 +156,46 @@ function CvPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="cv-block mt-8 border-t border-hairline pt-4 print:mt-5 print:border-t print:border-black/40 print:pt-2">
-      <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground print:text-[10pt] print:text-black">
-        {title}
-      </h2>
+    <section>
+      <h2>{title}</h2>
       {children}
     </section>
   );
 }
 
 function Job({ w, lang }: { w: WorkItem; lang: ReturnType<typeof currentLang> }) {
+  const { t } = useTranslation();
+
   return (
     <div className="cv-block mb-5 last:mb-0">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-base font-semibold print:text-[11pt]">
+        <h3>
           {w.position[lang]} — {w.name}
         </h3>
-        <span className="font-mono text-xs text-muted-foreground print:text-[9.5pt] print:text-black">
-          {formatPeriod(w.startDate, w.endDate, lang)}
-        </span>
+        <span className="font-mono text-xs">{formatPeriod(w.startDate, w.endDate, lang)}</span>
       </div>
-      <div className="text-sm text-muted-foreground print:text-[10pt] print:text-black">
+      <div className="cv-meta">
         {w.location[lang]} · {w.modality[lang]}
       </div>
-      <p className="mt-1 text-sm print:text-[10pt]">{w.summary[lang]}</p>
-      <ul className="mt-2 list-disc space-y-0.5 pl-5 text-sm print:text-[10pt]">
+      <p className="mt-1">{w.summary[lang]}</p>
+      <ul className="mt-2 list-disc space-y-0.5 pl-5">
         {w.highlights[lang].map((h, i) => (
           <li key={i}>{h}</li>
         ))}
       </ul>
-      <div className="mt-1.5 text-xs text-muted-foreground print:text-[9.5pt] print:text-black">
-        <strong>Stack:</strong> {w.technologies}
+      <div className="cv-stack mt-1.5">
+        <strong>{t("experience.stack")}:</strong> {w.technologies}
       </div>
     </div>
   );
+}
+
+function formatPrintDate(date: Date): string {
+  return new Intl.DateTimeFormat("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })
+    .format(date)
+    .replaceAll("/", "-");
 }

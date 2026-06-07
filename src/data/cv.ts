@@ -1,54 +1,103 @@
-// CV data. Translatable strings use { es, ca, en }.
-// Update this file to update content everywhere (portfolio + printable CV).
+// CV business data. Keep portfolio UI labels, SEO copy and helper text in src/i18n/translations.ts.
+//
+// This is intentionally a TypeScript "JSON-like" object instead of a .json file:
+// - comments explain each field for humans and AI agents generating CV content;
+// - TypeScript validates the shape at build time;
+// - all translatable CV content uses { es, ca, en } so the same data powers every language.
+//
+// Editing rule of thumb:
+// - Put facts about the person, companies, projects, education and skills here.
+// - Put button labels, section titles, page subtitles and interface descriptions in translations.ts.
 
 export type Lang = "es" | "ca" | "en";
 export type LocalizedString = Record<Lang, string>;
 export type LocalizedList = Record<Lang, string[]>;
 
+export interface ProfileItem {
+  network: string;
+  username: string;
+  url: string;
+}
+
+export interface LanguageItem {
+  // BCP-47 language code used in structured data and machine-readable output.
+  code: Lang;
+  name: LocalizedString;
+  level: LocalizedString;
+}
+
 export interface WorkItem {
+  // Public company or organization name as it should appear in the CV.
   name: string;
+  // Role title. Keep concise; this is used in cards and in the printable CV.
   position: LocalizedString;
+  // Optional public URL for the company.
   url?: string;
-  startDate: string; // ISO
+  // ISO date (YYYY-MM-DD). Month/year is rendered from this value.
+  startDate: string;
+  // ISO date or null for current roles.
   endDate: string | null;
+  // Short paragraph describing scope and context of the role.
   summary: LocalizedString;
+  // Impact bullets. Prefer measurable outcomes and shipped work.
   highlights: LocalizedList;
+  // Comma-separated stack for display chips and the printable CV.
   technologies: string;
+  // City/country or remote region shown next to the role.
   location: LocalizedString;
+  // Remote, hybrid or on-site.
   modality: LocalizedString;
+  // Marks the role with the "present/current" UI label.
   current?: boolean;
 }
 
 export interface ProjectItem {
+  // Project/product name as recruiters or stakeholders would recognize it.
   name: string;
+  // Optional public URL (product page, repo, marketplace listing, etc.).
+  url?: string;
+  // One-sentence business description of the project.
   description: LocalizedString;
+  // Tags or compact highlights shown as chips.
   highlights: LocalizedList;
+  // ISO date (YYYY-MM-DD).
   startDate: string;
+  // ISO date or null when the project is active.
   endDate: string | null;
+  // Controls active/archived presentation.
   active: boolean;
 }
 
 export interface EducationItem {
+  // School, university or training provider.
   institution: string;
+  // Subject area or specialization.
   area: LocalizedString;
+  // Degree, certificate or program name.
   studyType: LocalizedString;
+  // ISO date (YYYY-MM-DD).
   startDate: string;
+  // ISO date (YYYY-MM-DD).
   endDate: string;
+  // Short description of relevant focus areas.
   summary: LocalizedString;
 }
 
 export const cv = {
+  // Personal and contact data used across header, contact page, footer and printable CV.
   basics: {
     name: "Ubaldo Santos Patón",
+    givenName: "Ubaldo",
+    familyName: "Santos Patón",
     label: {
       es: "Ingeniero de Software Full-Stack · TypeScript · PHP · Laravel · Vue",
       ca: "Enginyer de Programari Full-Stack · TypeScript · PHP · Laravel · Vue",
       en: "Full-Stack Software Engineer · TypeScript · PHP · Laravel · Vue",
     } satisfies LocalizedString,
     tagline: {
-      es: "Construyo SDKs, integraciones y plataformas educativas que escalan.",
-      ca: "Construeixo SDKs, integracions i plataformes educatives que escalen.",
-      en: "I build SDKs, integrations and edtech platforms that scale.",
+      es: "Ingeniero full-stack con 6+ años en producto. Especializado en TypeScript y PHP/Laravel: SDKs multiplataforma, integraciones edtech y plataformas de assessment con foco en calidad, arquitectura y rendimiento.",
+      ca: "Enginyer full-stack amb més de 6 anys en producte. Especialitzat en TypeScript i PHP/Laravel: SDKs multiplataforma, integracions edtech i plataformes d'assessment amb focus en qualitat, arquitectura i rendiment.",
+      en: "Full-stack engineer with 6+ years in product. Specialized in TypeScript and PHP/Laravel: cross-platform SDKs, edtech integrations and assessment platforms with a focus on quality, architecture and performance.",
     } satisfies LocalizedString,
     summary: {
       es: "Ingeniero de Software Full-Stack con más de 6 años de experiencia en producto. Especializado en TypeScript/JavaScript y PHP/Laravel, con foco en calidad de código, arquitectura mantenible, accesibilidad y rendimiento. Actualmente en Wiris en el equipo de Assessment desarrollando Nubric (antes Learning Lemur) en Laravel, una plataforma de assessment matemático. Previamente, en el equipo de Integraciones desarrollé el SDK multiplataforma de MathType.",
@@ -62,21 +111,34 @@ export const cv = {
       ca: "Badalona, Barcelona · Espanya",
       en: "Badalona, Barcelona · Spain",
     } satisfies LocalizedString,
+    address: {
+      locality: "Badalona, Barcelona",
+      countryCode: "ES",
+    },
     url: "https://ubaldo.is-a.dev",
     profiles: [
-      { network: "LinkedIn", username: "ubaldo-santos", url: "https://linkedin.com/in/ubaldo-santos" },
-      { network: "GitHub", username: "usantos-at-wiris", url: "https://github.com/usantos-at-wiris" },
-    ],
+      {
+        network: "LinkedIn",
+        username: "ubaldo-santos",
+        url: "https://www.linkedin.com/in/ubaldo-santos",
+      },
+      {
+        network: "GitHub",
+        username: "usantos-at-wiris",
+        url: "https://github.com/usantos-at-wiris",
+      },
+    ] satisfies ProfileItem[],
   },
+  // Professional roles, newest first. Consecutive roles with the same company are grouped in the experience page.
   work: [
     {
       name: "Wiris",
       position: {
-        es: "Ingeniero de Software · Equipo de Assessment (Nubric)",
-        ca: "Enginyer de Programari · Equip d'Assessment (Nubric)",
-        en: "Software Engineer · Assessment Team (Nubric)",
+        es: "Ingeniero de Software · Assessment (Nubric)",
+        ca: "Enginyer de Programari · Assessment (Nubric)",
+        en: "Software Engineer · Assessment (Nubric)",
       },
-      url: "https://wiris.net",
+      url: "https://www.wiris.com/",
       startDate: "2025-04-10",
       endDate: null,
       current: true,
@@ -112,11 +174,11 @@ export const cv = {
     {
       name: "Wiris",
       position: {
-        es: "Ingeniero de Software · Equipo de Integraciones (MathType)",
-        ca: "Enginyer de Programari · Equip d'Integracions (MathType)",
-        en: "Software Engineer · Integrations Team (MathType)",
+        es: "Ingeniero de Software · Integraciones (MathType)",
+        ca: "Enginyer de Programari · Integracions (MathType)",
+        en: "Software Engineer · Integrations (MathType)",
       },
-      url: "https://wiris.net",
+      url: "https://www.wiris.com/",
       startDate: "2024-03-10",
       endDate: "2025-04-09",
       summary: {
@@ -144,18 +206,19 @@ export const cv = {
           "Implemented cross-platform, multi-language integration solutions",
         ],
       },
-      technologies: "TypeScript, JavaScript, Deno, Vue.js, CKEditor, TinyMCE, Froala, Moodle, MS Office & Google Docs APIs",
+      technologies:
+        "TypeScript, JavaScript, Deno, Vue.js, CKEditor, TinyMCE, Froala, Moodle, MS Office & Google Docs APIs",
       location: { es: "Barcelona, España", ca: "Barcelona, Espanya", en: "Barcelona, Spain" },
       modality: { es: "Híbrido", ca: "Híbrid", en: "Hybrid" },
     },
     {
       name: "Rotrafu",
       position: {
-        es: "Desarrollador Full-Stack PHP/Laravel · Responsable IT",
-        ca: "Desenvolupador Full-Stack PHP/Laravel · Responsable IT",
-        en: "Full-Stack PHP/Laravel Developer · IT Lead",
+        es: "Desarrollador Full-Stack · Responsable IT",
+        ca: "Desenvolupador Full-Stack · Responsable IT",
+        en: "Full-Stack Developer · IT Lead",
       },
-      url: "https://rotrafu.net",
+      url: "https://www.rotrafu.net/",
       startDate: "2020-06-01",
       endDate: "2024-03-01",
       summary: {
@@ -187,15 +250,19 @@ export const cv = {
         ],
       },
       technologies: "PHP, Laravel, MySQL, JavaScript, REST APIs, Git, Docker, Agile",
-      location: { es: "Hospitalet de Llobregat, Barcelona", ca: "Hospitalet de Llobregat, Barcelona", en: "Hospitalet de Llobregat, Barcelona" },
+      location: {
+        es: "Hospitalet de Llobregat, Barcelona",
+        ca: "Hospitalet de Llobregat, Barcelona",
+        en: "Hospitalet de Llobregat, Barcelona",
+      },
       modality: { es: "Remoto", ca: "Remot", en: "Remote" },
     },
     {
       name: "Prime IT",
       position: {
-        es: "Desarrollador Full-Stack PHP/Laravel (Consultoría)",
-        ca: "Desenvolupador Full-Stack PHP/Laravel (Consultoria)",
-        en: "Full-Stack PHP/Laravel Developer (Consulting)",
+        es: "Desarrollador Full-Stack · Consultoría",
+        ca: "Desenvolupador Full-Stack · Consultoria",
+        en: "Full-Stack Developer · Consulting",
       },
       url: "https://www.primeit.es",
       startDate: "2023-06-01",
@@ -227,15 +294,16 @@ export const cv = {
       modality: { es: "Remoto", ca: "Remot", en: "Remote" },
     },
   ] satisfies WorkItem[],
+  // Internships, dual training and early career placements, newest first.
   trainee: [
     {
       name: "iThinkUPC",
       position: {
-        es: "Desarrollador Full-Stack PHP/Moodle (Prácticas)",
-        ca: "Desenvolupador Full-Stack PHP/Moodle (Pràctiques)",
-        en: "Full-Stack PHP/Moodle Developer (Internship)",
+        es: "Desarrollador Full-Stack · Prácticas (Moodle)",
+        ca: "Desenvolupador Full-Stack · Pràctiques (Moodle)",
+        en: "Full-Stack Developer · Internship (Moodle)",
       },
-      url: "https://www.ithinkupc.com",
+      url: "https://www.thinkupc.com/en/",
       startDate: "2023-03-01",
       endDate: "2023-06-01",
       summary: {
@@ -244,9 +312,21 @@ export const cv = {
         en: "PHP developer in a 13-person team. Features for Atenea (UPC's Moodle-based LMS).",
       },
       highlights: {
-        es: ["Funcionalidades clave en Atenea/Moodle", "Resolución de tickets y soporte", "Trabajo ágil en equipo multidisciplinario"],
-        ca: ["Funcionalitats clau a Atenea/Moodle", "Resolució de tiquets i suport", "Treball àgil en equip multidisciplinari"],
-        en: ["Key features on Atenea/Moodle", "Ticket resolution and support", "Agile work in a cross-functional team"],
+        es: [
+          "Funcionalidades clave en Atenea/Moodle",
+          "Resolución de tickets y soporte",
+          "Trabajo ágil en equipo multidisciplinario",
+        ],
+        ca: [
+          "Funcionalitats clau a Atenea/Moodle",
+          "Resolució de tiquets i suport",
+          "Treball àgil en equip multidisciplinari",
+        ],
+        en: [
+          "Key features on Atenea/Moodle",
+          "Ticket resolution and support",
+          "Agile work in a cross-functional team",
+        ],
       },
       technologies: "PHP, Moodle, MySQL, REST APIs, Git",
       location: { es: "Barcelona, España", ca: "Barcelona, Espanya", en: "Barcelona, Spain" },
@@ -255,11 +335,11 @@ export const cv = {
     {
       name: "XMI Tech",
       position: {
-        es: "Desarrollador Full-Stack PHP (Formación Dual)",
-        ca: "Desenvolupador Full-Stack PHP (Formació Dual)",
-        en: "Full-Stack PHP Developer (Dual Training)",
+        es: "Desarrollador Full-Stack · Formación Dual",
+        ca: "Desenvolupador Full-Stack · Formació Dual",
+        en: "Full-Stack Developer · Dual Training",
       },
-      url: "https://www.xmitech.com",
+      url: "https://xmitech.com/",
       startDate: "2020-09-01",
       endDate: "2021-06-01",
       summary: {
@@ -283,7 +363,7 @@ export const cv = {
         ca: "Software Developer · Administració de Xarxes",
         en: "Software Developer · Network Administration",
       },
-      url: "",
+      url: "https://ectarc.com/",
       startDate: "2019-05-01",
       endDate: "2019-07-01",
       summary: {
@@ -292,18 +372,32 @@ export const cv = {
         en: "International experience in the UK (Erasmus+). Incident-management app in C# and network admin.",
       },
       highlights: {
-        es: ["App C# Windows Forms", "Configuración de infraestructura de red", "Equipo multicultural"],
-        ca: ["App C# Windows Forms", "Configuració d'infraestructura de xarxa", "Equip multicultural"],
+        es: [
+          "App C# Windows Forms",
+          "Configuración de infraestructura de red",
+          "Equipo multicultural",
+        ],
+        ca: [
+          "App C# Windows Forms",
+          "Configuració d'infraestructura de xarxa",
+          "Equip multicultural",
+        ],
         en: ["C# Windows Forms app", "Network infrastructure setup", "Multicultural team"],
       },
       technologies: "C#, .NET, Networking",
-      location: { es: "Llangollen, Reino Unido", ca: "Llangollen, Regne Unit", en: "Llangollen, United Kingdom" },
+      location: {
+        es: "Llangollen, Reino Unido",
+        ca: "Llangollen, Regne Unit",
+        en: "Llangollen, United Kingdom",
+      },
       modality: { es: "Presencial", ca: "Presencial", en: "On-site" },
     },
   ] satisfies WorkItem[],
+  // Representative shipped products/projects. These are business CV content, not UI cards.
   projects: [
     {
       name: "Nubric (Learning Lemur)",
+      url: "https://www.wiris.com/en/nubric/",
       active: true,
       description: {
         es: "Plataforma de assessment matemático en Laravel: creación y autocorrección de ejercicios con MathType embebido.",
@@ -320,6 +414,7 @@ export const cv = {
     },
     {
       name: "MathType Integrations SDK",
+      url: "https://www.wiris.com/en/solutions/integrations/",
       active: true,
       description: {
         es: "SDK multiplataforma para integrar MathType en editores. Arquitectura hexagonal y TypeScript.",
@@ -336,6 +431,7 @@ export const cv = {
     },
     {
       name: "MathType Add-in for Microsoft Office",
+      url: "https://www.wiris.com/en/mathtype/office-tools/",
       active: true,
       description: {
         es: "Add-in para Word y PowerPoint usando APIs de Office y el SDK de MathType, con Vue.js.",
@@ -352,6 +448,7 @@ export const cv = {
     },
     {
       name: "ROTRAFU 2.0",
+      url: "https://www.rotrafu.net/",
       active: true,
       description: {
         es: "Rediseño completo de la app de gestión funeraria en Laravel: UX, escalabilidad y seguridad. +50.000 servicios.",
@@ -367,11 +464,20 @@ export const cv = {
       endDate: "2024-03-01",
     },
   ] satisfies ProjectItem[],
+  // Formal education and training, newest first.
   education: [
     {
       institution: "Universitat Oberta de Catalunya",
-      area: { es: "Ingeniería de Software", ca: "Enginyeria del Programari", en: "Software Engineering" },
-      studyType: { es: "Grado en Ingeniería Informática", ca: "Grau en Enginyeria Informàtica", en: "BSc in Computer Engineering" },
+      area: {
+        es: "Ingeniería de Software",
+        ca: "Enginyeria del Programari",
+        en: "Software Engineering",
+      },
+      studyType: {
+        es: "Grado en Ingeniería Informática",
+        ca: "Grau en Enginyeria Informàtica",
+        en: "BSc in Computer Engineering",
+      },
       startDate: "2020-01-01",
       endDate: "2025-06-01",
       summary: {
@@ -382,8 +488,16 @@ export const cv = {
     },
     {
       institution: "INS La Pineda",
-      area: { es: "Desarrollo de Aplicaciones Web", ca: "Desenvolupament d'Aplicacions Web", en: "Web Application Development" },
-      studyType: { es: "CFGS DAW (Dual)", ca: "CFGS DAW (Dual)", en: "Higher Vocational Degree (Dual)" },
+      area: {
+        es: "Desarrollo de Aplicaciones Web",
+        ca: "Desenvolupament d'Aplicacions Web",
+        en: "Web Application Development",
+      },
+      studyType: {
+        es: "CFGS DAW (Dual)",
+        ca: "CFGS DAW (Dual)",
+        en: "Higher Vocational Degree (Dual)",
+      },
       startDate: "2019-09-01",
       endDate: "2021-06-01",
       summary: {
@@ -394,7 +508,11 @@ export const cv = {
     },
     {
       institution: "IES La Pineda",
-      area: { es: "Administración de Sistemas Informáticos en Red", ca: "Administració de Sistemes Informàtics en Xarxa", en: "Network Systems Administration" },
+      area: {
+        es: "Administración de Sistemas Informáticos en Red",
+        ca: "Administració de Sistemes Informàtics en Xarxa",
+        en: "Network Systems Administration",
+      },
       studyType: { es: "CFGS ASIR", ca: "CFGS ASIR", en: "Higher Vocational Degree" },
       startDate: "2016-09-01",
       endDate: "2018-06-01",
@@ -405,22 +523,96 @@ export const cv = {
       },
     },
   ] satisfies EducationItem[],
+  // Skills taxonomy used by the homepage, skills page and printable CV.
   skills: {
+    // Primary stack shown on the homepage and skills page callout.
+    primaryStack: {
+      backend: ["PHP", "Laravel"],
+      frontend: ["TypeScript", "Vue"],
+    },
+    // Programming and markup languages.
     languages: ["TypeScript", "JavaScript", "PHP", "SQL", "HTML", "CSS"],
-    frameworks: ["Laravel", "Vue.js", "Node.js", "Deno", "CodeIgniter", "Angular", "Electron", "Tailwind CSS"],
+    // Frameworks, runtimes and frontend/backend libraries.
+    frameworks: [
+      "Laravel",
+      "Vue.js",
+      "Node.js",
+      "Deno",
+      "CodeIgniter",
+      "Angular",
+      "Electron",
+      "Tailwind CSS",
+    ],
+    // Databases and persistence technologies.
     databases: ["MySQL", "MongoDB"],
-    practices: ["Arquitectura Hexagonal", "DDD", "TDD", "SOLID", "Clean Code", "Refactoring", "Testing"],
+    // Engineering practices and architecture keywords.
+    practices: [
+      "Arquitectura Hexagonal",
+      "DDD",
+      "TDD",
+      "SOLID",
+      "Clean Code",
+      "Refactoring",
+      "Testing",
+    ],
+    // Tools, platforms and delivery practices.
     tooling: ["Git", "GitHub Actions", "Docker", "Linux", "Vite", "CI/CD"],
-    integrations: ["MathType", "Moodle", "CKEditor", "TinyMCE", "Froala", "MS Office", "Google Docs"],
+    // Product integrations, platforms and domains.
+    integrations: [
+      "MathType",
+      "Moodle",
+      "CKEditor",
+      "TinyMCE",
+      "Froala",
+      "MS Office",
+      "Google Docs",
+    ],
+    // Hero ribbon keywords. Keep short because they scroll horizontally.
+    ribbon: [
+      "PHP",
+      "Laravel",
+      "TypeScript",
+      "Vue.js",
+      "Deno",
+      "Node.js",
+      "Docker",
+      "MySQL",
+      "MongoDB",
+      "Git",
+      "GitHub Actions",
+      "Vite",
+      "Tailwind",
+      "Edtech",
+      "MathType",
+      "Moodle",
+      "AI",
+      "MCP",
+    ],
   },
+  // Spoken languages and proficiency levels.
   languages: [
-    { name: { es: "Español", ca: "Espanyol", en: "Spanish" }, level: { es: "Nativo", ca: "Natiu", en: "Native" } },
-    { name: { es: "Catalán", ca: "Català", en: "Catalan" }, level: { es: "Nativo", ca: "Natiu", en: "Native" } },
-    { name: { es: "Inglés", ca: "Anglès", en: "English" }, level: { es: "Avanzado (B2)", ca: "Avançat (B2)", en: "Advanced (B2)" } },
-  ],
+    {
+      code: "es",
+      name: { es: "Español", ca: "Espanyol", en: "Spanish" },
+      level: { es: "Nativo", ca: "Natiu", en: "Native" },
+    },
+    {
+      code: "ca",
+      name: { es: "Catalán", ca: "Català", en: "Catalan" },
+      level: { es: "Nativo", ca: "Natiu", en: "Native" },
+    },
+    {
+      code: "en",
+      name: { es: "Inglés", ca: "Anglès", en: "English" },
+      level: { es: "Avanzado (B2)", ca: "Avançat (B2)", en: "Advanced (B2)" },
+    },
+  ] satisfies LanguageItem[],
 } as const;
 
-export function pick<T extends LocalizedString | LocalizedList>(field: T, lang: Lang): T extends LocalizedList ? string[] : string {
+export function pick<T extends LocalizedString | LocalizedList>(
+  field: T,
+  lang: Lang,
+): T extends LocalizedList ? string[] : string {
   // @ts-expect-error narrowed at runtime
   return field[lang];
 }

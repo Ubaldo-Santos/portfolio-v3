@@ -1,9 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
-import es from "./locales/es.json";
-import ca from "./locales/ca.json";
-import en from "./locales/en.json";
+import { translations } from "./translations";
 
 export const SUPPORTED_LANGS = ["es", "ca", "en"] as const;
 export type Lang = (typeof SUPPORTED_LANGS)[number];
@@ -13,9 +11,9 @@ export type Lang = (typeof SUPPORTED_LANGS)[number];
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources: {
-      es: { translation: es },
-      ca: { translation: ca },
-      en: { translation: en },
+      es: { translation: translations.es },
+      ca: { translation: translations.ca },
+      en: { translation: translations.en },
     },
     lng: "es",
     fallbackLng: "es",
