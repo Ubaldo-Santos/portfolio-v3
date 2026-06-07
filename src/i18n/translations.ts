@@ -45,13 +45,11 @@ export const translations = {
       experience: "Experiencia",
       projects: "Proyectos",
       skills: "Skills",
-      ai: "IA",
       contact: "Contacto",
       cv: "Curriculum Vitae",
     },
     actions: {
       printCv: "Imprimir CV",
-      downloadCv: "Descargar CV",
       viewCv: "Ver CV",
       viewProject: "Ver más",
       contactMe: "Contáctame",
@@ -119,32 +117,6 @@ export const translations = {
         body: "Uso IA como copiloto a diario (GitHub Copilot a nivel organización, Cursor CLI con reglas en el repo, OpenRouter para enrutar a varios modelos con fallback, MCP para conectar el modelo a datos reales). También la he integrado en producto, no solo en mi editor.",
         tags: ["GitHub Copilot (org)", "Cursor CLI", "OpenRouter", "MCP", "Agent Skills"],
       },
-    },
-    ai: {
-      title: "IA en mi día a día",
-      subtitle:
-        "Cómo configuro y uso herramientas de IA en producto: criterios, integraciones y plantillas.",
-      philosophyTitle: "Filosofía",
-      philosophy:
-        "La IA es un copiloto, no un piloto. La uso para acelerar la exploración, generar boilerplate y revisar código — siempre con criterio humano, tests y revisiones antes de mergear.",
-      copilotTitle: "GitHub Copilot — configuración a nivel organización",
-      copilotDesc:
-        "Política sensata para equipos: privacidad, modelos disponibles, repos permitidos y limites de contexto.",
-      cursorTitle: "Cursor CLI y editor",
-      cursorDesc:
-        "Reglas de proyecto, comandos slash y agentes versionados en el repo. La consola se queda fuera del flujo para no romper el foco.",
-      openrouterTitle: "OpenRouter",
-      openrouterDesc:
-        "Una sola API key para enrutar a múltiples modelos (Claude, GPT, DeepSeek, Gemini) con fallback y observabilidad.",
-      mcpTitle: "MCP — Model Context Protocol",
-      mcpDesc:
-        "Conectores estandarizados entre el modelo y los datos reales: Jira, Linear, GitHub, bases de datos. Menos copy-paste, más contexto.",
-      skillsTitle: "Skills",
-      skillsDesc:
-        "Procedimientos reusables guardados en el repo: cómo crear un PR, cómo escribir migraciones, cómo revisar accesibilidad. El agente los aplica solo cuando aplica.",
-      stackTitle: "Mi stack de IA",
-      providersTitle: "Proveedores",
-      tipTitle: "Buenas prácticas",
     },
     contact: {
       title: "Hablemos",
@@ -232,13 +204,11 @@ export const translations = {
       experience: "Experiència",
       projects: "Projectes",
       skills: "Skills",
-      ai: "IA",
       contact: "Contacte",
       cv: "Currículum vitae",
     },
     actions: {
       printCv: "Imprimir CV",
-      downloadCv: "Descarregar CV",
       viewCv: "Veure CV",
       viewProject: "Veure més",
       contactMe: "Contacta'm",
@@ -306,32 +276,6 @@ export const translations = {
         body: "Faig servir IA com a copilot a diari (GitHub Copilot a nivell d'organització, Cursor CLI amb regles al repo, OpenRouter per enrutar a diversos models amb fallback, MCP per connectar el model a dades reals). També l'he integrada en producte, no només al meu editor.",
         tags: ["GitHub Copilot (org)", "Cursor CLI", "OpenRouter", "MCP", "Agent Skills"],
       },
-    },
-    ai: {
-      title: "IA en el meu dia a dia",
-      subtitle:
-        "Com configuro i faig servir eines d'IA en producte: criteris, integracions i plantilles.",
-      philosophyTitle: "Filosofia",
-      philosophy:
-        "La IA és un copilot, no el pilot. La faig servir per accelerar l'exploració, generar boilerplate i revisar codi — sempre amb criteri humà, tests i revisions abans de fer merge.",
-      copilotTitle: "GitHub Copilot — configuració a nivell d'organització",
-      copilotDesc:
-        "Política sensata per a equips: privacitat, models disponibles, repos permesos i límits de context.",
-      cursorTitle: "Cursor CLI i editor",
-      cursorDesc:
-        "Regles de projecte, comandes slash i agents versionats al repo. La consola es queda fora del flux per no trencar el focus.",
-      openrouterTitle: "OpenRouter",
-      openrouterDesc:
-        "Una sola API key per enrutar a múltiples models (Claude, GPT, DeepSeek, Gemini) amb fallback i observabilitat.",
-      mcpTitle: "MCP — Model Context Protocol",
-      mcpDesc:
-        "Connectors estandarditzats entre el model i les dades reals: Jira, Linear, GitHub, bases de dades. Menys copy-paste, més context.",
-      skillsTitle: "Skills",
-      skillsDesc:
-        "Procediments reusables desats al repo: com obrir un PR, com escriure migracions, com revisar accessibilitat. L'agent els aplica només quan toca.",
-      stackTitle: "El meu stack d'IA",
-      providersTitle: "Proveïdors",
-      tipTitle: "Bones pràctiques",
     },
     contact: {
       title: "Parlem",
@@ -419,13 +363,11 @@ export const translations = {
       experience: "Experience",
       projects: "Projects",
       skills: "Skills",
-      ai: "AI",
       contact: "Contact",
       cv: "Curriculum Vitae",
     },
     actions: {
       printCv: "Print CV",
-      downloadCv: "Download CV",
       viewCv: "View CV",
       viewProject: "View more",
       contactMe: "Get in touch",
@@ -493,32 +435,6 @@ export const translations = {
         body: "I use AI as a copilot daily (GitHub Copilot at the org level, Cursor CLI with rules versioned in the repo, OpenRouter to route between models with fallback, MCP to connect the model to real data). I've also shipped AI into product, not just my editor.",
         tags: ["GitHub Copilot (org)", "Cursor CLI", "OpenRouter", "MCP", "Agent Skills"],
       },
-    },
-    ai: {
-      title: "AI in my daily work",
-      subtitle:
-        "How I configure and use AI tools in product: criteria, integrations and templates.",
-      philosophyTitle: "Philosophy",
-      philosophy:
-        "AI is a copilot, not the pilot. I use it to accelerate exploration, generate boilerplate and review code — always with human judgement, tests and reviews before merging.",
-      copilotTitle: "GitHub Copilot — org-level configuration",
-      copilotDesc:
-        "Sensible policy for teams: privacy, allowed models, permitted repos and context limits.",
-      cursorTitle: "Cursor CLI & editor",
-      cursorDesc:
-        "Project rules, slash commands and agents versioned in the repo. The CLI stays out of the way so focus is preserved.",
-      openrouterTitle: "OpenRouter",
-      openrouterDesc:
-        "One API key to route across multiple models (Claude, GPT, DeepSeek, Gemini) with fallback and observability.",
-      mcpTitle: "MCP — Model Context Protocol",
-      mcpDesc:
-        "Standardized connectors between the model and real data: Jira, Linear, GitHub, databases. Less copy-paste, more context.",
-      skillsTitle: "Skills",
-      skillsDesc:
-        "Reusable procedures stored in the repo: how to open a PR, how to write migrations, how to review accessibility. The agent applies them only when relevant.",
-      stackTitle: "My AI stack",
-      providersTitle: "Providers",
-      tipTitle: "Good practices",
     },
     contact: {
       title: "Let's talk",
