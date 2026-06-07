@@ -41,7 +41,7 @@ function ProjectsPage() {
                     <span
                       className={
                         p.active
-                          ? "rounded-full border border-accent/60 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-accent"
+                          ? "rounded-full border border-accent bg-accent/20 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest"
                           : "rounded-full border border-hairline px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
                       }
                     >

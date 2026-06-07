@@ -1,65 +1,22 @@
 import { cn } from "@/lib/utils";
 import { cv } from "@/data/cv";
+import codeSandboxLogo from "./code-sandbox.svg?url";
 
 type LogoMarkProps = {
   className?: string;
 };
 
-/**
- * Monograma propio "US" (Ubaldo Santos) en una forma squircle hairline.
- * Sin dependencias externas, hereda color del contenedor (`currentColor`)
- * y usa el token `--accent` para el punto.
- */
 function LogoMark({ className }: LogoMarkProps) {
   return (
-    <svg
-      viewBox="0 0 48 48"
+    <img
+      src={codeSandboxLogo}
+      alt=""
       aria-hidden
-      focusable="false"
-      className={cn("shrink-0 text-[oklch(0.34_0.01_80)] dark:text-[oklch(0.72_0.01_90)]", className)}
-    >
-      {/* squircle frame */}
-      <path
-        d="M24 2.5
-           C 8.5 2.5, 2.5 8.5, 2.5 24
-           S 8.5 45.5, 24 45.5
-           S 45.5 39.5, 45.5 24
-           S 39.5 2.5, 24 2.5 Z"
-        fill="none"
-        stroke="currentColor"
-        strokeOpacity="0.55"
-        strokeWidth="1.25"
-      />
-      {/* U */}
-      <text
-        x="14.5"
-        y="26"
-        textAnchor="middle"
-        fontFamily="Fraunces, ui-serif, Georgia, serif"
-        fontWeight="800"
-        fontSize="20"
-        fill="currentColor"
-        style={{ fontVariationSettings: "'opsz' 72, 'SOFT' 0" }}
-      >
-        u
-      </text>
-      {/* S (italic, espejo del wordmark) */}
-      <text
-        x="32"
-        y="34"
-        textAnchor="middle"
-        fontFamily="Fraunces, ui-serif, Georgia, serif"
-        fontWeight="750"
-        fontStyle="italic"
-        fontSize="18"
-        fill="currentColor"
-        style={{ fontVariationSettings: "'opsz' 72, 'SOFT' 0" }}
-      >
-        s
-      </text>
-      {/* acento lime */}
-      <circle cx="37.5" cy="13.5" r="1.6" fill="var(--accent)" />
-    </svg>
+      width={1024}
+      height={1024}
+      decoding="async"
+      className={cn("shrink-0 dark:invert", className)}
+    />
   );
 }
 
@@ -69,7 +26,7 @@ type BrandLogoProps = {
   variant?: "nav" | "footer";
 };
 
-/** Monograma US + wordmark — header y footer. */
+/** CodeSandbox mark + name lockup — header and footer only. */
 export function BrandLogo({ className, iconClassName, variant = "nav" }: BrandLogoProps) {
   const isFooter = variant === "footer";
 
@@ -77,13 +34,13 @@ export function BrandLogo({ className, iconClassName, variant = "nav" }: BrandLo
     <span
       className={cn(
         "inline-flex items-center",
-        isFooter ? "gap-2.5" : "gap-2",
+        isFooter ? "gap-1.5" : "gap-1",
         className,
       )}
     >
       <LogoMark
         className={cn(
-          isFooter ? "size-12" : "size-9 sm:size-10",
+          isFooter ? "size-14" : "size-11 sm:size-12",
           iconClassName,
         )}
       />

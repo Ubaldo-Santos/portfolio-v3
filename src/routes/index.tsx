@@ -25,14 +25,14 @@ function Home() {
     <div>
       {/* Hero */}
       <section className="relative flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden">
-        {/* Halo lime sutil — acento, no mancha */}
+        {/* Soft accent wash — lighter on mobile so the hero does not read too green */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-32 right-[-20%] size-[280px] rounded-full bg-accent/[0.05] blur-[80px] sm:-top-40 sm:right-[-10%] sm:size-[560px] sm:bg-accent/15 sm:blur-[120px]"
+          className="pointer-events-none absolute -top-32 right-[-20%] size-[320px] rounded-full bg-accent/[0.07] blur-[80px] sm:-top-40 sm:right-[-10%] sm:size-[680px] sm:bg-accent/20 sm:blur-[140px]"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute bottom-0 left-[-20%] size-[200px] rounded-full bg-accent/[0.03] blur-[70px] sm:left-[-10%] sm:size-[320px] sm:bg-accent/[0.07] sm:blur-[110px]"
+          className="pointer-events-none absolute bottom-0 left-[-20%] size-[240px] rounded-full bg-accent/[0.04] blur-[70px] sm:left-[-10%] sm:size-[420px] sm:bg-accent/10 sm:blur-[120px]"
         />
 
         <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-10">

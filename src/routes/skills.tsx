@@ -66,7 +66,7 @@ function SkillsPage() {
 
       {/* AI — single editorial block, no card grid */}
       <Reveal delay={0.05}>
-        <section className="mt-20 grid gap-10 rounded-3xl border border-hairline bg-surface/40 p-8 sm:p-12 md:grid-cols-[1fr_1.4fr]">
+        <section className="mt-20 grid gap-10 rounded-3xl border border-accent/40 bg-gradient-to-br from-accent/10 via-background to-background p-8 sm:p-12 md:grid-cols-[1fr_1.4fr]">
           <header>
             <div className="flex items-center gap-2 text-accent">
               <Sparkles className="size-4" aria-hidden />
@@ -85,7 +85,7 @@ function SkillsPage() {
             <ul className="mt-5 flex flex-wrap gap-1.5">
               {aiTags.map((tag) => (
                 <li key={tag}>
-                  <span className="inline-flex rounded-full border border-hairline bg-background px-2.5 py-1 text-xs">
+                  <span className="inline-flex rounded-full border border-accent/40 bg-background px-2.5 py-1 text-xs">
                     {tag}
                   </span>
                 </li>
