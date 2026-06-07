@@ -119,7 +119,7 @@ export function Footer() {
                   href={item.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-full border border-hairline bg-background/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground transition-colors hover:border-foreground/20 hover:text-foreground"
+                  className="rounded-full border border-hairline bg-background px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground transition-colors hover:border-foreground/20 hover:text-foreground"
                 >
                   {item.name}
                 </a>

@@ -153,28 +153,20 @@ function InfoCard({
   const base =
     "group flex h-full min-h-[112px] flex-col justify-between rounded-2xl border p-5 transition-colors";
   const variant = highlight
-    ? "border-foreground bg-foreground text-background hover:opacity-90"
+    ? "border-accent/50 bg-accent/10 hover:bg-accent/15"
     : "border-hairline bg-surface/40 hover:bg-surface";
   const cls = `${base} ${variant}`;
 
   const body = (
     <>
-      <div
-        className={`flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest ${
-          highlight ? "text-background/80" : "text-muted-foreground"
-        }`}
-      >
+      <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
         {icon}
         <span>{label}</span>
       </div>
       <div className="mt-3 flex items-end justify-between gap-3">
         <span className="font-display text-lg leading-tight">{value}</span>
         {action && (
-          <span
-            className={`font-mono text-[10px] uppercase tracking-widest ${
-              highlight ? "text-background/80" : "text-muted-foreground"
-            }`}
-          >
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
             {action}
           </span>
         )}
