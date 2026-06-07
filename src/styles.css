@@ -233,7 +233,7 @@
 }
 
 #cv-article section {
-  margin-top: 16px;
+  margin-top: 20px;
   padding-top: 7px;
   border-top: 1px solid rgba(0, 0, 0, 0.45);
 }
@@ -243,7 +243,7 @@
 }
 
 #cv-article h2 {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   color: #000000;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 9.5pt;
@@ -286,7 +286,7 @@
 }
 
 #cv-article .cv-meta {
-  margin-top: 1px;
+  margin-top: 2px;
   line-height: 1.32;
 }
 
