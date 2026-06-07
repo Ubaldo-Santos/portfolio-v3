@@ -26,14 +26,14 @@ type BrandLogoProps = {
   variant?: "nav" | "footer";
 };
 
-/** Brand mark + name lockup — header and footer only. Tokens only. */
+/** CodeSandbox mark + name lockup — header and footer only. */
 export function BrandLogo({ className, iconClassName, variant = "nav" }: BrandLogoProps) {
   const isFooter = variant === "footer";
 
   return (
     <span
       className={cn(
-        "inline-flex items-center text-foreground",
+        "inline-flex items-center",
         isFooter ? "gap-1.5" : "gap-1",
         className,
       )}
@@ -45,12 +45,7 @@ export function BrandLogo({ className, iconClassName, variant = "nav" }: BrandLo
         )}
       />
 
-      <span
-        className={cn(
-          "flex min-w-0 flex-col",
-          isFooter ? "" : "hidden sm:flex",
-        )}
-      >
+      <span className="flex min-w-0 flex-col text-[oklch(0.34_0.01_80)] dark:text-[oklch(0.72_0.01_90)]">
         <span
           className={cn(
             "font-display leading-none tracking-tight [font-weight:800] [font-variation-settings:'opsz'_72,'SOFT'_0]",
@@ -61,7 +56,7 @@ export function BrandLogo({ className, iconClassName, variant = "nav" }: BrandLo
         </span>
         <span
           className={cn(
-            "font-display-italic leading-none text-muted-foreground [font-weight:750] [font-variation-settings:'opsz'_72,'SOFT'_0]",
+            "font-display-italic leading-none [font-weight:750] [font-variation-settings:'opsz'_72,'SOFT'_0]",
             isFooter
               ? "-mt-1.5 text-2xl sm:-mt-2 sm:text-3xl"
               : "-mt-1 text-lg sm:-mt-1.5 sm:text-xl",

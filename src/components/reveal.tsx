@@ -62,26 +62,20 @@ export function RevealGroup({
   className,
   delay = 0,
   stagger = 0.07,
-  as = "div",
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
   stagger?: number;
-  /** HTML tag to render as motion element (so stagger reaches direct children). */
-  as?: "div" | "ol" | "ul" | "section";
 }) {
   const reduced = useReducedMotion();
 
   if (reduced) {
-    const Tag = as as "div";
-    return <Tag className={className}>{children}</Tag>;
+    return <div className={className}>{children}</div>;
   }
 
-  const MotionTag = motion[as] as typeof motion.div;
-
   return (
-    <MotionTag
+    <motion.div
       className={className}
       initial="hidden"
       whileInView="show"
@@ -95,33 +89,27 @@ export function RevealGroup({
       }}
     >
       {children}
-    </MotionTag>
+    </motion.div>
   );
 }
-
 
 export function RevealItem({
   children,
   className,
   y = 20,
-  as = "div",
 }: {
   children: ReactNode;
   className?: string;
   y?: number;
-  as?: "div" | "li" | "section" | "article";
 }) {
   const reduced = useReducedMotion();
 
   if (reduced) {
-    const Tag = as as "div";
-    return <Tag className={className}>{children}</Tag>;
+    return <div className={className}>{children}</div>;
   }
 
-  const MotionTag = motion[as] as typeof motion.div;
-
   return (
-    <MotionTag
+    <motion.div
       className={cn(className)}
       variants={{
         hidden: { ...fadeUp.hidden, y },
@@ -129,7 +117,6 @@ export function RevealItem({
       }}
     >
       {children}
-    </MotionTag>
+    </motion.div>
   );
 }
-

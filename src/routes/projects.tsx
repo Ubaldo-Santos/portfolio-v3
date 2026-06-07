@@ -4,9 +4,8 @@ import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
-import { RevealGroup, RevealItem } from "@/components/reveal";
+import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
-import { Chip } from "@/components/ui/chip";
 
 export const Route = createFileRoute("/projects")({
   head: () => routeHead("projects", "/projects"),
@@ -39,15 +38,15 @@ function ProjectsPage() {
                     <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                       {formatPeriod(p.startDate, p.endDate, lang)}
                     </span>
-                    {p.active ? (
-                      <Chip variant="active" size="xs">
-                        {t("projects.active")}
-                      </Chip>
-                    ) : (
-                      <Chip variant="muted" size="xs">
-                        {t("projects.archived")}
-                      </Chip>
-                    )}
+                    <span
+                      className={
+                        p.active
+                          ? "rounded-full border border-accent bg-accent/20 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest"
+                          : "rounded-full border border-hairline px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
+                      }
+                    >
+                      {p.active ? t("projects.active") : t("projects.archived")}
+                    </span>
                   </div>
                   <div className="mt-5 flex items-start justify-between gap-3">
                     <h2 className="font-display text-3xl sm:text-4xl">{p.name}</h2>
@@ -67,9 +66,12 @@ function ProjectsPage() {
                 </div>
                 <div className="mt-6 flex flex-wrap gap-1.5">
                   {p.highlights[lang].map((h) => (
-                    <Chip key={h} variant="neutral" size="sm">
+                    <span
+                      key={h}
+                      className="rounded-full border border-hairline bg-background px-2.5 py-0.5 text-xs"
+                    >
                       {h}
-                    </Chip>
+                    </span>
                   ))}
                 </div>
               </Card>

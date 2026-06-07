@@ -3,9 +3,8 @@ import { useTranslation } from "react-i18next";
 import { cv, type WorkItem } from "@/data/cv";
 import { currentLang, formatPeriod, workAnchorId } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
-import { Reveal } from "@/components/reveal";
+import { RevealGroup, RevealItem } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
-import { Chip } from "@/components/ui/chip";
 import { MapPin, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/experience")({
@@ -57,15 +56,17 @@ function Section({
       <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
         {title}
       </h2>
-      <ol className="mt-8 space-y-12">
-        {groups.map((group, gi) => {
+      <RevealGroup className="mt-8">
+        <ol className="space-y-12">
+        {groups.map((group) => {
+          // Items are most-recent first; oldest start = last item, newest end = first item
           const newest = group[0];
           const oldest = group[group.length - 1];
           const isMulti = group.length > 1;
           const url = newest.url;
           const anyCurrent = group.some((g) => g.current);
           return (
-            <Reveal key={newest.name + newest.startDate} delay={gi * 0.04}>
+            <RevealItem key={newest.name + newest.startDate}>
               <li
                 id={!isMulti ? workAnchorId(newest) : undefined}
                 className="scroll-mt-24 grid gap-6 border-t border-hairline pt-8 md:grid-cols-[200px_1fr]"
@@ -93,15 +94,15 @@ function Section({
                       )}
                     </h3>
                     {anyCurrent && (
-                      <Chip variant="active" size="xs">
+                      <span className="rounded-full border border-accent bg-accent/20 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-foreground">
                         {t("experience.present")}
-                      </Chip>
+                      </span>
                     )}
                   </div>
 
                   {isMulti ? (
                     <ol className="relative mt-5 space-y-8 border-l border-hairline pl-6">
-                      {group.map((w) => (
+                      {group.map((w, idx) => (
                         <li
                           key={w.startDate}
                           id={workAnchorId(w)}
@@ -126,9 +127,9 @@ function Section({
                           </p>
                           <ul className="mt-3 space-y-1.5">
                             {w.highlights[lang].map((h, hidx) => (
-                              <li key={hidx} className="flex gap-2.5 text-sm">
+                              <li key={hidx} className="flex gap-2 text-sm">
                                 <span
-                                  className="mt-2 size-1 shrink-0 rounded-full bg-muted-foreground/60"
+                                  className="mt-2 size-1 shrink-0 rounded-full bg-accent"
                                   aria-hidden
                                 />
                                 <span>{h}</span>
@@ -137,9 +138,12 @@ function Section({
                           </ul>
                           <div className="mt-3 flex flex-wrap gap-1.5">
                             {w.technologies.split(",").map((tech) => (
-                              <Chip key={tech} variant="neutral" size="sm">
+                              <span
+                                key={tech}
+                                className="rounded-full border border-hairline px-2 py-0.5 text-[11px]"
+                              >
                                 {tech.trim()}
-                              </Chip>
+                              </span>
                             ))}
                           </div>
                         </li>
@@ -159,9 +163,9 @@ function Section({
                         </div>
                         <ul className="mt-2 space-y-1.5">
                           {newest.highlights[lang].map((h, idx) => (
-                            <li key={idx} className="flex gap-2.5 text-sm">
+                            <li key={idx} className="flex gap-2 text-sm">
                               <span
-                                className="mt-2 size-1 shrink-0 rounded-full bg-muted-foreground/60"
+                                className="mt-2 size-1 shrink-0 rounded-full bg-accent"
                                 aria-hidden
                               />
                               <span>{h}</span>
@@ -175,9 +179,12 @@ function Section({
                         </div>
                         <div className="mt-2 flex flex-wrap gap-1.5">
                           {newest.technologies.split(",").map((tech) => (
-                            <Chip key={tech} variant="neutral" size="sm">
+                            <span
+                              key={tech}
+                              className="rounded-full border border-hairline px-2.5 py-0.5 text-xs"
+                            >
                               {tech.trim()}
-                            </Chip>
+                            </span>
                           ))}
                         </div>
                       </div>
@@ -185,10 +192,11 @@ function Section({
                   )}
                 </div>
               </li>
-            </Reveal>
+            </RevealItem>
           );
         })}
-      </ol>
+        </ol>
+      </RevealGroup>
     </section>
   );
 }
