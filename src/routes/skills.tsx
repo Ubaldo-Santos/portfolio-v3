@@ -46,7 +46,7 @@ function SkillsPage() {
       <RevealGroup className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" stagger={0.05}>
         {groups.map((g) => (
           <RevealItem key={g.key}>
-            <article className="h-full rounded-2xl border border-hairline bg-surface/30 p-5">
+            <article className="h-full rounded-2xl border border-hairline bg-surface/40 p-5">
               <h3 className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
                 {t(`skills.${g.key}`)}
               </h3>
@@ -105,7 +105,7 @@ function SkillsPage() {
         <ol className="mt-6 space-y-4">
           {cv.education.map((ed, i) => (
             <Reveal key={ed.institution + ed.startDate} delay={i * 0.03}>
-              <li className="grid gap-4 rounded-2xl border border-hairline bg-surface/30 p-5 md:grid-cols-[200px_1fr] md:items-start">
+              <li className="grid gap-4 rounded-2xl border border-hairline bg-surface/40 p-5 md:grid-cols-[200px_1fr] md:items-start">
                 <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
                   {formatPeriod(ed.startDate, ed.endDate, lang)}
                 </div>
@@ -133,7 +133,7 @@ function SkillsPage() {
           {cv.languages.map((l) => (
             <li
               key={l.name[lang]}
-              className="flex items-center justify-between rounded-2xl border border-hairline bg-surface/30 px-4 py-3"
+              className="flex items-center justify-between rounded-2xl border border-hairline bg-surface/40 px-4 py-3"
             >
               <span className="font-display text-xl">{l.name[lang]}</span>
               <span className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">

@@ -32,7 +32,7 @@ export function TechRibbon({ location, items, label }: TechRibbonProps) {
   return (
     <div
       className="relative z-10 h-11 shrink-0 overflow-hidden border-y border-hairline bg-surface/50 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs"
-      role="marquee"
+      role="region"
       aria-label={`${label} · ${location}`}
     >
       <div className="tech-marquee-mask pointer-events-none absolute inset-0 z-10" aria-hidden />
