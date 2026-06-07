@@ -1,12 +1,15 @@
 # Logs
 logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-package-lock.json
+bun-debug.log*
 lerna-debug.log*
+
+# Lockfiles (Bun only — bun.lock is committed)
+package-lock.json
+npm-shrinkwrap.json
+yarn.lock
+pnpm-lock.yaml
+node_modules/.package-lock.json
 
 node_modules
 dist
@@ -16,6 +19,9 @@ dist-ssr
 .tanstack/**
 .nitro
 *.local
+
+# Vercel
+.vercel
 
 # Wrangler / Cloudflare
 .wrangler/

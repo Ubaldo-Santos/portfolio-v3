@@ -1,4 +1,3 @@
-
 # Portfolio de Ubaldo Santos
 
 Portfolio personal en TanStack Start + Tailwind v4, totalmente estático, con i18n (ES/CA/EN), tema claro/oscuro, y un botón de impresión que genera un CV en PDF con formato **ATS-friendly de una columna** (estilo Harvard reverse-chronological).

@@ -1,3 +1,4 @@
+import { useHydrated } from "@tanstack/react-router";
 import { motion, useReducedMotion, type HTMLMotionProps } from "motion/react";
 import type { ReactNode } from "react";
 import { fadeUp, revealEase, staggerContainer, staggerItem } from "@/lib/motion";
@@ -20,8 +21,9 @@ export function Reveal({
   ...rest
 }: RevealProps) {
   const reduced = useReducedMotion();
+  const hydrated = useHydrated();
 
-  if (reduced) {
+  if (!hydrated || reduced) {
     return (
       <div className={className} {...(rest as object)}>
         {children}
@@ -69,8 +71,9 @@ export function RevealGroup({
   stagger?: number;
 }) {
   const reduced = useReducedMotion();
+  const hydrated = useHydrated();
 
-  if (reduced) {
+  if (!hydrated || reduced) {
     return <div className={className}>{children}</div>;
   }
 
@@ -103,8 +106,9 @@ export function RevealItem({
   y?: number;
 }) {
   const reduced = useReducedMotion();
+  const hydrated = useHydrated();
 
-  if (reduced) {
+  if (!hydrated || reduced) {
     return <div className={className}>{children}</div>;
   }
 

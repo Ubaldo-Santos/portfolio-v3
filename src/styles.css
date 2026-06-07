@@ -536,7 +536,9 @@ html.konami-board-open .custom-cursor-layer {
     0 2px 0 color-mix(in oklab, var(--foreground) 30%, transparent),
     0 8px 24px color-mix(in oklab, var(--foreground) 35%, transparent);
   cursor: pointer;
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
 }
 .konami-cat-close:hover {
   transform: scale(1.06);

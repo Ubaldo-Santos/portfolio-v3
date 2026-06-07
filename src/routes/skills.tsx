@@ -4,9 +4,11 @@ import { Sparkles } from "lucide-react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
+import { cn } from "@/lib/utils";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { PrimaryStack } from "@/components/primary-stack";
-import { PageHeader, PageShell } from "@/components/page-shell";
+import { PageHeader, PageShell, pageLeadClass } from "@/components/page-shell";
+import { MotionPage } from "@/components/page-transition";
 
 export const Route = createFileRoute("/skills")({
   head: () =>
@@ -35,12 +37,18 @@ function SkillsPage() {
   ] as const;
 
   return (
+    <MotionPage>
     <PageShell>
       <PageHeader page="skills" subtitle={t("skills.subtitle")} />
 
       {/* Primary stack callout */}
       <Reveal delay={0.04}>
-        <div className="mt-12 grid gap-4 rounded-3xl border border-hairline bg-surface/40 p-6 sm:p-8 md:grid-cols-[auto_1fr] md:items-center">
+        <div
+          className={cn(
+            "grid gap-4 rounded-3xl border border-hairline bg-surface/40 p-6 sm:p-8 md:grid-cols-[auto_1fr] md:items-center",
+            pageLeadClass,
+          )}
+        >
           <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
             {t("skills.primaryStack")}
           </div>
@@ -150,5 +158,6 @@ function SkillsPage() {
         </ul>
       </section>
     </PageShell>
+    </MotionPage>
   );
 }

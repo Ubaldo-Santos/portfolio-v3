@@ -76,9 +76,7 @@ export function KonamiCatRain({ onDismiss }: KonamiCatRainProps) {
         />
       ))}
 
-      {ready && (
-        <p className="konami-cat-pill konami-cat-hint font-mono">{t("easter.dragHint")}</p>
-      )}
+      {ready && <p className="konami-cat-pill konami-cat-hint font-mono">{t("easter.dragHint")}</p>}
     </div>
   );
 }

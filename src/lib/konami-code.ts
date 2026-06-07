@@ -1,8 +1,4 @@
-import {
-  KONAMI_CELEBRATE_CLASS,
-  KONAMI_CELEBRATE_MS,
-  KONAMI_SEQUENCE,
-} from "@/lib/konami-config";
+import { KONAMI_CELEBRATE_CLASS, KONAMI_CELEBRATE_MS, KONAMI_SEQUENCE } from "@/lib/konami-config";
 
 export function matchesKonamiKey(key: string, expected: string) {
   return key === expected || (expected.length === 1 && key.toLowerCase() === expected);

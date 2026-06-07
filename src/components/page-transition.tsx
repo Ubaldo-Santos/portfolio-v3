@@ -1,40 +1,46 @@
-import { useEffect, useState } from "react";
-import { useRouterState } from "@tanstack/react-router";
+import { useEffect, type ReactNode } from "react";
+import { Outlet, useMatch, useMatches, useRouterState } from "@tanstack/react-router";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { pageEase, pageMotion, pageMotionReduced } from "@/lib/motion";
 
-/**
- * Page transition keyed by pathname: fade, lift and soft de-blur on enter.
- * Scrolls to top on route change. Skips the first render to avoid hydration flicker.
- */
-export function PageTransition({ children }: { children: React.ReactNode }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+/** Root wrapper for each route — must be the direct child of AnimatePresence (via Outlet key). */
+export function MotionPage({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    // Instant scroll avoids shared-layout (nav pill) measuring wrong positions mid-scroll.
-    window.scrollTo({ top: 0, behavior: "auto" });
-  }, [pathname, mounted]);
-
-  if (!mounted) return <>{children}</>;
-
   const variants = reduced ? pageMotionReduced : pageMotion;
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={pathname}
-        initial={variants.initial}
-        animate={variants.animate}
-        exit={variants.exit}
-        transition={reduced ? { duration: 0.15 } : pageEase}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      className="w-full"
+      initial={variants.initial}
+      animate={variants.animate}
+      exit={variants.exit}
+      transition={reduced ? { duration: 0.15 } : pageEase}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/**
+ * Page transition keyed by route match id (TanStack Router + Motion pattern).
+ * Outlet must be the direct child of AnimatePresence so exit keeps the old page frozen.
+ */
+export function PageTransition() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const matches = useMatches();
+  const match = useMatch({ strict: false });
+  const nextMatchIndex = matches.findIndex((d) => d.id === match.id) + 1;
+  const nextMatch = matches[nextMatchIndex];
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [pathname]);
+
+  return (
+    <div className="relative w-full">
+      <AnimatePresence mode="wait" initial={false}>
+        <Outlet key={nextMatch?.id ?? pathname} />
+      </AnimatePresence>
+    </div>
   );
 }

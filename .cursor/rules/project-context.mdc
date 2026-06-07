@@ -3,14 +3,15 @@ description: Contexto del portfolio de Ubaldo Santos — stack, arquitectura y c
 alwaysApply: true
 ---
 
-# ubaldo-s-digital-craft — Portfolio personal
+# Portfolio v3 — Portfolio personal
 
-Sitio estático de **Ubaldo Santos Patón** (Full-Stack, Barcelona). URL: `https://ubaldo.is-a.dev`. Repo: `usantos-at-wiris/ubaldo-s-digital-craft`.
+Sitio estático de **Ubaldo Santos Patón** (Full-Stack, Barcelona). URL: `https://ubaldo.is-a.dev`. Repo: `Ubaldo-Santos/portfolio-v3`.
 
 ## Stack
 
 - **TanStack Start** (SSR) + **TanStack Router** (file-based routing en `src/routes/`)
-- **React 19**, **TypeScript**, **Vite 7**, **Bun** (`packageManager: bun@1.3.14`)
+- **React 19**, **TypeScript**, **Vite 7**, **Bun** exclusivo (`packageManager: bun@1.3.14`, lockfile `bun.lock`, tipos `bun-types`)
+- Env server-side: `Bun.env` en `*.server.ts` — no imports `node:*`
 - **Tailwind CSS v4** (`src/styles.css` con `@theme inline`, tokens oklch)
 - **i18next** + **react-i18next** — idiomas ES / CA / EN
 - **Motion** (`motion/react`), **lucide-react**, **shadcn/ui** (`components.json`, alias `@/`)

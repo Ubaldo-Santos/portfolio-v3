@@ -1,0 +1,2 @@
+/** Blocking inline script — runs before first paint to avoid theme/lang flash. */
+export const BOOTSTRAP_SCRIPT = `(function(){try{var l=localStorage.getItem("lang");if(l&&/^(es|ca|en)$/.test(l)){document.documentElement.lang=l;document.cookie="lang="+l+";path=/;max-age=31536000;samesite=lax"}var t=localStorage.getItem("theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme:dark)").matches))document.documentElement.classList.add("dark")}catch(e){}})();`;

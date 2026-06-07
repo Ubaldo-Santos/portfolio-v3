@@ -84,11 +84,7 @@ export function Header() {
   return (
     <header className="no-print sticky top-0 z-50 border-b border-hairline bg-background/70 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-5 sm:px-8">
-        <Link
-          to="/"
-          className="group shrink-0"
-          aria-label={t("a11y.homeLink")}
-        >
+        <Link to="/" className="group shrink-0" aria-label={t("a11y.homeLink")}>
           <BrandLogo
             variant="nav"
             iconClassName="transition-transform duration-300 group-hover:rotate-3"

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState, useCallback, type MouseEvent } from "react";
+import { useLayoutEffect, useState, useCallback, type MouseEvent } from "react";
 import { flushSync } from "react-dom";
 
 export type Theme = "light" | "dark";
@@ -34,11 +34,7 @@ function canAnimateTheme(event?: MouseEvent<HTMLElement>) {
 }
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>("light");
-
-  useEffect(() => {
-    setTheme(getInitialTheme());
-  }, []);
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   useLayoutEffect(() => {
     applyThemeToDom(theme);

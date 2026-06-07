@@ -22,14 +22,7 @@ function useIsActive(to: string) {
 const activePillClass =
   "pointer-events-none absolute inset-0 rounded-full border border-hairline bg-surface shadow-[0_1px_0_rgba(0,0,0,0.03)]";
 
-export function NavLink({
-  to,
-  label,
-  onClick,
-  className,
-  mobile,
-  animated = false,
-}: NavLinkProps) {
+export function NavLink({ to, label, onClick, className, mobile, animated = false }: NavLinkProps) {
   const isActive = useIsActive(to);
   const reduced = useReducedMotion();
   const showAnimatedPill = animated && isActive && !reduced;

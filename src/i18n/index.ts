@@ -6,8 +6,6 @@ import { translations } from "./translations";
 export const SUPPORTED_LANGS = ["es", "ca", "en"] as const;
 export type Lang = (typeof SUPPORTED_LANGS)[number];
 
-// Always init with "es" so SSR and the first client paint match.
-// The real language is resolved AFTER mount in I18nProvider (avoids hydration mismatch).
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources: {
@@ -15,7 +13,7 @@ if (!i18n.isInitialized) {
       ca: { translation: translations.ca },
       en: { translation: translations.en },
     },
-    lng: "es",
+    lng: typeof window === "undefined" ? "es" : detectClientLang(),
     fallbackLng: "es",
     supportedLngs: SUPPORTED_LANGS as unknown as string[],
     nonExplicitSupportedLngs: true,

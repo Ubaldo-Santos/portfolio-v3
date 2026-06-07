@@ -525,21 +525,8 @@ export const cv = {
     backend: ["Laravel", "Deno", "Node.js", "REST", "OpenAPI"],
     frontend: ["Vue.js", "HTML5", "CSS3", "Tailwind CSS"],
     edtech: ["MathType", "CKEditor", "TinyMCE", "Froala", "Moodle"],
-    practices: [
-      "Arquitectura Hexagonal",
-      "DDD",
-      "SOLID",
-      "Design Patterns",
-      "TDD",
-    ],
-    devops: [
-      "Docker",
-      "Git",
-      "GitHub Actions",
-      "CI/CD",
-      "Unit Testing",
-      "Integration Testing",
-    ],
+    practices: ["Arquitectura Hexagonal", "DDD", "SOLID", "Design Patterns", "TDD"],
+    devops: ["Docker", "Git", "GitHub Actions", "CI/CD", "Unit Testing", "Integration Testing"],
     other: ["Electron", "SDK Integrations", "Scrum", "Kanban"],
     ribbon: [
       "TypeScript",

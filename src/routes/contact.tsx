@@ -5,8 +5,10 @@ import { useState, type ReactNode } from "react";
 import { cv } from "@/data/cv";
 import { currentLang } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
+import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/reveal";
-import { PageHeader, PageShell } from "@/components/page-shell";
+import { PageHeader, PageShell, pageLeadClass } from "@/components/page-shell";
+import { MotionPage } from "@/components/page-transition";
 
 export const Route = createFileRoute("/contact")({
   head: () =>
@@ -24,12 +26,18 @@ function ContactPage() {
   const lang = currentLang(i18n.language);
 
   return (
+    <MotionPage>
     <PageShell>
       <PageHeader page="contact" subtitle={t("contact.subtitle")} />
 
       {/* Primary email — full-width feature card */}
       <Reveal delay={0.04}>
-        <div className="group relative mt-12 overflow-hidden rounded-3xl border border-hairline bg-surface/40 p-8 sm:p-12">
+        <div
+          className={cn(
+            "group relative overflow-hidden rounded-3xl border border-hairline bg-surface/40 p-8 sm:p-12",
+            pageLeadClass,
+          )}
+        >
           <div
             className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-accent/20 blur-3xl transition-opacity duration-500 group-hover:opacity-80"
             aria-hidden
@@ -133,6 +141,7 @@ function ContactPage() {
         </div>
       </section>
     </PageShell>
+    </MotionPage>
   );
 }
 

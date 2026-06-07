@@ -174,7 +174,10 @@ export function CustomCursor() {
       : cfg.ring.sizePx.idle;
 
   return (
-    <div className="custom-cursor-layer no-print pointer-events-none fixed inset-0 z-[100]" aria-hidden>
+    <div
+      className="custom-cursor-layer no-print pointer-events-none fixed inset-0 z-[100]"
+      aria-hidden
+    >
       <div ref={dotRef} className="custom-cursor-dot fixed left-0 top-0 rounded-full" />
       <div
         ref={ringRef}

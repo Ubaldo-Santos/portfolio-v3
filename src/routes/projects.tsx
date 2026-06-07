@@ -6,6 +6,7 @@ import { currentLang, formatPeriod } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
+import { MotionPage } from "@/components/page-transition";
 
 export const Route = createFileRoute("/projects")({
   head: () =>
@@ -25,15 +26,14 @@ function ProjectsPage() {
   const activeProjects = cv.projects.filter((p) => p.active);
 
   return (
+    <MotionPage>
     <PageShell>
       <PageHeader page="projects" subtitle={t("projects.subtitle")} />
 
       <RevealGroup className="mt-16 grid gap-6 sm:grid-cols-2" stagger={0.08}>
         {activeProjects.map((p) => {
           const Card = p.url ? "a" : "article";
-          const cardProps = p.url
-            ? { href: p.url, target: "_blank", rel: "noreferrer" }
-            : {};
+          const cardProps = p.url ? { href: p.url, target: "_blank", rel: "noreferrer" } : {};
 
           return (
             <RevealItem key={p.name}>
@@ -77,5 +77,6 @@ function ProjectsPage() {
         })}
       </RevealGroup>
     </PageShell>
+    </MotionPage>
   );
 }

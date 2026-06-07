@@ -1,10 +1,17 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, useReducedMotion } from "motion/react";
-import { staggerContainer, staggerItem } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 export const pageShellClass = "mx-auto max-w-6xl px-5 pt-6 pb-20 sm:px-8 sm:pt-10 sm:pb-28";
+
+/** Gap between PageHeader and the first content block (contact, skills, CV hint, …). */
+export const pageLeadClass = "mt-12";
+
+/** PageShell bottom padding when full-bleed content follows (e.g. CV canvas). */
+export const pageShellLeadGapClass = "pb-12 sm:pb-16";
+
+/** Standalone bottom padding for pages whose shell ends before main content. */
+export const pageBottomClass = "pb-20 sm:pb-28";
 
 export const pageKickerClass =
   "font-mono text-[11px] uppercase tracking-widest text-muted-foreground";
@@ -59,51 +66,24 @@ type PageHeaderProps = {
 
 export function PageHeaderBlock({ page, title, subtitle, hint, actions }: PageHeaderProps) {
   const { t } = useTranslation();
-  const reduced = useReducedMotion();
   const heading = title ?? t(PAGE_NAV_KEY[page]);
 
   const copy = (
-    <motion.div
-      variants={reduced ? undefined : staggerContainer}
-      initial={reduced ? false : "hidden"}
-      animate={reduced ? undefined : "show"}
-    >
-      <motion.div variants={reduced ? undefined : staggerItem}>
-        <PageKicker page={page} />
-      </motion.div>
-      <motion.h1 className={pageTitleClass} variants={reduced ? undefined : staggerItem}>
-        {heading}
-      </motion.h1>
+    <div>
+      <PageKicker page={page} />
+      <h1 className={pageTitleClass}>{heading}</h1>
       {subtitle ? (
-        <motion.p
-          className="mt-4 max-w-xl text-lg text-muted-foreground"
-          variants={reduced ? undefined : staggerItem}
-        >
-          {subtitle}
-        </motion.p>
+        <p className="mt-4 max-w-xl text-lg text-muted-foreground">{subtitle}</p>
       ) : null}
-      {hint ? (
-        <motion.p
-          className="mt-4 text-sm text-muted-foreground"
-          variants={reduced ? undefined : staggerItem}
-        >
-          {hint}
-        </motion.p>
-      ) : null}
-    </motion.div>
+      {hint ? <p className="mt-4 text-sm text-muted-foreground">{hint}</p> : null}
+    </div>
   );
 
   if (actions) {
     return (
       <div className="flex flex-wrap items-start justify-between gap-6">
         {copy}
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 12 }}
-          animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {actions}
-        </motion.div>
+        <div>{actions}</div>
       </div>
     );
   }

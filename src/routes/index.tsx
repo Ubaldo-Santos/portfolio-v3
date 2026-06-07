@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowUpRight } from "lucide-react";
-import { motion } from "motion/react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod, workAnchorId } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
@@ -9,6 +8,7 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { PrimaryStack } from "@/components/primary-stack";
 import { WorkTitle } from "@/components/work-title";
 import { PageHeaderBlock, SectionIndex } from "@/components/page-shell";
+import { MotionPage } from "@/components/page-transition";
 import { TechRibbon } from "@/components/tech-ribbon";
 
 export const Route = createFileRoute("/")({
@@ -22,7 +22,8 @@ function Home() {
   const currentWork = cv.work.find((w) => w.current);
 
   return (
-    <div>
+    <MotionPage>
+      <div>
       {/* Hero */}
       <section className="relative flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden">
         {/* Soft accent wash — lighter on mobile so the hero does not read too green */}
@@ -36,13 +37,7 @@ function Home() {
         />
 
         <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-10">
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <PageHeaderBlock page="home" />
-          </motion.div>
+          <PageHeaderBlock page="home" />
 
           {/* Name block — centered vertically */}
           <div className="flex min-h-0 flex-1 flex-col justify-center py-6 sm:py-8">
@@ -184,6 +179,7 @@ function Home() {
           </Reveal>
         </div>
       </section>
-    </div>
+      </div>
+    </MotionPage>
   );
 }

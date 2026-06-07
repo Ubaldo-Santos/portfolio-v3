@@ -31,19 +31,8 @@ export function BrandLogo({ className, iconClassName, variant = "nav" }: BrandLo
   const isFooter = variant === "footer";
 
   return (
-    <span
-      className={cn(
-        "inline-flex items-center",
-        isFooter ? "gap-1.5" : "gap-1",
-        className,
-      )}
-    >
-      <LogoMark
-        className={cn(
-          isFooter ? "size-14" : "size-11 sm:size-12",
-          iconClassName,
-        )}
-      />
+    <span className={cn("inline-flex items-center", isFooter ? "gap-1.5" : "gap-1", className)}>
+      <LogoMark className={cn(isFooter ? "size-14" : "size-11 sm:size-12", iconClassName)} />
 
       <span className="flex min-w-0 flex-col text-[oklch(0.34_0.01_80)] dark:text-[oklch(0.72_0.01_90)]">
         <span

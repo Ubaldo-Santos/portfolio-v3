@@ -1,6 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
@@ -22,6 +21,8 @@ import { CustomCursor } from "@/components/custom-cursor";
 import { PageTransition } from "@/components/page-transition";
 import { EasterEgg } from "@/components/easter-egg";
 import { Toaster } from "@/components/ui/sonner";
+import { VercelAnalytics } from "@/components/vercel-analytics";
+import { BOOTSTRAP_SCRIPT } from "@/lib/bootstrap-script";
 
 function NotFoundComponent() {
   const copy = translations.es.errors;
@@ -72,8 +73,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#000000" },
-      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
-      { name: "googlebot", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+      {
+        name: "robots",
+        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      },
+      {
+        name: "googlebot",
+        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      },
       { name: "format-detection", content: "telephone=no" },
       { title: translations.es.meta.home.title },
       { name: "description", content: translations.es.meta.home.description },
@@ -158,8 +165,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: BOOTSTRAP_SCRIPT }} />
         <HeadContent />
       </head>
       <body>
@@ -179,12 +187,11 @@ function RootComponent() {
         <CustomCursor />
         <EasterEgg />
         <Toaster position="bottom-right" />
+        <VercelAnalytics />
         <div className="flex min-h-dvh flex-col">
           <Header />
           <main id="main" className="flex-1">
-            <PageTransition>
-              <Outlet />
-            </PageTransition>
+            <PageTransition />
           </main>
           <Footer />
         </div>

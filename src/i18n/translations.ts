@@ -67,6 +67,7 @@ export const translations = {
       homeLink: "Ubaldo Santos — Portfolio",
       mainNav: "Navegación principal",
       mobileNav: "Navegación móvil",
+      footerNav: "Enlaces del pie de página",
       skipToContent: "Saltar al contenido",
     },
     brand: {
@@ -145,12 +146,8 @@ export const translations = {
       links: "Enlaces",
     },
     footer: {
-      rights: "Todos los derechos reservados",
-      contactLabel: "Contacto",
-      stackLabel: "Stack del sitio",
       stackSummary:
-        "Portfolio SSR con TanStack Start y Vite. UI en React 19 y TypeScript, estilos con Tailwind CSS v4, animaciones con Motion e i18n en ES · CA · EN.",
-      konami: "Tip: prueba el código Konami.",
+        "Portfolio SSR con TanStack Start, React 19, TypeScript, Tailwind CSS v4, Motion e i18n en ES · CA · EN.",
     },
     easter: {
       unlocked: "¡Konami activado! Lluvia de gatitos incoming.",
@@ -237,6 +234,7 @@ export const translations = {
       homeLink: "Ubaldo Santos — Portfolio",
       mainNav: "Navegació principal",
       mobileNav: "Navegació mòbil",
+      footerNav: "Enllaços del peu de pàgina",
       skipToContent: "Saltar al contingut",
     },
     brand: {
@@ -315,12 +313,8 @@ export const translations = {
       links: "Enllaços",
     },
     footer: {
-      rights: "Tots els drets reservats",
-      contactLabel: "Contacte",
-      stackLabel: "Stack del lloc",
       stackSummary:
-        "Portfolio SSR amb TanStack Start i Vite. UI en React 19 i TypeScript, estils amb Tailwind CSS v4, animacions amb Motion i i18n en ES · CA · EN.",
-      konami: "Pista: prova el codi Konami.",
+        "Portfolio SSR amb TanStack Start, React 19, TypeScript, Tailwind CSS v4, Motion i i18n en ES · CA · EN.",
     },
     easter: {
       unlocked: "Konami activat! Pluja de gatets incoming.",
@@ -407,6 +401,7 @@ export const translations = {
       homeLink: "Ubaldo Santos — Portfolio",
       mainNav: "Main navigation",
       mobileNav: "Mobile navigation",
+      footerNav: "Footer links",
       skipToContent: "Skip to content",
     },
     brand: {
@@ -484,12 +479,8 @@ export const translations = {
       links: "Links",
     },
     footer: {
-      rights: "All rights reserved",
-      contactLabel: "Contact",
-      stackLabel: "Site stack",
       stackSummary:
-        "SSR portfolio on TanStack Start and Vite. UI in React 19 and TypeScript, Tailwind CSS v4 for styling, Motion for animations, and i18n in ES · CA · EN.",
-      konami: "Tip: try the Konami code.",
+        "SSR portfolio on TanStack Start, React 19, TypeScript, Tailwind CSS v4, Motion, and i18n in ES · CA · EN.",
     },
     easter: {
       unlocked: "Konami unlocked! Incoming kitty sticker rain.",

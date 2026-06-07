@@ -18,9 +18,9 @@ export const revealEase = {
 } as const;
 
 export const pageMotion = {
-  initial: { opacity: 0, y: 16, filter: "blur(8px)" },
-  animate: { opacity: 1, y: 0, filter: "blur(0px)" },
-  exit: { opacity: 0, y: -12, filter: "blur(6px)" },
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -6 },
 } as const;
 
 export const pageMotionReduced = {
