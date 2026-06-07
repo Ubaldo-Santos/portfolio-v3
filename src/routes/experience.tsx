@@ -8,7 +8,13 @@ import { PageHeader, PageShell } from "@/components/page-shell";
 import { MapPin, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/experience")({
-  head: () => routeHead("experience", "/experience"),
+  head: () =>
+    routeHead("experience", "/experience", {
+      breadcrumbs: [
+        { name: "Inicio", path: "/" },
+        { name: "Experiencia", path: "/experience" },
+      ],
+    }),
   component: ExperiencePage,
 });
 
