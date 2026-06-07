@@ -20,11 +20,12 @@ function SkillsPage() {
 
   const groups = [
     { key: "languages", items: cv.skills.languages },
-    { key: "frameworks", items: cv.skills.frameworks },
+    { key: "backend", items: cv.skills.backend },
+    { key: "frontend", items: cv.skills.frontend },
+    { key: "edtech", items: cv.skills.edtech },
     { key: "practices", items: cv.skills.practices },
-    { key: "tooling", items: cv.skills.tooling },
-    { key: "databases", items: cv.skills.databases },
-    { key: "integrations", items: cv.skills.integrations },
+    { key: "devops", items: cv.skills.devops },
+    { key: "other", items: cv.skills.other },
   ] as const;
 
   return (

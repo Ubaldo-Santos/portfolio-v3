@@ -107,19 +107,22 @@ function CvPage() {
               <strong>{t("skills.languages")}:</strong> {cv.skills.languages.join(", ")}
             </li>
             <li>
-              <strong>{t("skills.frameworks")}:</strong> {cv.skills.frameworks.join(", ")}
+              <strong>{t("skills.backend")}:</strong> {cv.skills.backend.join(", ")}
             </li>
             <li>
-              <strong>{t("skills.databases")}:</strong> {cv.skills.databases.join(", ")}
+              <strong>{t("skills.frontend")}:</strong> {cv.skills.frontend.join(", ")}
+            </li>
+            <li>
+              <strong>{t("skills.edtech")}:</strong> {cv.skills.edtech.join(", ")}
             </li>
             <li>
               <strong>{t("skills.practices")}:</strong> {cv.skills.practices.join(", ")}
             </li>
             <li>
-              <strong>{t("skills.tooling")}:</strong> {cv.skills.tooling.join(", ")}
+              <strong>{t("skills.devops")}:</strong> {cv.skills.devops.join(", ")}
             </li>
             <li>
-              <strong>{t("skills.integrations")}:</strong> {cv.skills.integrations.join(", ")}
+              <strong>{t("skills.other")}:</strong> {cv.skills.other.join(", ")}
             </li>
           </ul>
         </Section>
