@@ -147,6 +147,18 @@ export const translations = {
     footer: {
       rights: "Todos los derechos reservados",
       contactLabel: "Contacto",
+      stackLabel: "Stack del sitio",
+      stackSummary:
+        "Portfolio SSR con TanStack Start y Vite. UI en React 19 y TypeScript, estilos con Tailwind CSS v4, animaciones con Motion e i18n en ES · CA · EN.",
+      konami: "Tip: prueba el código Konami.",
+    },
+    easter: {
+      unlocked: "¡Konami activado! Lluvia de gatitos incoming.",
+      konamiCode: "↑ ↑ ↓ ↓ ← → ← → B A",
+      boardLabel: "Tablero de gatitos",
+      close: "Cerrar tablero de gatitos",
+      dragHint: "Arrastra las fotos · Esc o ✕ para cerrar",
+      loading: "Preparando gatitos…",
     },
     errors: {
       loadTitle: "Esta página no se ha cargado",
@@ -305,6 +317,18 @@ export const translations = {
     footer: {
       rights: "Tots els drets reservats",
       contactLabel: "Contacte",
+      stackLabel: "Stack del lloc",
+      stackSummary:
+        "Portfolio SSR amb TanStack Start i Vite. UI en React 19 i TypeScript, estils amb Tailwind CSS v4, animacions amb Motion i i18n en ES · CA · EN.",
+      konami: "Pista: prova el codi Konami.",
+    },
+    easter: {
+      unlocked: "Konami activat! Pluja de gatets incoming.",
+      konamiCode: "↑ ↑ ↓ ↓ ← → ← → B A",
+      boardLabel: "Tauler de gatets",
+      close: "Tancar el tauler de gatets",
+      dragHint: "Arrossega les fotos · Esc o ✕ per tancar",
+      loading: "Preparant gatets…",
     },
     errors: {
       loadTitle: "Aquesta pàgina no s'ha carregat",
@@ -462,6 +486,18 @@ export const translations = {
     footer: {
       rights: "All rights reserved",
       contactLabel: "Contact",
+      stackLabel: "Site stack",
+      stackSummary:
+        "SSR portfolio on TanStack Start and Vite. UI in React 19 and TypeScript, Tailwind CSS v4 for styling, Motion for animations, and i18n in ES · CA · EN.",
+      konami: "Tip: try the Konami code.",
+    },
+    easter: {
+      unlocked: "Konami unlocked! Incoming kitty sticker rain.",
+      konamiCode: "↑ ↑ ↓ ↓ ← → ← → B A",
+      boardLabel: "Kitty photo board",
+      close: "Close kitty board",
+      dragHint: "Drag the photos · Esc or ✕ to close",
+      loading: "Loading kitties…",
     },
     errors: {
       loadTitle: "This page didn't load",
