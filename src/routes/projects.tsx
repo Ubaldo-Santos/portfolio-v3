@@ -23,7 +23,7 @@ function ProjectsPage() {
       <PageHeader page="projects" subtitle={t("projects.subtitle")} />
 
       <RevealGroup className="mt-16 grid gap-6 sm:grid-cols-2" stagger={0.08}>
-        {cv.projects.map((p) => {
+        {activeProjects.map((p) => {
           const Card = p.url ? "a" : "article";
           const cardProps = p.url
             ? { href: p.url, target: "_blank", rel: "noreferrer" }
@@ -36,20 +36,9 @@ function ProjectsPage() {
                 className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-hairline bg-surface/40 p-6 transition-colors hover:bg-surface sm:p-8"
               >
                 <div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      {formatPeriod(p.startDate, p.endDate, lang)}
-                    </span>
-                    <span
-                      className={
-                        p.active
-                          ? "rounded-full border border-accent bg-accent/20 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest"
-                          : "rounded-full border border-hairline px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
-                      }
-                    >
-                      {p.active ? t("projects.active") : t("projects.archived")}
-                    </span>
-                  </div>
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    {formatPeriod(p.startDate, p.endDate, lang)}
+                  </span>
                   <div className="mt-5 flex items-start justify-between gap-3">
                     <h2 className="font-display text-3xl sm:text-4xl">{p.name}</h2>
                     {p.url ? (
