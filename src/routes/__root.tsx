@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { cv } from "@/data/cv";
+import { BRAND_MARK_URL } from "@/lib/seo";
 import { translations } from "@/i18n/translations";
 import { I18nProvider } from "@/components/i18n-provider";
 import { Header } from "@/components/header";
@@ -70,7 +71,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#0f0f0f" },
+      { name: "theme-color", content: "#000000" },
       { title: translations.es.meta.home.title },
       { name: "description", content: translations.es.meta.home.description },
       { name: "author", content: translations.es.meta.author },
@@ -80,12 +81,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:locale", content: "es_ES" },
       { property: "og:locale:alternate", content: "ca_ES" },
       { property: "og:locale:alternate", content: "en_US" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:card", content: "summary" },
       { name: "twitter:creator", content: "@ubaldosantos" },
+      { name: "twitter:image", content: BRAND_MARK_URL },
+      { property: "og:image", content: BRAND_MARK_URL },
+      { property: "og:image:type", content: "image/svg+xml" },
+      { property: "og:image:alt", content: translations.es.meta.siteName },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico" },
+      { rel: "icon", href: "/code-sandbox.svg", type: "image/svg+xml" },
+      { rel: "apple-touch-icon", href: "/code-sandbox.svg" },
     ],
     scripts: [
       {
@@ -100,6 +106,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           email: cv.basics.email,
           telephone: cv.basics.phone,
           url: cv.basics.url,
+          image: BRAND_MARK_URL,
           worksFor: { "@type": "Organization", name: cv.work[0].name, url: cv.work[0].url },
           address: {
             "@type": "PostalAddress",

@@ -1,6 +1,7 @@
 import { translations, type TranslationPage } from "@/i18n/translations";
 
-const SITE_URL = "https://ubaldo.is-a.dev";
+export const SITE_URL = "https://ubaldo.is-a.dev";
+export const BRAND_MARK_URL = `${SITE_URL}/code-sandbox.svg`;
 const DEFAULT_LANG = "es";
 
 type SeoPage = Exclude<TranslationPage, "siteName" | "author" | "keywords">;
@@ -20,6 +21,9 @@ export function routeHead(page: SeoPage, path: string, options?: { noIndex?: boo
       { property: "og:title", content: pageMeta.title },
       { property: "og:description", content: pageMeta.ogDescription },
       { property: "og:url", content: url },
+      { property: "og:image", content: BRAND_MARK_URL },
+      { property: "og:image:type", content: "image/svg+xml" },
+      { property: "og:image:alt", content: meta.siteName },
       ...(options?.noIndex ? [{ name: "robots", content: "noindex, follow" }] : []),
     ],
     links: [{ rel: "canonical", href: url }],

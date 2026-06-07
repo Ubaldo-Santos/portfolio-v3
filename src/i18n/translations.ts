@@ -52,6 +52,7 @@ export const translations = {
       printCv: "Imprimir CV",
       viewCv: "Ver CV",
       viewProject: "Ver más",
+      viewSkills: "Ver skills",
       contactMe: "Contáctame",
       openMenu: "Abrir menú",
       closeMenu: "Cerrar menú",
@@ -144,7 +145,10 @@ export const translations = {
     },
     footer: {
       rights: "Todos los derechos reservados",
-      builtWith: "Construido con TanStack Start y Tailwind",
+      contactLabel: "Contacto",
+      stackLabel: "Stack del sitio",
+      stackSummary:
+        "Portfolio SSR con TanStack Start y Vite. UI en React 19 y TypeScript, estilos con Tailwind CSS v4, animaciones con Motion e i18n en ES · CA · EN.",
       konami: "Tip: prueba el código Konami.",
     },
     easter: {
@@ -211,6 +215,7 @@ export const translations = {
       printCv: "Imprimir CV",
       viewCv: "Veure CV",
       viewProject: "Veure més",
+      viewSkills: "Veure skills",
       contactMe: "Contacta'm",
       openMenu: "Obrir menú",
       closeMenu: "Tancar menú",
@@ -303,7 +308,10 @@ export const translations = {
     },
     footer: {
       rights: "Tots els drets reservats",
-      builtWith: "Construït amb TanStack Start i Tailwind",
+      contactLabel: "Contacte",
+      stackLabel: "Stack del lloc",
+      stackSummary:
+        "Portfolio SSR amb TanStack Start i Vite. UI en React 19 i TypeScript, estils amb Tailwind CSS v4, animacions amb Motion i i18n en ES · CA · EN.",
       konami: "Pista: prova el codi Konami.",
     },
     easter: {
@@ -370,6 +378,7 @@ export const translations = {
       printCv: "Print CV",
       viewCv: "View CV",
       viewProject: "View more",
+      viewSkills: "View skills",
       contactMe: "Get in touch",
       openMenu: "Open menu",
       closeMenu: "Close menu",
@@ -461,7 +470,10 @@ export const translations = {
     },
     footer: {
       rights: "All rights reserved",
-      builtWith: "Built with TanStack Start and Tailwind",
+      contactLabel: "Contact",
+      stackLabel: "Site stack",
+      stackSummary:
+        "SSR portfolio on TanStack Start and Vite. UI in React 19 and TypeScript, Tailwind CSS v4 for styling, Motion for animations, and i18n in ES · CA · EN.",
       konami: "Tip: try the Konami code.",
     },
     easter: {

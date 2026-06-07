@@ -4,7 +4,8 @@ import { Sparkles } from "lucide-react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
-import { Reveal } from "@/components/reveal";
+import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
+import { PrimaryStack } from "@/components/primary-stack";
 import { PageHeader, PageShell } from "@/components/page-shell";
 
 export const Route = createFileRoute("/skills")({
@@ -36,22 +37,14 @@ function SkillsPage() {
           <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
             {t("skills.primaryStack")}
           </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-display text-2xl sm:text-3xl">
-            <span>PHP</span>
-            <span className="text-muted-foreground/50">·</span>
-            <span>Laravel</span>
-            <span className="text-muted-foreground/30">/</span>
-            <span>TypeScript</span>
-            <span className="text-muted-foreground/50">·</span>
-            <span>Vue</span>
-          </div>
+          <PrimaryStack />
         </div>
       </Reveal>
 
       {/* Categorized chips — uniform cards */}
-      <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {groups.map((g, i) => (
-          <Reveal key={g.key} delay={i * 0.03}>
+      <RevealGroup className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" stagger={0.05}>
+        {groups.map((g) => (
+          <RevealItem key={g.key}>
             <article className="h-full rounded-2xl border border-hairline bg-surface/30 p-5">
               <h3 className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
                 {t(`skills.${g.key}`)}
@@ -66,9 +59,9 @@ function SkillsPage() {
                 ))}
               </ul>
             </article>
-          </Reveal>
+          </RevealItem>
         ))}
-      </div>
+      </RevealGroup>
 
       {/* AI — single editorial block, no card grid */}
       <Reveal delay={0.05}>

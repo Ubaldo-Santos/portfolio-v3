@@ -524,52 +524,6 @@ html.konami-celebrate {
   }
 }
 
-/* Neon-lime glow for the primary CV download CTA — soft, breathing */
-.btn-neon-cv {
-  position: relative;
-  background: color-mix(in oklab, var(--accent) 10%, var(--background));
-  color: var(--foreground);
-  border: 1px solid color-mix(in oklab, var(--accent) 45%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--accent) 12%, transparent),
-    0 0 10px color-mix(in oklab, var(--accent) 22%, transparent),
-    0 0 22px color-mix(in oklab, var(--accent) 12%, transparent);
-  animation: neon-breathe 3.6s ease-in-out infinite;
-  transition:
-    transform 220ms ease,
-    background-color 220ms ease,
-    border-color 220ms ease;
-}
-.btn-neon-cv:hover {
-  background: color-mix(in oklab, var(--accent) 18%, var(--background));
-  border-color: color-mix(in oklab, var(--accent) 70%, transparent);
-  transform: translateY(-1px);
-}
-@keyframes neon-breathe {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 1px color-mix(in oklab, var(--accent) 12%, transparent),
-      0 0 8px color-mix(in oklab, var(--accent) 18%, transparent),
-      0 0 18px color-mix(in oklab, var(--accent) 10%, transparent);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1px color-mix(in oklab, var(--accent) 22%, transparent),
-      0 0 18px color-mix(in oklab, var(--accent) 38%, transparent),
-      0 0 36px color-mix(in oklab, var(--accent) 22%, transparent);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .btn-neon-cv {
-    animation: none;
-    transition: none;
-  }
-  .btn-neon-cv:hover {
-    transform: none;
-  }
-}
-
 /* Circular reveal when toggling light/dark theme */
 ::view-transition-old(root),
 ::view-transition-new(root) {

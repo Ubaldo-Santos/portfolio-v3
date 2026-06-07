@@ -1,5 +1,15 @@
 import type { Lang } from "@/i18n";
 
+export function workAnchorId(item: { name: string; startDate: string }): string {
+  const slug = item.name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+  return `${slug}-${item.startDate}`;
+}
+
 const LABELS: Record<Lang, { present: string }> = {
   es: { present: "Actualidad" },
   ca: { present: "Actualitat" },

@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Printer } from "lucide-react";
+import { ArrowUpRight, Printer } from "lucide-react";
 import { cv, type WorkItem } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
+import { Reveal } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
 
 export const Route = createFileRoute("/cv")({
@@ -36,21 +37,27 @@ function CvPage() {
   return (
     <div className="bg-background py-8 print:bg-white print:py-0">
       <PageShell className="no-print">
-        <PageHeader
-          page="cv"
-          subtitle={t("cv.subtitle")}
-          hint={t("cv.printHint")}
-          actions={
+        <PageHeader page="cv" subtitle={t("cv.subtitle")} />
+
+        <Reveal delay={0.04} onMount>
+          <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-hairline bg-surface/40 p-5 sm:mt-10 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6">
+            <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+              {t("cv.printHint")}
+            </p>
             <button
               type="button"
               onClick={handlePrint}
-              className="btn-neon-cv inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium uppercase tracking-wider"
+              className="group inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3 sm:w-auto"
             >
-              <Printer className="size-3.5" aria-hidden />
-              <span>{t("actions.printCv")}</span>
+              <Printer className="size-4" aria-hidden />
+              {t("actions.printCv")}
+              <ArrowUpRight
+                className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                aria-hidden
+              />
             </button>
-          }
-        />
+          </div>
+        </Reveal>
       </PageShell>
 
       <article id="cv-article" className="mx-auto">
@@ -125,7 +132,15 @@ function CvPage() {
           {cv.projects.map((p) => (
             <div key={p.name} className="cv-block mb-2 last:mb-0">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3>{p.name}</h3>
+                <h3>
+                  {p.url ? (
+                    <a href={p.url} target="_blank" rel="noreferrer">
+                      {p.name}
+                    </a>
+                  ) : (
+                    p.name
+                  )}
+                </h3>
                 <span className="font-mono text-xs">
                   {formatPeriod(p.startDate, p.endDate, lang)}
                 </span>

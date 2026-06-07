@@ -3,9 +3,11 @@ import { useTranslation } from "react-i18next";
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
 import { cv } from "@/data/cv";
-import { currentLang, formatPeriod } from "@/lib/format";
+import { currentLang, formatPeriod, workAnchorId } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
-import { Reveal } from "@/components/reveal";
+import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
+import { PrimaryStack } from "@/components/primary-stack";
+import { WorkTitle } from "@/components/work-title";
 import { PageHeaderBlock, SectionIndex } from "@/components/page-shell";
 import { TechRibbon } from "@/components/tech-ribbon";
 
@@ -17,26 +19,27 @@ export const Route = createFileRoute("/")({
 function Home() {
   const { t, i18n } = useTranslation();
   const lang = currentLang(i18n.language);
+  const currentWork = cv.work.find((w) => w.current);
 
   return (
     <div>
       {/* Hero */}
       <section className="relative flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden">
-        {/* Soft accent wash */}
+        {/* Soft accent wash — lighter on mobile so the hero does not read too green */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-40 right-[-10%] size-[680px] rounded-full bg-accent/20 blur-[140px]"
+          className="pointer-events-none absolute -top-32 right-[-20%] size-[320px] rounded-full bg-accent/[0.07] blur-[80px] sm:-top-40 sm:right-[-10%] sm:size-[680px] sm:bg-accent/20 sm:blur-[140px]"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute bottom-0 left-[-10%] size-[420px] rounded-full bg-accent/10 blur-[120px]"
+          className="pointer-events-none absolute bottom-0 left-[-20%] size-[240px] rounded-full bg-accent/[0.04] blur-[70px] sm:left-[-10%] sm:size-[420px] sm:bg-accent/10 sm:blur-[120px]"
         />
 
         <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-5 pb-6 pt-6 sm:px-8 sm:pb-10 sm:pt-10">
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
             <PageHeaderBlock page="home" />
           </motion.div>
@@ -53,18 +56,30 @@ function Home() {
 
             {/* Fractioned info grid */}
             <div className="grid gap-x-10 gap-y-10 pt-8 sm:grid-cols-12 sm:gap-y-12 sm:pt-10">
-              <div className="sm:col-span-4">
-                <SectionIndex index="01" label={t("home.currentRole")} />
-                <p className="mt-3 text-sm leading-relaxed sm:mt-4 sm:text-base">
-                  {t("home.atWiris")}
+              <div className="sm:col-span-5">
+                <SectionIndex index="01" label={t("home.whatIDo")} />
+                <p className="mt-3 text-sm leading-relaxed text-balance sm:mt-4 sm:text-base">
+                  {cv.basics.tagline[lang]}
                 </p>
               </div>
 
-              <div className="sm:col-span-5">
-                <SectionIndex index="02" label={t("home.whatIDo")} />
-                <p className="font-display mt-3 text-xl leading-snug text-balance sm:mt-4 sm:text-2xl lg:text-3xl">
-                  {cv.basics.tagline[lang]}
-                </p>
+              <div className="sm:col-span-4">
+                <SectionIndex index="02" label={t("home.currentRole")} />
+                {currentWork ? (
+                  <Link
+                    to="/experience"
+                    hash={workAnchorId(currentWork)}
+                    className="group mt-3 inline-flex items-start gap-2 transition-colors hover:text-foreground sm:mt-4"
+                  >
+                    <WorkTitle
+                      name={currentWork.name}
+                      position={currentWork.position}
+                      lang={lang}
+                      size="hero"
+                    />
+                    <ArrowUpRight className="mt-1.5 size-5 shrink-0 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 sm:mt-2 sm:size-6" />
+                  </Link>
+                ) : null}
               </div>
 
               <div className="sm:col-span-3">
@@ -115,55 +130,57 @@ function Home() {
           </div>
         </Reveal>
 
-        <div className="mt-12 divide-y divide-hairline border-y border-hairline">
-          {cv.work.slice(0, 3).map((w, i) => (
-            <Reveal key={w.name + i} delay={i * 0.05}>
+        <RevealGroup className="mt-12 divide-y divide-hairline border-y border-hairline">
+          {cv.work.map((w) => (
+            <RevealItem key={workAnchorId(w)}>
               <Link
                 to="/experience"
+                hash={workAnchorId(w)}
                 className="group flex flex-col gap-3 py-6 transition-colors hover:bg-surface/50 sm:flex-row sm:items-center sm:justify-between sm:py-8"
               >
                 <div>
                   <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                     {formatPeriod(w.startDate, w.endDate, lang)}
                   </div>
-                  <div className="mt-2 font-display text-3xl sm:text-4xl">
-                    {w.name}{" "}
-                    <span className="italic text-muted-foreground">— {w.position[lang]}</span>
+                  <div className="mt-2">
+                    <WorkTitle name={w.name} position={w.position} lang={lang} size="list" />
                   </div>
+                  <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                    {w.summary[lang]}
+                  </p>
                 </div>
                 <ArrowUpRight className="size-6 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
               </Link>
-            </Reveal>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </section>
 
       {/* Stack */}
       <section className="border-t border-hairline bg-surface/40">
-        <div className="mx-auto grid max-w-6xl gap-12 px-5 py-20 sm:px-8 lg:grid-cols-[1fr_2fr]">
+        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
           <Reveal>
-            <SectionIndex index="05" />
-            <h2 className="mt-3 font-display text-5xl">{t("home.stack")}</h2>
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <SectionIndex index="05" />
+                <h2 className="mt-3 font-display text-5xl">{t("home.stack")}</h2>
+              </div>
+              <Link
+                to="/skills"
+                className="hidden shrink-0 items-center gap-1 text-sm text-muted-foreground hover:text-foreground sm:inline-flex"
+              >
+                {t("actions.viewSkills")} <ArrowUpRight className="size-4" />
+              </Link>
+            </div>
           </Reveal>
           <Reveal delay={0.1}>
-            <div className="flex flex-wrap gap-2">
-              {[
-                "PHP",
-                "Laravel",
-                "TypeScript",
-                "Vue.js",
-                ...cv.skills.languages.filter((s) => !["PHP", "TypeScript"].includes(s)),
-                ...cv.skills.frameworks.filter((s) => !["Laravel", "Vue.js"].includes(s)),
-                ...cv.skills.databases,
-              ].map((s) => (
-                <span
-                  key={s}
-                  className="rounded-full border border-hairline bg-background px-3 py-1.5 text-sm"
-                >
-                  {s}
-                </span>
-              ))}
-            </div>
+            <Link
+              to="/skills"
+              className="group mt-12 flex items-center justify-between gap-6 rounded-3xl border border-hairline bg-background/60 p-6 transition-colors hover:bg-background sm:p-8"
+            >
+              <PrimaryStack />
+              <ArrowUpRight className="size-6 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
+            </Link>
           </Reveal>
         </div>
       </section>

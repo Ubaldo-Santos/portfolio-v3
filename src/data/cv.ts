@@ -54,6 +54,8 @@ export interface WorkItem {
 export interface ProjectItem {
   // Project/product name as recruiters or stakeholders would recognize it.
   name: string;
+  // Optional public URL (product page, repo, marketplace listing, etc.).
+  url?: string;
   // One-sentence business description of the project.
   description: LocalizedString;
   // Tags or compact highlights shown as chips.
@@ -93,9 +95,9 @@ export const cv = {
       en: "Full-Stack Software Engineer · TypeScript · PHP · Laravel · Vue",
     } satisfies LocalizedString,
     tagline: {
-      es: "Construyo SDKs, integraciones y plataformas educativas que escalan.",
-      ca: "Construeixo SDKs, integracions i plataformes educatives que escalen.",
-      en: "I build SDKs, integrations and edtech platforms that scale.",
+      es: "Ingeniero full-stack con 6+ años en producto. Especializado en TypeScript y PHP/Laravel: SDKs multiplataforma, integraciones edtech y plataformas de assessment con foco en calidad, arquitectura y rendimiento.",
+      ca: "Enginyer full-stack amb més de 6 anys en producte. Especialitzat en TypeScript i PHP/Laravel: SDKs multiplataforma, integracions edtech i plataformes d'assessment amb focus en qualitat, arquitectura i rendiment.",
+      en: "Full-stack engineer with 6+ years in product. Specialized in TypeScript and PHP/Laravel: cross-platform SDKs, edtech integrations and assessment platforms with a focus on quality, architecture and performance.",
     } satisfies LocalizedString,
     summary: {
       es: "Ingeniero de Software Full-Stack con más de 6 años de experiencia en producto. Especializado en TypeScript/JavaScript y PHP/Laravel, con foco en calidad de código, arquitectura mantenible, accesibilidad y rendimiento. Actualmente en Wiris en el equipo de Assessment desarrollando Nubric (antes Learning Lemur) en Laravel, una plataforma de assessment matemático. Previamente, en el equipo de Integraciones desarrollé el SDK multiplataforma de MathType.",
@@ -132,9 +134,9 @@ export const cv = {
     {
       name: "Wiris",
       position: {
-        es: "Ingeniero de Software · Equipo de Assessment (Nubric)",
-        ca: "Enginyer de Programari · Equip d'Assessment (Nubric)",
-        en: "Software Engineer · Assessment Team (Nubric)",
+        es: "Ingeniero de Software · Assessment (Nubric)",
+        ca: "Enginyer de Programari · Assessment (Nubric)",
+        en: "Software Engineer · Assessment (Nubric)",
       },
       url: "https://www.wiris.com/",
       startDate: "2025-04-10",
@@ -172,9 +174,9 @@ export const cv = {
     {
       name: "Wiris",
       position: {
-        es: "Ingeniero de Software · Equipo de Integraciones (MathType)",
-        ca: "Enginyer de Programari · Equip d'Integracions (MathType)",
-        en: "Software Engineer · Integrations Team (MathType)",
+        es: "Ingeniero de Software · Integraciones (MathType)",
+        ca: "Enginyer de Programari · Integracions (MathType)",
+        en: "Software Engineer · Integrations (MathType)",
       },
       url: "https://www.wiris.com/",
       startDate: "2024-03-10",
@@ -212,9 +214,9 @@ export const cv = {
     {
       name: "Rotrafu",
       position: {
-        es: "Desarrollador Full-Stack PHP/Laravel · Responsable IT",
-        ca: "Desenvolupador Full-Stack PHP/Laravel · Responsable IT",
-        en: "Full-Stack PHP/Laravel Developer · IT Lead",
+        es: "Desarrollador Full-Stack · Responsable IT",
+        ca: "Desenvolupador Full-Stack · Responsable IT",
+        en: "Full-Stack Developer · IT Lead",
       },
       url: "https://www.rotrafu.net/",
       startDate: "2020-06-01",
@@ -258,9 +260,9 @@ export const cv = {
     {
       name: "Prime IT",
       position: {
-        es: "Desarrollador Full-Stack PHP/Laravel (Consultoría)",
-        ca: "Desenvolupador Full-Stack PHP/Laravel (Consultoria)",
-        en: "Full-Stack PHP/Laravel Developer (Consulting)",
+        es: "Desarrollador Full-Stack · Consultoría",
+        ca: "Desenvolupador Full-Stack · Consultoria",
+        en: "Full-Stack Developer · Consulting",
       },
       url: "https://www.primeit.es",
       startDate: "2023-06-01",
@@ -297,9 +299,9 @@ export const cv = {
     {
       name: "iThinkUPC",
       position: {
-        es: "Desarrollador Full-Stack PHP/Moodle (Prácticas)",
-        ca: "Desenvolupador Full-Stack PHP/Moodle (Pràctiques)",
-        en: "Full-Stack PHP/Moodle Developer (Internship)",
+        es: "Desarrollador Full-Stack · Prácticas (Moodle)",
+        ca: "Desenvolupador Full-Stack · Pràctiques (Moodle)",
+        en: "Full-Stack Developer · Internship (Moodle)",
       },
       url: "https://www.thinkupc.com/en/",
       startDate: "2023-03-01",
@@ -333,9 +335,9 @@ export const cv = {
     {
       name: "XMI Tech",
       position: {
-        es: "Desarrollador Full-Stack PHP (Formación Dual)",
-        ca: "Desenvolupador Full-Stack PHP (Formació Dual)",
-        en: "Full-Stack PHP Developer (Dual Training)",
+        es: "Desarrollador Full-Stack · Formación Dual",
+        ca: "Desenvolupador Full-Stack · Formació Dual",
+        en: "Full-Stack Developer · Dual Training",
       },
       url: "https://xmitech.com/",
       startDate: "2020-09-01",
@@ -395,6 +397,7 @@ export const cv = {
   projects: [
     {
       name: "Nubric (Learning Lemur)",
+      url: "https://www.wiris.com/en/nubric/",
       active: true,
       description: {
         es: "Plataforma de assessment matemático en Laravel: creación y autocorrección de ejercicios con MathType embebido.",
@@ -411,6 +414,7 @@ export const cv = {
     },
     {
       name: "MathType Integrations SDK",
+      url: "https://www.wiris.com/en/solutions/integrations/",
       active: true,
       description: {
         es: "SDK multiplataforma para integrar MathType en editores. Arquitectura hexagonal y TypeScript.",
@@ -427,6 +431,7 @@ export const cv = {
     },
     {
       name: "MathType Add-in for Microsoft Office",
+      url: "https://www.wiris.com/en/mathtype/office-tools/",
       active: true,
       description: {
         es: "Add-in para Word y PowerPoint usando APIs de Office y el SDK de MathType, con Vue.js.",
@@ -443,6 +448,7 @@ export const cv = {
     },
     {
       name: "ROTRAFU 2.0",
+      url: "https://www.rotrafu.net/",
       active: true,
       description: {
         es: "Rediseño completo de la app de gestión funeraria en Laravel: UX, escalabilidad y seguridad. +50.000 servicios.",
@@ -519,6 +525,11 @@ export const cv = {
   ] satisfies EducationItem[],
   // Skills taxonomy used by the homepage, skills page and printable CV.
   skills: {
+    // Primary stack shown on the homepage and skills page callout.
+    primaryStack: {
+      backend: ["PHP", "Laravel"],
+      frontend: ["TypeScript", "Vue"],
+    },
     // Programming and markup languages.
     languages: ["TypeScript", "JavaScript", "PHP", "SQL", "HTML", "CSS"],
     // Frameworks, runtimes and frontend/backend libraries.

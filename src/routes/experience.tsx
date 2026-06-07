@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { cv, type WorkItem } from "@/data/cv";
-import { currentLang, formatPeriod } from "@/lib/format";
+import { currentLang, formatPeriod, workAnchorId } from "@/lib/format";
 import { routeHead } from "@/lib/seo";
-import { Reveal } from "@/components/reveal";
+import { RevealGroup, RevealItem } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
 import { MapPin, ExternalLink } from "lucide-react";
 
@@ -56,8 +56,9 @@ function Section({
       <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
         {title}
       </h2>
-      <ol className="mt-8 space-y-12">
-        {groups.map((group, gi) => {
+      <RevealGroup className="mt-8">
+        <ol className="space-y-12">
+        {groups.map((group) => {
           // Items are most-recent first; oldest start = last item, newest end = first item
           const newest = group[0];
           const oldest = group[group.length - 1];
@@ -65,8 +66,11 @@ function Section({
           const url = newest.url;
           const anyCurrent = group.some((g) => g.current);
           return (
-            <Reveal key={newest.name + newest.startDate} delay={gi * 0.04}>
-              <li className="grid gap-6 border-t border-hairline pt-8 md:grid-cols-[200px_1fr]">
+            <RevealItem key={newest.name + newest.startDate}>
+              <li
+                id={!isMulti ? workAnchorId(newest) : undefined}
+                className="scroll-mt-24 grid gap-6 border-t border-hairline pt-8 md:grid-cols-[200px_1fr]"
+              >
                 <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
                   <div>{formatPeriod(oldest.startDate, newest.endDate, lang)}</div>
                   <div className="mt-2 flex items-center gap-1 normal-case">
@@ -99,7 +103,11 @@ function Section({
                   {isMulti ? (
                     <ol className="relative mt-5 space-y-8 border-l border-hairline pl-6">
                       {group.map((w, idx) => (
-                        <li key={w.startDate} className="relative">
+                        <li
+                          key={w.startDate}
+                          id={workAnchorId(w)}
+                          className="relative scroll-mt-24"
+                        >
                           <div className="relative">
                             <span
                               className={`absolute -left-6 top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-4 ring-background ${
@@ -111,7 +119,9 @@ function Section({
                               {formatPeriod(w.startDate, w.endDate, lang)}
                             </div>
                           </div>
-                          <div className="mt-1 font-display text-xl">{w.position[lang]}</div>
+                          <div className="mt-1 font-display-italic text-xl text-muted-foreground">
+                            {w.position[lang]}
+                          </div>
                           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-foreground/90">
                             {w.summary[lang]}
                           </p>
@@ -141,7 +151,7 @@ function Section({
                     </ol>
                   ) : (
                     <>
-                      <div className="mt-1 italic text-muted-foreground">
+                      <div className="mt-1 font-display-italic text-xl text-muted-foreground">
                         {newest.position[lang]}
                       </div>
                       <p className="mt-4 max-w-2xl text-base leading-relaxed">
@@ -182,10 +192,11 @@ function Section({
                   )}
                 </div>
               </li>
-            </Reveal>
+            </RevealItem>
           );
         })}
-      </ol>
+        </ol>
+      </RevealGroup>
     </section>
   );
 }
