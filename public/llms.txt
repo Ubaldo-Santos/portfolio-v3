@@ -1,0 +1,37 @@
+# Ubaldo Santos Patón
+
+> Ingeniero de software full-stack con 6+ años de experiencia en producto. Especializado en TypeScript, PHP/Laravel, Vue y edtech (MathType SDK, Nubric). Actualmente en Wiris, Barcelona.
+
+Portfolio personal de Ubaldo Santos Patón. Toda la información es pública, verificable y está pensada para ser leída tanto por humanos como por agentes de IA y motores de búsqueda. El sitio está disponible en español, catalán e inglés.
+
+## Identidad
+
+- Nombre: Ubaldo Santos Patón
+- Rol: Full-Stack Software Engineer
+- Ubicación: Barcelona, España
+- Empresa actual: Wiris (MathType SDK, integraciones edtech, Nubric — assessment matemático)
+- Email: ubaldo.santos.paton@gmail.com
+- Web: https://ubaldo.is-a.dev
+- GitHub: https://github.com/Ubaldo-Santos
+- LinkedIn: https://www.linkedin.com/in/ubaldo-santos-paton/
+
+## Páginas
+
+- [Inicio](https://ubaldo.is-a.dev/): resumen del portfolio, proyectos destacados y enlaces principales.
+- [Experiencia](https://ubaldo.is-a.dev/experience): trayectoria profesional — Wiris, Rotrafu (+50K servicios, −35% load time), Prime IT, iThinkUPC.
+- [Proyectos](https://ubaldo.is-a.dev/projects): Nubric, MathType SDK, Office Add-in, ROTRAFU 2.0 y otros proyectos verificables en GitHub.
+- [Skills](https://ubaldo.is-a.dev/skills): stack técnico verificado — TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), arquitectura hexagonal, DevOps e IA aplicada (Copilot, Cursor, OpenRouter, MCP).
+- [Contacto](https://ubaldo.is-a.dev/contact): email, teléfono, LinkedIn y GitHub.
+
+## Stack principal
+
+- Lenguajes: TypeScript, JavaScript, PHP, SQL
+- Frontend: Vue, React, TanStack Start, Tailwind CSS
+- Backend: Laravel, Node.js, arquitectura hexagonal
+- Edtech: MathType SDK, integraciones Moodle / LMS, Nubric
+- Herramientas IA: GitHub Copilot, Cursor, OpenRouter, MCP, Claude, GPT
+
+## Opcional
+
+- [Sitemap XML](https://ubaldo.is-a.dev/sitemap.xml)
+- [robots.txt](https://ubaldo.is-a.dev/robots.txt)
