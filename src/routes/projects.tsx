@@ -8,7 +8,13 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
 
 export const Route = createFileRoute("/projects")({
-  head: () => routeHead("projects", "/projects"),
+  head: () =>
+    routeHead("projects", "/projects", {
+      breadcrumbs: [
+        { name: "Inicio", path: "/" },
+        { name: "Proyectos", path: "/projects" },
+      ],
+    }),
   component: ProjectsPage,
 });
 

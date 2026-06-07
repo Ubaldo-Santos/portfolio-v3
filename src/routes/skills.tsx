@@ -9,7 +9,13 @@ import { PrimaryStack } from "@/components/primary-stack";
 import { PageHeader, PageShell } from "@/components/page-shell";
 
 export const Route = createFileRoute("/skills")({
-  head: () => routeHead("skills", "/skills"),
+  head: () =>
+    routeHead("skills", "/skills", {
+      breadcrumbs: [
+        { name: "Inicio", path: "/" },
+        { name: "Skills", path: "/skills" },
+      ],
+    }),
   component: SkillsPage,
 });
 
