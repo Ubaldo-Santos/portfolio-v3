@@ -79,7 +79,7 @@ function CvPage() {
         </Section>
 
         <Section title={t("cv.experience")}>
-          {cv.work.map((w) => (
+          {[...cv.work, ...cv.trainee].map((w) => (
             <Job key={w.name + w.startDate} w={w} lang={lang} />
           ))}
         </Section>

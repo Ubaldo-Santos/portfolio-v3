@@ -1,0 +1,68 @@
+---
+description: Contexto del portfolio de Ubaldo Santos — stack, arquitectura y convenciones
+alwaysApply: true
+---
+
+# ubaldo-s-digital-craft — Portfolio personal
+
+Sitio estático de **Ubaldo Santos Patón** (Full-Stack, Barcelona). URL: `https://ubaldo.is-a.dev`. Repo: `usantos-at-wiris/ubaldo-s-digital-craft`.
+
+## Stack
+
+- **TanStack Start** (SSR) + **TanStack Router** (file-based routing en `src/routes/`)
+- **React 19**, **TypeScript**, **Vite 7**, **Bun** (`packageManager: bun@1.3.14`)
+- **Tailwind CSS v4** (`src/styles.css` con `@theme inline`, tokens oklch)
+- **i18next** + **react-i18next** — idiomas ES / CA / EN
+- **Motion** (`motion/react`), **lucide-react**, **shadcn/ui** (`components.json`, alias `@/`)
+- Template Lovable: `@lovable.dev/vite-tanstack-config` — **no añadir plugins Vite manualmente**
+
+## Rutas
+
+| Ruta | Archivo | Propósito |
+|------|---------|-----------|
+| `/` | `index.tsx` | Hero editorial, trabajo destacado, stack |
+| `/experience` | `experience.tsx` | Timeline laboral + prácticas |
+| `/projects` | `projects.tsx` | Proyectos |
+| `/skills` | `skills.tsx` | Skills, idiomas, educación |
+| `/contact` | `contact.tsx` | mailto, teléfono, LinkedIn, GitHub |
+| `/cv` | `cv.tsx` | CV imprimible ATS-friendly (1 columna) |
+
+Layout raíz: `__root.tsx` (Header, Footer, CustomCursor, EasterEgg, i18n, Toaster).
+
+## Datos y contenido
+
+- **Fuente única de verdad**: `src/data/cv.ts` — experiencia, proyectos, educación, skills
+- Strings UI: `src/i18n/locales/{es,ca,en}.json`
+- Helper `pick()` y tipos `LocalizedString` / `LocalizedList` en `cv.ts`
+- `currentLang()` y `formatPeriod()` en `src/lib/format.ts`
+- Idioma SSR siempre `es`; cliente resuelve en `I18nProvider` (evita hydration mismatch)
+
+## Diseño visual
+
+Estilo **editorial-técnico**: Fraunces (display) + Inter (body) + JetBrains Mono. Accent lime eléctrico. Tema claro/oscuro vía `useTheme` + clase `.dark`. Animaciones scroll con `Reveal` + Motion. Cursor custom en `pointer: fine`. Easter egg Konami en `easter-egg.tsx`.
+
+## CV / PDF
+
+- Vista `/cv` con `#cv-article`, estilos `@media print` en `styles.css`
+- Descarga: `downloadCv()` en `src/lib/download-cv.ts` usa **html2pdf.js** (no `window.print()`)
+- Secciones: Contacto → Resumen → Experiencia → Educación → Skills → Idiomas → Proyectos
+
+## Experiencia profesional clave (cv.ts)
+
+- **Wiris / Assessment (Nubric)**: desde abr 2025, PHP/Laravel, plataforma assessment matemático
+- **Wiris / Integraciones (MathType SDK)**: mar 2024 – abr 2025, TypeScript/Deno
+- **Rotrafu**, **Prime IT**, prácticas iThinkUPC, XMI Tech, Erasmus+
+
+## Convenciones de código
+
+- Alias `@/` → `src/`
+- Componentes UI en `src/components/ui/` (shadcn)
+- Rutas con `head()` para SEO (title, og:*, canonical)
+- Clase `no-print` oculta chrome al imprimir
+- Cambios mínimos; reutilizar patrones existentes (Reveal, font-mono labels, max-w-6xl)
+- Sin backend real — contacto vía `mailto:` / enlaces externos
+- SSR errors: `src/server.ts` + `src/start.ts` middleware
+
+## Fuera de alcance
+
+Blog/MDX, analytics, formulario de contacto con backend, README (aún no existe).
