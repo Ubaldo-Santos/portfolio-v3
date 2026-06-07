@@ -25,7 +25,7 @@ function ContactPage() {
       <Reveal delay={0.04}>
         <div className="group relative mt-12 overflow-hidden rounded-3xl border border-hairline bg-surface/40 p-8 sm:p-12">
           <div
-            className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-accent/20 blur-3xl transition-opacity duration-500 group-hover:opacity-80"
+            className="pointer-events-none absolute -right-12 -top-12 size-40 rounded-full bg-accent/10 blur-2xl transition-opacity duration-500 group-hover:opacity-80"
             aria-hidden
           />
           <div className="relative grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end">

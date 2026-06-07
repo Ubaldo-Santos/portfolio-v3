@@ -94,7 +94,7 @@ function Section({
                       )}
                     </h3>
                     {anyCurrent && (
-                      <span className="rounded-full border border-accent bg-accent/20 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-foreground">
+                      <span className="rounded-full border border-accent/60 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-accent">
                         {t("experience.present")}
                       </span>
                     )}
