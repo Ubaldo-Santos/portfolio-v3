@@ -104,19 +104,24 @@ export function RevealItem({
   children,
   className,
   y = 20,
+  as = "div",
 }: {
   children: ReactNode;
   className?: string;
   y?: number;
+  as?: "div" | "li" | "section" | "article";
 }) {
   const reduced = useReducedMotion();
 
   if (reduced) {
-    return <div className={className}>{children}</div>;
+    const Tag = as as "div";
+    return <Tag className={className}>{children}</Tag>;
   }
 
+  const MotionTag = motion[as] as typeof motion.div;
+
   return (
-    <motion.div
+    <MotionTag
       className={cn(className)}
       variants={{
         hidden: { ...fadeUp.hidden, y },
@@ -124,6 +129,7 @@ export function RevealItem({
       }}
     >
       {children}
-    </motion.div>
+    </MotionTag>
   );
 }
+
