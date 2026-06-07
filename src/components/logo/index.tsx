@@ -1,24 +1,6 @@
 import { cn } from "@/lib/utils";
 import { cv } from "@/data/cv";
-import codeSandboxLogo from "./code-sandbox.svg?url";
-
-type LogoMarkProps = {
-  className?: string;
-};
-
-function LogoMark({ className }: LogoMarkProps) {
-  return (
-    <img
-      src={codeSandboxLogo}
-      alt=""
-      aria-hidden
-      width={1024}
-      height={1024}
-      decoding="async"
-      className={cn("shrink-0 dark:invert", className)}
-    />
-  );
-}
+import { Monogram } from "./monogram";
 
 type BrandLogoProps = {
   className?: string;
@@ -26,40 +8,43 @@ type BrandLogoProps = {
   variant?: "nav" | "footer";
 };
 
-/** CodeSandbox mark + name lockup — header and footer only. */
+/** Monogram + name lockup. Tokens only — no hardcoded colors. */
 export function BrandLogo({ className, iconClassName, variant = "nav" }: BrandLogoProps) {
   const isFooter = variant === "footer";
 
   return (
     <span
       className={cn(
-        "inline-flex items-center",
-        isFooter ? "gap-1.5" : "gap-1",
+        "inline-flex items-center text-foreground",
+        isFooter ? "gap-3" : "gap-2.5",
         className,
       )}
     >
-      <LogoMark
+      <Monogram
         className={cn(
-          isFooter ? "size-14" : "size-11 sm:size-12",
+          isFooter ? "size-12" : "size-9",
           iconClassName,
         )}
       />
 
-      <span className="flex min-w-0 flex-col text-[oklch(0.34_0.01_80)] dark:text-[oklch(0.72_0.01_90)]">
+      <span
+        className={cn(
+          "flex min-w-0 flex-col leading-none",
+          isFooter ? "" : "hidden sm:flex",
+        )}
+      >
         <span
           className={cn(
-            "font-display leading-none tracking-tight [font-weight:800] [font-variation-settings:'opsz'_72,'SOFT'_0]",
-            isFooter ? "text-3xl sm:text-4xl" : "text-xl sm:text-2xl",
+            "font-display tracking-tight",
+            isFooter ? "text-2xl" : "text-base",
           )}
         >
           {cv.basics.givenName}
         </span>
         <span
           className={cn(
-            "font-display-italic leading-none [font-weight:750] [font-variation-settings:'opsz'_72,'SOFT'_0]",
-            isFooter
-              ? "-mt-1.5 text-2xl sm:-mt-2 sm:text-3xl"
-              : "-mt-1 text-lg sm:-mt-1.5 sm:text-xl",
+            "font-display-italic text-muted-foreground",
+            isFooter ? "mt-0.5 text-xl" : "mt-0.5 text-sm",
           )}
         >
           {cv.basics.familyName}
