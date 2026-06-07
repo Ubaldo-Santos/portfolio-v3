@@ -15,7 +15,7 @@
 
 export function getServerConfig() {
   return {
-    nodeEnv: Bun.env.NODE_ENV,
+    nodeEnv: process.env.NODE_ENV,
     // Add server-only values here, e.g.:
     //   databaseUrl: Bun.env.DATABASE_URL,
     //   stripeSecretKey: Bun.env.STRIPE_SECRET_KEY,

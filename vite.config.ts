@@ -15,6 +15,12 @@ export default defineConfig({
   // Nitro deploy bundle for Vercel (Build Output API → .vercel/output)
   nitro: {
     preset: "vercel",
+    // Bun runtime writes to disk at cold start — Vercel functions are read-only.
+    vercel: {
+      functions: {
+        runtime: "nodejs22.x",
+      },
+    },
     output: {
       dir: ".vercel/output",
       serverDir: ".vercel/output/functions/__server.func",
