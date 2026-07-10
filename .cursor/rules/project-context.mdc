@@ -67,3 +67,7 @@ Estilo **editorial-técnico**: Fraunces (display) + Inter (body) + JetBrains Mon
 ## Fuera de alcance
 
 Blog/MDX, analytics, formulario de contacto con backend, README (aún no existe).
+
+## Harness ECC (Cursor)
+
+Este repo usa **ECC** (Everything Claude Code) con perfil `developer`. Ver `AGENTS.md` y `.cursor/rules/ecc-harness.mdc` para skills, agents, hooks y convenciones del harness. Las reglas de este archivo tienen prioridad sobre defaults genéricos de ECC.

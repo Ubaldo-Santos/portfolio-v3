@@ -17,6 +17,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
+    "ecc:smoke": "node scripts/ecc-smoke-test.mjs",
     "preinstall": "bun x only-allow bun"
   },
   "dependencies": {

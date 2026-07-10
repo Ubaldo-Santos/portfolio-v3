@@ -72,9 +72,7 @@ export function PageHeaderBlock({ page, title, subtitle, hint, actions }: PageHe
     <div>
       <PageKicker page={page} />
       <h1 className={pageTitleClass}>{heading}</h1>
-      {subtitle ? (
-        <p className="mt-4 max-w-xl text-lg text-muted-foreground">{subtitle}</p>
-      ) : null}
+      {subtitle ? <p className="mt-4 max-w-xl text-lg text-muted-foreground">{subtitle}</p> : null}
       {hint ? <p className="mt-4 text-sm text-muted-foreground">{hint}</p> : null}
     </div>
   );

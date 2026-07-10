@@ -27,120 +27,120 @@ function ContactPage() {
 
   return (
     <MotionPage>
-    <PageShell>
-      <PageHeader page="contact" subtitle={t("contact.subtitle")} />
+      <PageShell>
+        <PageHeader page="contact" subtitle={t("contact.subtitle")} />
 
-      {/* Primary email — full-width feature card */}
-      <Reveal delay={0.04}>
-        <div
-          className={cn(
-            "group relative overflow-hidden rounded-3xl border border-hairline bg-surface/40 p-8 sm:p-12",
-            pageLeadClass,
-          )}
-        >
+        {/* Primary email — full-width feature card */}
+        <Reveal delay={0.04}>
           <div
-            className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-accent/20 blur-3xl transition-opacity duration-500 group-hover:opacity-80"
-            aria-hidden
-          />
-          <div className="relative grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end">
-            <div>
-              <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                {t("contact.ctaEmail")}
+            className={cn(
+              "group relative overflow-hidden rounded-3xl border border-hairline bg-surface/40 p-8 sm:p-12",
+              pageLeadClass,
+            )}
+          >
+            <div
+              className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-accent/20 blur-3xl transition-opacity duration-500 group-hover:opacity-80"
+              aria-hidden
+            />
+            <div className="relative grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end">
+              <div>
+                <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                  {t("contact.ctaEmail")}
+                </div>
+                <a
+                  href={`mailto:${cv.basics.email}`}
+                  className="mt-3 flex items-center gap-3 break-all font-display text-3xl underline-offset-4 hover:underline sm:text-5xl"
+                >
+                  {cv.basics.email}
+                  <ArrowUpRight className="size-7 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </a>
+                <p className="mt-4 max-w-md text-sm text-muted-foreground">
+                  {t("contact.availability")}
+                </p>
               </div>
-              <a
-                href={`mailto:${cv.basics.email}`}
-                className="mt-3 flex items-center gap-3 break-all font-display text-3xl underline-offset-4 hover:underline sm:text-5xl"
-              >
-                {cv.basics.email}
-                <ArrowUpRight className="size-7 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </a>
-              <p className="mt-4 max-w-md text-sm text-muted-foreground">
-                {t("contact.availability")}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2 lg:justify-end">
-              <a
-                href={`mailto:${cv.basics.email}`}
-                className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm text-background hover:opacity-90"
-              >
-                <Mail className="size-4" /> {t("actions.writeMe")}
-              </a>
-              <CopyButton
-                value={cv.basics.email}
-                label={t("actions.copy")}
-                doneLabel={t("actions.copied")}
-              />
+              <div className="flex flex-wrap gap-2 lg:justify-end">
+                <a
+                  href={`mailto:${cv.basics.email}`}
+                  className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm text-background hover:opacity-90"
+                >
+                  <Mail className="size-4" /> {t("actions.writeMe")}
+                </a>
+                <CopyButton
+                  value={cv.basics.email}
+                  label={t("actions.copy")}
+                  doneLabel={t("actions.copied")}
+                />
+              </div>
             </div>
           </div>
+        </Reveal>
+
+        {/* Quick info — uniform 3-up grid */}
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <Reveal delay={0.06}>
+            <InfoCard
+              icon={<Phone className="size-4" />}
+              label={t("contact.phone")}
+              value={cv.basics.phone}
+              href={`tel:${cv.basics.phone.replace(/\s/g, "")}`}
+              action={t("actions.callMe")}
+            />
+          </Reveal>
+          <Reveal delay={0.09}>
+            <InfoCard
+              icon={<MapPin className="size-4" />}
+              label={t("contact.location")}
+              value={cv.basics.location[lang]}
+            />
+          </Reveal>
+          <Reveal delay={0.12}>
+            <InfoCard
+              as={Link}
+              to="/cv"
+              icon={<Printer className="size-4" />}
+              label={t("cv.title")}
+              value={t("actions.printCv")}
+              action="→"
+              highlight
+            />
+          </Reveal>
         </div>
-      </Reveal>
 
-      {/* Quick info — uniform 3-up grid */}
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        <Reveal delay={0.06}>
-          <InfoCard
-            icon={<Phone className="size-4" />}
-            label={t("contact.phone")}
-            value={cv.basics.phone}
-            href={`tel:${cv.basics.phone.replace(/\s/g, "")}`}
-            action={t("actions.callMe")}
-          />
-        </Reveal>
-        <Reveal delay={0.09}>
-          <InfoCard
-            icon={<MapPin className="size-4" />}
-            label={t("contact.location")}
-            value={cv.basics.location[lang]}
-          />
-        </Reveal>
-        <Reveal delay={0.12}>
-          <InfoCard
-            as={Link}
-            to="/cv"
-            icon={<Printer className="size-4" />}
-            label={t("cv.title")}
-            value={t("actions.printCv")}
-            action="→"
-            highlight
-          />
-        </Reveal>
-      </div>
-
-      {/* Social — uniform 2-up grid */}
-      <section className="mt-16">
-        <Reveal>
-          <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
-            {t("contact.social")}
-          </h2>
-          <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t("contact.preferred")}</p>
-        </Reveal>
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {cv.basics.profiles.map((p, i) => (
-            <Reveal key={p.network} delay={i * 0.04}>
-              <a
-                href={p.url}
-                target="_blank"
-                rel="noreferrer"
-                className="group flex h-full items-center justify-between rounded-2xl border border-hairline bg-surface/40 p-5 transition-colors hover:bg-surface"
-              >
-                <span className="flex items-center gap-4">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full border border-hairline bg-background font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                    {p.network.slice(0, 2)}
-                  </span>
-                  <span>
-                    <span className="block font-display text-xl leading-tight">{p.network}</span>
-                    <span className="block font-mono text-xs text-muted-foreground">
-                      @{p.username}
+        {/* Social — uniform 2-up grid */}
+        <section className="mt-16">
+          <Reveal>
+            <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
+              {t("contact.social")}
+            </h2>
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t("contact.preferred")}</p>
+          </Reveal>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            {cv.basics.profiles.map((p, i) => (
+              <Reveal key={p.network} delay={i * 0.04}>
+                <a
+                  href={p.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group flex h-full items-center justify-between rounded-2xl border border-hairline bg-surface/40 p-5 transition-colors hover:bg-surface"
+                >
+                  <span className="flex items-center gap-4">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full border border-hairline bg-background font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                      {p.network.slice(0, 2)}
+                    </span>
+                    <span>
+                      <span className="block font-display text-xl leading-tight">{p.network}</span>
+                      <span className="block font-mono text-xs text-muted-foreground">
+                        @{p.username}
+                      </span>
                     </span>
                   </span>
-                </span>
-                <ArrowUpRight className="size-5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </a>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-    </PageShell>
+                  <ArrowUpRight className="size-5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </a>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      </PageShell>
     </MotionPage>
   );
 }

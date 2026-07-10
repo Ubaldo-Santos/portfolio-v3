@@ -25,16 +25,16 @@ function ExperiencePage() {
 
   return (
     <MotionPage>
-    <PageShell>
-      <PageHeader page="experience" subtitle={t("experience.subtitle")} />
+      <PageShell>
+        <PageHeader page="experience" subtitle={t("experience.subtitle")} />
 
-      <Section title={t("experience.work")} items={cv.work as readonly WorkItem[]} lang={lang} />
-      <Section
-        title={t("experience.trainee")}
-        items={cv.trainee as readonly WorkItem[]}
-        lang={lang}
-      />
-    </PageShell>
+        <Section title={t("experience.work")} items={cv.work as readonly WorkItem[]} lang={lang} />
+        <Section
+          title={t("experience.trainee")}
+          items={cv.trainee as readonly WorkItem[]}
+          lang={lang}
+        />
+      </PageShell>
     </MotionPage>
   );
 }

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://raw.githubusercontent.com/affaan-m/ECC/main/schemas/ecc-install-config.schema.json",
+  "version": 1,
+  "target": "cursor",
+  "profile": "developer",
+  "options": {
+    "hooksProfile": "standard"
+  }
+}

@@ -1,0 +1,77 @@
+---
+description: "ECC harness — agent operating system activo en este repo"
+alwaysApply: true
+---
+
+# ECC Harness (Everything Claude Code)
+
+Este repositorio está gestionado con **[ECC](https://github.com/affaan-m/ECC)** (Everything Claude Code) v2, adaptado a **Cursor**.
+
+## Cuándo usar ECC
+
+Usa el harness ECC automáticamente cuando la tarea encaje con alguno de estos casos:
+
+| Situación | Recurso ECC |
+|-----------|-------------|
+| Entender qué ofrece ECC o qué instalar | skill `ecc-guide` |
+| Elegir perfil, módulos o reinstalar | skill `configure-ecc` + `ecc-install.json` |
+| TDD, tests, verificación | skill `tdd-workflow`, `verification-loop` |
+| Review de código / seguridad | agents `ecc-code-reviewer`, `ecc-security-reviewer` |
+| Patrones React/TS/Vite/Bun | rules `react-*`, `typescript-*`, skills `react-patterns`, `vite-patterns`, `bun-runtime` |
+| Git, commits, PRs | skill `git-workflow`, rule `common-git-workflow` |
+| Memoria entre sesiones | hooks `sessionStart`/`sessionEnd` → `~/.cursor/ecc` |
+| Aprendizaje continuo | skill `continuous-learning-v2` |
+
+## Estructura instalada
+
+```
+.cursor/
+  hooks.json          # 15 eventos de hook (formato, secretos, memoria, etc.)
+  hooks/              # Adaptadores Cursor → scripts ECC
+  scripts/hooks/      # Lógica compartida del harness
+  skills/             # ~100+ skills (TDD, React, Bun, ECC, etc.)
+  agents/             # Subagentes especializados (prefijo ecc-)
+  commands/           # Comandos slash (ecc-guide, tdd, etc.)
+  rules/              # Reglas por lenguaje/framework (.mdc)
+  mcp.json            # MCP servers (chrome-devtools)
+  ecc-agent-data.json # Raíz de memoria: ~/.cursor/ecc
+```
+
+## Prioridad de contexto
+
+1. **Este proyecto** → `.cursor/rules/project-context.mdc` (stack TanStack Start, Bun, i18n, cv.ts)
+2. **ECC reglas activas** → globs en `.cursor/rules/*.mdc` según archivos abiertos
+3. **ECC skills** → invocar cuando el trigger del `SKILL.md` coincida con la tarea
+
+Los defaults de ECC no sobrescriben convenciones del portfolio (Bun exclusivo, `src/data/cv.ts` como fuente de verdad, sin plugins Vite manuales).
+
+## Reinstalar / actualizar ECC
+
+Desde la raíz del repo (requiere clone temporal o `npx` del repo ECC):
+
+```bash
+git clone --depth 1 https://github.com/affaan-m/ECC.git /tmp/ecc && \
+  cd "$(pwd)" && /tmp/ecc/install.sh --config ecc-install.json
+```
+
+Tras reinstalar, aplicar estos fixes manuales (el instalador ECC aún no los incluye en perfil `developer`):
+
+1. `adapter.js` → `getPluginRoot()` debe resolver a `path.resolve(__dirname, '..')` (no `../..`)
+2. `hooks.json` → añadir `cursor-session-env.js` como primer hook de `sessionStart`
+3. Copiar scaffolds: `ecc-agent-data.json`, `rules/ecc-agent-data-home.mdc`
+4. Mantener `.cursor/package.json` con `"type": "commonjs"` (el root usa `"type": "module"` y rompe los hooks ECC)
+5. Corregir requires en wrappers Cursor: `before-shell-execution-block-no-verify.js` y `before-shell-execution.js` usan `../scripts/` (no `../../scripts/`)
+
+## Variables de entorno opcionales
+
+```bash
+export ECC_AGENT_DATA_HOME="$HOME/.cursor/ecc"   # memoria aislada (default)
+export ECC_HOOK_PROFILE=standard                  # minimal | standard | strict
+export ECC_DISABLED_HOOKS=                        # IDs separados por coma
+```
+
+## Comandos útiles en chat
+
+- `/ecc-guide` — catálogo interactivo de ECC
+- `/tdd` — flujo test-driven
+- `/code-review` — revisión estructurada

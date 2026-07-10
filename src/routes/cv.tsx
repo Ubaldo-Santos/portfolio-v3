@@ -44,136 +44,136 @@ function CvPage() {
 
   return (
     <MotionPage>
-    <>
-      <PageShell className={cn("no-print", pageShellLeadGapClass)}>
-        <PageHeader page="cv" subtitle={t("cv.subtitle")} />
+      <>
+        <PageShell className={cn("no-print", pageShellLeadGapClass)}>
+          <PageHeader page="cv" subtitle={t("cv.subtitle")} />
 
-        <Reveal delay={0.04} onMount>
-          <div
-            className={cn(
-              pageLeadClass,
-              "group relative overflow-hidden flex flex-col gap-4 rounded-2xl border border-hairline bg-surface/40 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6",
-            )}
-          >
+          <Reveal delay={0.04} onMount>
             <div
-              className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-accent/20 blur-3xl transition-opacity duration-500 group-hover:opacity-80"
-              aria-hidden
-            />
-            <p className="relative max-w-md text-sm leading-relaxed text-muted-foreground">
-              {t("cv.printHint")}
-            </p>
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="relative inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3 sm:w-auto"
+              className={cn(
+                pageLeadClass,
+                "group relative overflow-hidden flex flex-col gap-4 rounded-2xl border border-hairline bg-surface/40 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6",
+              )}
             >
-              <Printer className="size-4" aria-hidden />
-              {t("actions.printCv")}
-              <ArrowUpRight
-                className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              <div
+                className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-accent/20 blur-3xl transition-opacity duration-500 group-hover:opacity-80"
                 aria-hidden
               />
-            </button>
-          </div>
-        </Reveal>
-      </PageShell>
-
-      <div className={cn(pageBottomClass, "print:pb-0")}>
-        <article id="cv-article" className="mx-auto">
-          <header className="cv-block cv-header">
-            <h1>{cv.basics.name}</h1>
-            <p>{cv.basics.label[lang]}</p>
-            <div className="cv-contact-line">
-              {contactItems.map((item, index) => (
-                <span key={item} className="cv-contact-item">
-                  {index > 0 ? <span aria-hidden>·</span> : null}
-                  <span>{item}</span>
-                </span>
-              ))}
+              <p className="relative max-w-md text-sm leading-relaxed text-muted-foreground">
+                {t("cv.printHint")}
+              </p>
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="relative inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3 sm:w-auto"
+              >
+                <Printer className="size-4" aria-hidden />
+                {t("actions.printCv")}
+                <ArrowUpRight
+                  className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  aria-hidden
+                />
+              </button>
             </div>
-          </header>
+          </Reveal>
+        </PageShell>
 
-          <Section title={t("cv.profile")}>
-            <p className="leading-relaxed">{cv.basics.summary[lang]}</p>
-          </Section>
-
-          <Section title={t("cv.experience")}>
-            {cv.work.slice(0, 3).map((w) => (
-              <Job key={w.name + w.startDate} w={w} lang={lang} />
-            ))}
-          </Section>
-
-          <Section title={t("cv.education")}>
-            {cv.education.map((ed) => (
-              <div key={ed.institution + ed.startDate} className="cv-block mb-3 last:mb-0">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h3>
-                    {ed.studyType[lang]} — {ed.institution}
-                  </h3>
-                  <span className="font-mono text-xs">
-                    {formatPeriod(ed.startDate, ed.endDate, lang)}
+        <div className={cn(pageBottomClass, "print:pb-0")}>
+          <article id="cv-article" className="mx-auto">
+            <header className="cv-block cv-header">
+              <h1>{cv.basics.name}</h1>
+              <p>{cv.basics.label[lang]}</p>
+              <div className="cv-contact-line">
+                {contactItems.map((item, index) => (
+                  <span key={item} className="cv-contact-item">
+                    {index > 0 ? <span aria-hidden>·</span> : null}
+                    <span>{item}</span>
                   </span>
-                </div>
-                <div className="cv-meta">{ed.area[lang]}</div>
-                <p className="mt-1">{ed.summary[lang]}</p>
+                ))}
               </div>
-            ))}
-          </Section>
+            </header>
 
-          <Section title={t("cv.skills")}>
-            <ul className="space-y-1">
-              <li>
-                <strong>{t("skills.languages")}:</strong> {cv.skills.languages.join(", ")}
-              </li>
-              <li>
-                <strong>{t("skills.backend")}:</strong> {cv.skills.backend.join(", ")}
-              </li>
-              <li>
-                <strong>{t("skills.frontend")}:</strong> {cv.skills.frontend.join(", ")}
-              </li>
-              <li>
-                <strong>{t("skills.edtech")}:</strong> {cv.skills.edtech.join(", ")}
-              </li>
-              <li>
-                <strong>{t("skills.practices")}:</strong> {cv.skills.practices.join(", ")}
-              </li>
-              <li>
-                <strong>{t("skills.devops")}:</strong> {cv.skills.devops.join(", ")}
-              </li>
-              <li>
-                <strong>{t("skills.other")}:</strong> {cv.skills.other.join(", ")}
-              </li>
-            </ul>
-          </Section>
+            <Section title={t("cv.profile")}>
+              <p className="leading-relaxed">{cv.basics.summary[lang]}</p>
+            </Section>
 
-          <Section title={t("cv.languages")}>
-            <p>{cv.languages.map((l) => `${l.name[lang]} (${l.level[lang]})`).join(" · ")}</p>
-          </Section>
+            <Section title={t("cv.experience")}>
+              {cv.work.slice(0, 3).map((w) => (
+                <Job key={w.name + w.startDate} w={w} lang={lang} />
+              ))}
+            </Section>
 
-          <Section title={t("cv.projects")}>
-            {cv.projects.map((p) => (
-              <div key={p.name} className="cv-block mb-2 last:mb-0">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h3>
-                    {p.url ? (
-                      <a href={p.url} target="_blank" rel="noreferrer">
-                        {p.name}
-                      </a>
-                    ) : (
-                      p.name
-                    )}
-                  </h3>
-                  <span className="font-mono text-xs">
-                    {formatPeriod(p.startDate, p.endDate, lang)}
-                  </span>
+            <Section title={t("cv.education")}>
+              {cv.education.map((ed) => (
+                <div key={ed.institution + ed.startDate} className="cv-block mb-3 last:mb-0">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h3>
+                      {ed.studyType[lang]} — {ed.institution}
+                    </h3>
+                    <span className="font-mono text-xs">
+                      {formatPeriod(ed.startDate, ed.endDate, lang)}
+                    </span>
+                  </div>
+                  <div className="cv-meta">{ed.area[lang]}</div>
+                  <p className="mt-1">{ed.summary[lang]}</p>
                 </div>
-                <p>{p.description[lang]}</p>
-              </div>
-            ))}
-          </Section>
-        </article>
-      </div>
-    </>
+              ))}
+            </Section>
+
+            <Section title={t("cv.skills")}>
+              <ul className="space-y-1">
+                <li>
+                  <strong>{t("skills.languages")}:</strong> {cv.skills.languages.join(", ")}
+                </li>
+                <li>
+                  <strong>{t("skills.backend")}:</strong> {cv.skills.backend.join(", ")}
+                </li>
+                <li>
+                  <strong>{t("skills.frontend")}:</strong> {cv.skills.frontend.join(", ")}
+                </li>
+                <li>
+                  <strong>{t("skills.edtech")}:</strong> {cv.skills.edtech.join(", ")}
+                </li>
+                <li>
+                  <strong>{t("skills.practices")}:</strong> {cv.skills.practices.join(", ")}
+                </li>
+                <li>
+                  <strong>{t("skills.devops")}:</strong> {cv.skills.devops.join(", ")}
+                </li>
+                <li>
+                  <strong>{t("skills.other")}:</strong> {cv.skills.other.join(", ")}
+                </li>
+              </ul>
+            </Section>
+
+            <Section title={t("cv.languages")}>
+              <p>{cv.languages.map((l) => `${l.name[lang]} (${l.level[lang]})`).join(" · ")}</p>
+            </Section>
+
+            <Section title={t("cv.projects")}>
+              {cv.projects.map((p) => (
+                <div key={p.name} className="cv-block mb-2 last:mb-0">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h3>
+                      {p.url ? (
+                        <a href={p.url} target="_blank" rel="noreferrer">
+                          {p.name}
+                        </a>
+                      ) : (
+                        p.name
+                      )}
+                    </h3>
+                    <span className="font-mono text-xs">
+                      {formatPeriod(p.startDate, p.endDate, lang)}
+                    </span>
+                  </div>
+                  <p>{p.description[lang]}</p>
+                </div>
+              ))}
+            </Section>
+          </article>
+        </div>
+      </>
     </MotionPage>
   );
 }
