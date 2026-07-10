@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ArrowUpRight, Printer } from "lucide-react";
-import { cv, type WorkItem } from "@/data/cv";
+import { Printer } from "lucide-react";
+import { cv, pick, type Lang, type WorkItem } from "@/data/cv";
 import { currentLang, cvSummary, formatPeriod } from "@/lib/format";
 import { cvPageSubtitle, cvPrintHint } from "@/lib/cv-copy";
 import { routeHead } from "@/lib/seo";
@@ -15,6 +15,7 @@ import {
 } from "@/components/page-shell";
 import { cn } from "@/lib/utils";
 import { MotionPage } from "@/components/page-transition";
+import { CtaButton, SurfaceCard } from "@/components/editorial";
 
 export const Route = createFileRoute("/cv")({
   head: () => routeHead("cv", "/cv", { noIndex: true }),
@@ -38,7 +39,7 @@ function CvPage() {
       document.title = originalTitle;
     };
 
-    document.title = `Ubaldo Santos - ${formatPrintDate(new Date())}`;
+    document.title = `Ubaldo Santos - ${formatPrintDate(new Date(), lang)}`;
     window.addEventListener("afterprint", restoreTitle, { once: true });
     window.print();
   };
@@ -47,35 +48,31 @@ function CvPage() {
     <MotionPage>
       <>
         <PageShell className={cn("no-print", pageShellLeadGapClass)}>
-          <PageHeader page="cv" subtitle={cvPageSubtitle("cv", lang)} />
+          <PageHeader page="cv" titleAs="p" subtitle={cvPageSubtitle("cv", lang)} />
 
           <Reveal delay={0.04} onMount>
-            <div
+            <SurfaceCard
+              variant="feature"
+              padding="sm"
+              wash
               className={cn(
                 pageLeadClass,
-                "group relative overflow-hidden flex flex-col gap-4 rounded-2xl border border-hairline bg-surface/40 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6",
+                "flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6",
               )}
             >
-              <div
-                className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-accent/20 blur-3xl transition-opacity duration-500 group-hover:opacity-80"
-                aria-hidden
-              />
               <p className="relative max-w-md text-sm leading-relaxed text-muted-foreground">
                 {cvPrintHint(lang)}
               </p>
-              <button
-                type="button"
+              <CtaButton
+                variant="primary"
+                withArrow
+                className="relative w-full sm:w-auto"
                 onClick={handlePrint}
-                className="relative inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3 sm:w-auto"
               >
                 <Printer className="size-4" aria-hidden />
                 {t("actions.printCv")}
-                <ArrowUpRight
-                  className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                  aria-hidden
-                />
-              </button>
-            </div>
+              </CtaButton>
+            </SurfaceCard>
           </Reveal>
         </PageShell>
 
@@ -136,7 +133,8 @@ function CvPage() {
                   <strong>{t("skills.edtech")}:</strong> {cv.skills.edtech.join(", ")}
                 </li>
                 <li>
-                  <strong>{t("skills.practices")}:</strong> {cv.skills.practices.join(", ")}
+                  <strong>{t("skills.practices")}:</strong>{" "}
+                  {pick(cv.skills.practices, lang).join(", ")}
                 </li>
                 <li>
                   <strong>{t("skills.devops")}:</strong> {cv.skills.devops.join(", ")}
@@ -215,8 +213,14 @@ function Job({ w, lang }: { w: WorkItem; lang: ReturnType<typeof currentLang> })
   );
 }
 
-function formatPrintDate(date: Date): string {
-  return new Intl.DateTimeFormat("es-ES", {
+const PRINT_DATE_LOCALE: Record<Lang, string> = {
+  es: "es-ES",
+  ca: "ca-ES",
+  en: "en-GB",
+};
+
+function formatPrintDate(date: Date, lang: Lang): string {
+  return new Intl.DateTimeFormat(PRINT_DATE_LOCALE[lang], {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

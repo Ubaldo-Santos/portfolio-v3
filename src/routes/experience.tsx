@@ -7,7 +7,15 @@ import { routeHead, seoBreadcrumbs } from "@/lib/seo";
 import { RevealGroup, RevealItem } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
 import { MotionPage } from "@/components/page-transition";
-import { MapPin, ExternalLink } from "lucide-react";
+import { MapPin } from "lucide-react";
+import {
+  ArrowLink,
+  Chip,
+  ChipList,
+  MetaLabel,
+  SectionHeader,
+  sectionGap,
+} from "@/components/editorial";
 
 export const Route = createFileRoute("/experience")({
   head: () => routeHead("experience", "/experience", { breadcrumbs: seoBreadcrumbs("experience") }),
@@ -56,10 +64,8 @@ function Section({
   const { t } = useTranslation();
   const groups = groupByCompany(items);
   return (
-    <section className="mt-20">
-      <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
-        {title}
-      </h2>
+    <section className={sectionGap.lg}>
+      <SectionHeader title={title} />
       <RevealGroup className="mt-8">
         <ol className="space-y-12">
           {groups.map((group) => {
@@ -75,38 +81,31 @@ function Section({
                   id={!isMulti ? workAnchorId(newest) : undefined}
                   className="scroll-mt-24 grid gap-6 border-t border-hairline pt-8 md:grid-cols-[200px_1fr]"
                 >
-                  <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                    <div>{formatPeriod(oldest.startDate, newest.endDate, lang)}</div>
-                    <div className="mt-2 flex items-center gap-1 normal-case">
-                      <MapPin className="size-3" /> {newest.location[lang]}
-                    </div>
-                    <div className="mt-1 normal-case">{newest.modality[lang]}</div>
+                  <div>
+                    <MetaLabel>{formatPeriod(oldest.startDate, newest.endDate, lang)}</MetaLabel>
+                    <MetaLabel icon={MapPin} className="mt-2">
+                      {newest.location[lang]}
+                    </MetaLabel>
+                    <MetaLabel className="mt-1">{newest.modality[lang]}</MetaLabel>
                   </div>
                   <div>
                     <div className="flex flex-wrap items-baseline justify-between gap-3">
                       <h3 className="font-display text-3xl">
                         {newest.name}
-                        {url && (
-                          <a
+                        {url ? (
+                          <ArrowLink
                             href={url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="ml-2 inline-flex text-muted-foreground hover:text-foreground"
-                          >
-                            <ExternalLink className="size-4" />
-                          </a>
-                        )}
+                            aria-label={`${newest.name} website`}
+                            className="ml-2 align-middle"
+                          />
+                        ) : null}
                       </h3>
-                      {anyCurrent && (
-                        <span className="rounded-full border border-accent bg-accent/20 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-foreground">
-                          {t("experience.present")}
-                        </span>
-                      )}
+                      {anyCurrent ? <Chip variant="status">{t("experience.present")}</Chip> : null}
                     </div>
 
                     {isMulti ? (
                       <ol className="relative mt-5 space-y-8 border-l border-hairline pl-6">
-                        {group.map((w, idx) => (
+                        {group.map((w) => (
                           <li
                             key={w.startDate}
                             id={workAnchorId(w)}
@@ -119,9 +118,9 @@ function Section({
                                 }`}
                                 aria-hidden
                               />
-                              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                              <MetaLabel size="sm">
                                 {formatPeriod(w.startDate, w.endDate, lang)}
-                              </div>
+                              </MetaLabel>
                             </div>
                             <div className="mt-1 font-display-italic text-xl text-muted-foreground">
                               {w.position[lang]}
@@ -140,16 +139,11 @@ function Section({
                                 </li>
                               ))}
                             </ul>
-                            <div className="mt-3 flex flex-wrap gap-1.5">
-                              {w.technologies.split(",").map((tech) => (
-                                <span
-                                  key={tech}
-                                  className="rounded-full border border-hairline px-2 py-0.5 text-[11px]"
-                                >
-                                  {tech.trim()}
-                                </span>
-                              ))}
-                            </div>
+                            <ChipList
+                              className="mt-3"
+                              items={w.technologies.split(",").map((tech) => tech.trim())}
+                              label={t("experience.stack")}
+                            />
                           </li>
                         ))}
                       </ol>
@@ -162,9 +156,7 @@ function Section({
                           {newest.summary[lang]}
                         </p>
                         <div className="mt-6">
-                          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                            {t("experience.highlights")}
-                          </div>
+                          <MetaLabel size="sm">{t("experience.highlights")}</MetaLabel>
                           <ul className="mt-2 space-y-1.5">
                             {newest.highlights[lang].map((h, idx) => (
                               <li key={idx} className="flex gap-2 text-sm">
@@ -178,19 +170,12 @@ function Section({
                           </ul>
                         </div>
                         <div className="mt-6">
-                          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                            {t("experience.stack")}
-                          </div>
-                          <div className="mt-2 flex flex-wrap gap-1.5">
-                            {newest.technologies.split(",").map((tech) => (
-                              <span
-                                key={tech}
-                                className="rounded-full border border-hairline px-2.5 py-0.5 text-xs"
-                              >
-                                {tech.trim()}
-                              </span>
-                            ))}
-                          </div>
+                          <MetaLabel size="sm">{t("experience.stack")}</MetaLabel>
+                          <ChipList
+                            className="mt-2"
+                            items={newest.technologies.split(",").map((tech) => tech.trim())}
+                            label={t("experience.stack")}
+                          />
                         </div>
                       </>
                     )}

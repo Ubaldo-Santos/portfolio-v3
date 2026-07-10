@@ -1,3 +1,4 @@
+import { type Lang } from "@/data/cv";
 import { cv } from "@/data/cv";
 import { translations } from "@/i18n/translations";
 import {
@@ -7,8 +8,8 @@ import {
   cvMetaTitle,
   type CvMetaPage,
 } from "@/lib/cv-copy";
+import { detectLang } from "@/lib/detect-lang";
 import { homeOgDescription } from "@/lib/og-copy";
-import { OG_LANG } from "@/lib/og-sizes";
 import { SITE_URL } from "@/lib/site";
 import { OG_PRIMARY_SIZE, OG_PRIMARY_THEME, OG_SIZES, ogImageUrl } from "@/lib/og-sizes";
 
@@ -18,12 +19,12 @@ export const BRAND_MARK_URL = `${SITE_URL}/code-sandbox.svg`;
 export const OG_IMAGE_URL = ogImageUrl(OG_PRIMARY_SIZE, OG_PRIMARY_THEME);
 const OG_IMAGE = OG_SIZES[OG_PRIMARY_SIZE];
 
-/** SSR document meta — Spanish default for local SEO. */
-const DEFAULT_LANG = "es";
-/** Open Graph / Twitter copy — English, matches OG banner PNGs. */
-const SOCIAL_LANG = OG_LANG;
+const OG_LOCALE_BY_LANG: Record<Lang, string> = {
+  es: "es_ES",
+  ca: "ca_ES",
+  en: "en_US",
+};
 
-const SOCIAL_LOCALES = ["en_US", "es_ES", "ca_ES"] as const;
 const HREFLANGS: Array<{ hreflang: string }> = [
   { hreflang: "es" },
   { hreflang: "ca" },
@@ -33,10 +34,9 @@ const HREFLANGS: Array<{ hreflang: string }> = [
 
 type BreadcrumbPage = Exclude<CvMetaPage, "home" | "cv">;
 
-function socialPageCopy(page: CvMetaPage) {
-  const description =
-    page === "home" ? homeOgDescription(SOCIAL_LANG) : cvMetaOgDescription(page, SOCIAL_LANG);
-  const title = cvMetaTitle(page, SOCIAL_LANG);
+function socialPageCopy(page: CvMetaPage, lang: Lang) {
+  const description = page === "home" ? homeOgDescription(lang) : cvMetaOgDescription(page, lang);
+  const title = cvMetaTitle(page, lang);
 
   return {
     title,
@@ -46,9 +46,13 @@ function socialPageCopy(page: CvMetaPage) {
   };
 }
 
-/** Shared og:* / twitter:* tags — always English, aligned with /og/*.png banners. */
-export function socialMetaTags(page: CvMetaPage, url: string) {
-  const social = socialPageCopy(page);
+/** Shared og:* / twitter:* tags — localized text; OG image URLs stay English pre-rendered PNGs. */
+export function socialMetaTags(page: CvMetaPage, url: string, lang: Lang) {
+  const social = socialPageCopy(page, lang);
+  const primaryLocale = OG_LOCALE_BY_LANG[lang];
+  const alternateLocales = (Object.values(OG_LOCALE_BY_LANG) as string[]).filter(
+    (locale) => locale !== primaryLocale,
+  );
 
   return [
     { property: "og:site_name", content: social.siteName },
@@ -56,8 +60,8 @@ export function socialMetaTags(page: CvMetaPage, url: string) {
     { property: "og:description", content: social.description },
     { property: "og:url", content: url },
     { property: "og:type", content: page === "home" ? "profile" : "website" },
-    { property: "og:locale", content: SOCIAL_LOCALES[0] },
-    ...SOCIAL_LOCALES.slice(1).map((locale) => ({
+    { property: "og:locale", content: primaryLocale },
+    ...alternateLocales.map((locale) => ({
       property: "og:locale:alternate",
       content: locale,
     })),
@@ -74,9 +78,9 @@ export function socialMetaTags(page: CvMetaPage, url: string) {
   ];
 }
 
-/** SSR breadcrumb labels — uses default locale (es), matching routeHead meta. */
-export function seoBreadcrumbs(page: BreadcrumbPage) {
-  const nav = translations.es.nav;
+export function seoBreadcrumbs(page: BreadcrumbPage, lang?: Lang) {
+  const resolvedLang = lang ?? detectLang();
+  const nav = translations[resolvedLang].nav;
   const paths: Record<BreadcrumbPage, string> = {
     experience: "/experience",
     projects: "/projects",
@@ -90,11 +94,13 @@ export function seoBreadcrumbs(page: BreadcrumbPage) {
 }
 
 export interface RouteHeadOptions {
+  lang?: Lang;
   noIndex?: boolean;
   breadcrumbs?: Array<{ name: string; path: string }>;
 }
 
 export function routeHead(page: CvMetaPage, path: string, options?: RouteHeadOptions) {
+  const lang = options?.lang ?? detectLang();
   const url = `${SITE_URL}${path}`;
 
   const scripts =
@@ -122,13 +128,13 @@ export function routeHead(page: CvMetaPage, path: string, options?: RouteHeadOpt
 
   return {
     meta: [
-      { title: cvMetaTitle(page, DEFAULT_LANG) },
-      { name: "description", content: cvMetaDescription(page, DEFAULT_LANG) },
+      { title: cvMetaTitle(page, lang) },
+      { name: "description", content: cvMetaDescription(page, lang) },
       { name: "author", content: cv.basics.name },
       { name: "keywords", content: cvMetaKeywords() },
       { name: "robots", content: robotsContent },
       { name: "googlebot", content: robotsContent },
-      ...socialMetaTags(page, url),
+      ...socialMetaTags(page, url, lang),
     ],
     links: [
       { rel: "canonical", href: url },

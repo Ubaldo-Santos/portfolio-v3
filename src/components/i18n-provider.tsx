@@ -27,9 +27,13 @@ function HtmlLangSync() {
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const lang = detectLang();
-  if (i18n.language !== lang) {
-    void i18n.changeLanguage(lang);
-  }
+
+  useEffect(() => {
+    if (i18n.language !== lang) {
+      void i18n.changeLanguage(lang);
+    }
+  }, [lang]);
+
   return (
     <I18nextProvider i18n={i18n}>
       <HtmlLangSync />

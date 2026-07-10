@@ -36,11 +36,12 @@ cv.ts (facts)          translations.ts (UI labels)
 | Add/edit job, project, skill        | `src/data/cv.ts`                                         | Use `LocalizedString` / `LocalizedList`; run through `pick(obj, lang)` |
 | Change UI text (nav, buttons, meta) | `src/i18n/translations.ts`                               | Update **all three** locales: `es`, `ca`, `en`                         |
 | New page/route                      | `src/routes/<name>.tsx`                                  | File-based routing; add `head()` with `routeHead()`                    |
-| SEO (title, OG, canonical)          | `src/lib/seo.ts`                                         | SSR meta always uses `es` default; see `routeHead()`                   |
-| Breadcrumbs JSON-LD                 | `seoBreadcrumbs()` in `seo.ts`                           | Used in route `head()` — also ES default                               |
+| SEO (title, OG, canonical)          | `src/lib/seo.ts`                                         | `routeHead(page, path, opts)` localizes via `detectLang()` on SSR      |
+| Breadcrumbs JSON-LD                 | `seoBreadcrumbs()` in `seo.ts`                           | Localized labels via `detectLang()` (or explicit `lang` arg)           |
 | Date/period formatting              | `src/lib/format.ts`                                      | `formatPeriod()`, `currentLang()`, `workAnchorId()`                    |
 | Theme (light/dark)                  | `src/hooks/use-theme.ts` + `src/lib/bootstrap-script.ts` | View Transitions API                                                   |
-| Language detection                  | `src/lib/detect-lang.ts`                                 | Cookie → Accept-Language (SSR); localStorage (client)                  |
+| Language detection                  | `src/lib/detect-lang.ts`                                 | SSR: cookie → Accept-Language; client: cookie → localStorage → navigator |
+| Catastrophic SSR error HTML         | `src/lib/error-page.ts`                                  | `renderErrorPage(lang)` — same detection as SSR via request headers    |
 | Print/PDF CV                        | `src/routes/cv.tsx` + `@media print` in `styles.css`     | Uses `window.print()`, **not** html2pdf                                |
 | OG image preview                    | `src/routes/og.$size.tsx` + `src/lib/og-sizes.ts`        | `/og/1200x630?theme=light`                                             |
 | Design tokens / fonts               | `src/styles.css`                                         | Tailwind v4 `@theme inline`, oklch colors                              |
@@ -83,12 +84,14 @@ Every content route follows this stack:
 
 ## i18n rules (critical)
 
-1. **SSR always renders Spanish** (`es`) to avoid hydration mismatch.
-2. Client resolves language in `I18nProvider` via `detectLang()`.
-3. `BOOTSTRAP_SCRIPT` in `__root.tsx` sets theme + lang before paint.
-4. CV facts: `pick(cv.work[0].summary, lang)` — never hardcode one language in JSX.
-5. UI strings: `t("nav.experience")` — keys mirror `translations.ts` structure.
-6. Route `head()` meta: always ES via `routeHead()` — intentional for SEO consistency.
+1. **SSR resolves language before render** — `start.ts` middleware runs `detectLang()` then `i18n.changeLanguage()` so `t()`, `pick()`, and `routeHead()` match the request.
+2. **Detection order (SSR):** `lang` cookie → `Accept-Language` → fallback `es`. **`detectLangFromRequest(request)`** for handlers outside middleware (e.g. `server.ts` error fallback).
+3. **Detection order (client):** cookie → `localStorage` → `navigator` (`detectClientLang()`). `BOOTSTRAP_SCRIPT` syncs `localStorage` → cookie and sets `<html lang>` before paint.
+4. **Hydration edge case:** if cookie is missing but `localStorage` has a lang, first SSR may differ until cookie sync; `I18nProvider` aligns in `useEffect` after hydrate.
+5. CV facts: `pick(cv.work[0].summary, lang)` — never hardcode one language in JSX.
+6. UI strings: `t("nav.experience")` — keys mirror `translations.ts` structure.
+7. Route `head()` meta: localized via `routeHead()` + `detectLang()`; OG **text** per lang, OG **PNG** stays English (`OG_LANG` in `og-sizes.ts`).
+8. `hreflang` alternates share one canonical URL (cookie-based i18n, no `/en/` prefixes).
 
 ## Content change recipes
 

@@ -1,22 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ArrowUpRight } from "lucide-react";
 import { cv } from "@/data/cv";
 import { NAV_ITEMS } from "@/lib/nav";
+import { ArrowLink, chipBase, focusRing, kickerMd } from "@/components/editorial";
+import { cn } from "@/lib/utils";
 
-function FooterExternalLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
-    >
-      {children}
-      <ArrowUpRight className="size-3 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-    </a>
-  );
-}
+const navPillClass = cn(
+  chipBase,
+  kickerMd,
+  "px-3 py-1.5 bg-background/80 transition-colors hover:border-foreground/15 hover:text-foreground",
+  focusRing,
+);
 
 export function Footer() {
   const { t } = useTranslation();
@@ -29,10 +23,7 @@ export function Footer() {
           <ul className="flex flex-wrap gap-2">
             {NAV_ITEMS.map((item) => (
               <li key={item.to}>
-                <Link
-                  to={item.to}
-                  className="inline-flex rounded-full border border-hairline bg-background/80 px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider text-muted-foreground transition-colors hover:border-foreground/15 hover:text-foreground"
-                >
+                <Link to={item.to} className={navPillClass}>
                   {t(`nav.${item.key}`)}
                 </Link>
               </li>
@@ -49,21 +40,17 @@ export function Footer() {
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-mono text-[11px] text-muted-foreground">
             © {year} <span className="text-foreground/80">{cv.basics.name}</span>
-            <span className="mx-2 text-muted-foreground/30" aria-hidden>
-              ·
-            </span>
-            <span className="text-muted-foreground/50">{t("easter.konamiCode")}</span>
           </p>
 
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             {cv.basics.profiles.map((p) => (
-              <FooterExternalLink key={p.network} href={p.url}>
+              <ArrowLink key={p.network} href={p.url} className={kickerMd}>
                 {p.network}
-              </FooterExternalLink>
+              </ArrowLink>
             ))}
-            <FooterExternalLink href={`mailto:${cv.basics.email}`}>
+            <ArrowLink href={`mailto:${cv.basics.email}`} className={kickerMd}>
               {t("contact.email")}
-            </FooterExternalLink>
+            </ArrowLink>
           </div>
         </div>
       </div>

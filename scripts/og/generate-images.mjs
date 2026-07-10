@@ -108,9 +108,7 @@ async function main() {
     await runNode("scripts/og/verify-images.mjs");
     console.log(`\nOG images ready in public/og/ (${OG_VARIANTS.length} variants)`);
   } catch {
-    console.error(
-      "\nCapture the URLs above in Cursor browser, then run:\n  bun run og\n",
-    );
+    console.error("\nCapture the URLs above in Cursor browser, then run:\n  bun run og\n");
     process.exit(1);
   } finally {
     if (server && process.env.OG_STOP_DEV === "1") {

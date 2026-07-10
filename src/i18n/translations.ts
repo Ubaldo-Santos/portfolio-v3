@@ -6,7 +6,7 @@ export const translations = {
       projects: "Proyectos",
       skills: "Skills",
       contact: "Contacto",
-      cv: "Curriculum Vitae",
+      cv: "CV",
     },
     actions: {
       printCv: "Imprimir CV",
@@ -29,6 +29,8 @@ export const translations = {
       mobileNav: "Navegación móvil",
       footerNav: "Enlaces del pie de página",
       skipToContent: "Saltar al contenido",
+      copySuccess: "Copiado al portapapeles",
+      copyFailed: "No se pudo copiar",
     },
     brand: {
       portfolio: "Portfolio",
@@ -93,7 +95,7 @@ export const translations = {
         "Portfolio SSR con TanStack Start, React 19, TypeScript, Tailwind CSS v4, Motion e i18n en ES · CA · EN.",
     },
     easter: {
-      unlocked: "¡Konami activado! Lluvia de gatitos incoming.",
+      unlocked: "¡Konami activado! Lluvia de gatitos en camino.",
       konamiCode: "↑ ↑ ↓ ↓ ← → ← → B A",
       boardLabel: "Tablero de gatitos",
       close: "Cerrar tablero de gatitos",
@@ -116,7 +118,7 @@ export const translations = {
       projects: "Projectes",
       skills: "Skills",
       contact: "Contacte",
-      cv: "Currículum vitae",
+      cv: "CV",
     },
     actions: {
       printCv: "Imprimir CV",
@@ -139,6 +141,8 @@ export const translations = {
       mobileNav: "Navegació mòbil",
       footerNav: "Enllaços del peu de pàgina",
       skipToContent: "Saltar al contingut",
+      copySuccess: "Copiat al porta-retalls",
+      copyFailed: "No s'ha pogut copiar",
     },
     brand: {
       portfolio: "Portfolio",
@@ -203,7 +207,7 @@ export const translations = {
         "Portfolio SSR amb TanStack Start, React 19, TypeScript, Tailwind CSS v4, Motion i i18n en ES · CA · EN.",
     },
     easter: {
-      unlocked: "Konami activat! Pluja de gatets incoming.",
+      unlocked: "Konami activat! Pluja de gatets en camí.",
       konamiCode: "↑ ↑ ↓ ↓ ← → ← → B A",
       boardLabel: "Tauler de gatets",
       close: "Tancar el tauler de gatets",
@@ -226,7 +230,7 @@ export const translations = {
       projects: "Projects",
       skills: "Skills",
       contact: "Contact",
-      cv: "Curriculum Vitae",
+      cv: "CV",
     },
     actions: {
       printCv: "Print CV",
@@ -249,6 +253,8 @@ export const translations = {
       mobileNav: "Mobile navigation",
       footerNav: "Footer links",
       skipToContent: "Skip to content",
+      copySuccess: "Copied to clipboard",
+      copyFailed: "Could not copy",
     },
     brand: {
       portfolio: "Portfolio",

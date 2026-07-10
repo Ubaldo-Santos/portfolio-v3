@@ -36,6 +36,7 @@ export interface WorkItem {
   location: LocalizedString;
   modality: LocalizedString;
   current?: boolean;
+  featured?: boolean;
 }
 
 export interface ProjectItem {
@@ -138,6 +139,7 @@ export const cv = {
       startDate: "2025-04-10",
       endDate: null,
       current: true,
+      featured: true,
       summary: {
         es: "Equipo de producto especializado en assessment matemático. Desarrollo Nubric (antes Learning Lemur), plataforma en PHP/Laravel para crear, autocorregir y programar reglas de ejercicios con MathType integrado, usada por instituciones educativas.",
         ca: "Equip de producte especialitzat en assessment matemàtic. Desenvolupo Nubric (abans Learning Lemur), plataforma en PHP/Laravel per crear, autocorregir i programar regles d'exercicis amb MathType integrat, usada per institucions educatives.",
@@ -174,6 +176,7 @@ export const cv = {
       url: "https://www.wiris.com/",
       startDate: "2024-03-10",
       endDate: "2025-04-09",
+      featured: true,
       summary: {
         es: "Desarrollo de integraciones MathType en el ecosistema edtech: Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author y otros editores WYSIWYG. Incluye el SDK multiplataforma y cada conector de producto, con arquitectura modular en TypeScript/Deno.",
         ca: "Desenvolupament d'integracions MathType a l'ecosistema edtech: Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author i altres editors WYSIWYG. Inclou el SDK multiplataforma i cada connector de producte, amb arquitectura modular en TypeScript/Deno.",
@@ -217,6 +220,7 @@ export const cv = {
       url: "https://www.rotrafu.net/",
       startDate: "2020-06-01",
       endDate: "2024-03-01",
+      featured: true,
       summary: {
         es: "Responsable IT y full-stack del diseño, desarrollo y mantenimiento de aplicaciones web para la gestión integral de trámites funerarios. Lideré la transformación digital con soluciones a medida en PHP/Laravel, en paralelo con consultoría en Prime IT (jun–dic 2023).",
         ca: "Responsable IT i full-stack del disseny, desenvolupament i manteniment d'aplicacions web per a la gestió integral de tràmits funeraris. Vaig liderar la transformació digital amb solucions a mida en PHP/Laravel, en paral·lel amb consultoria a Prime IT (juny–des. 2023).",
@@ -590,7 +594,11 @@ export const cv = {
       "Froala",
       "Oxygen Web Author",
     ],
-    practices: ["Arquitectura Hexagonal", "DDD", "SOLID", "Design Patterns", "TDD"],
+    practices: {
+      es: ["Arquitectura Hexagonal", "DDD", "SOLID", "Patrones de Diseño", "TDD"],
+      ca: ["Arquitectura Hexagonal", "DDD", "SOLID", "Patrons de Disseny", "TDD"],
+      en: ["Hexagonal Architecture", "DDD", "SOLID", "Design Patterns", "TDD"],
+    } satisfies LocalizedList,
     devops: ["Docker", "Git", "GitHub Actions", "CI/CD", "Unit Testing", "Integration Testing"],
     other: ["Electron", "SDK Integrations", "Scrum", "Kanban"],
     ribbon: [
@@ -631,8 +639,8 @@ export const cv = {
       },
       projects: {
         subtitle: {
-          es: "Producto en producción y technical assessments verificables.",
-          ca: "Producte en producció i technical assessments verificables.",
+          es: "Producto en producción y evaluaciones técnicas verificables.",
+          ca: "Producte en producció i avaluacions tècniques verificables.",
           en: "Production product and verifiable technical assessments.",
         },
       },
@@ -679,8 +687,8 @@ export const cv = {
       pages: {
         home: {
           title: {
-            es: "Ubaldo Santos Patón — Full-Stack Software Engineer",
-            ca: "Ubaldo Santos Patón — Full-Stack Software Engineer",
+            es: "Ubaldo Santos Patón — Ingeniero de Software Full-Stack",
+            ca: "Ubaldo Santos Patón — Enginyer de Programari Full-Stack",
             en: "Ubaldo Santos Patón — Full-Stack Software Engineer",
           },
           description: {
@@ -718,8 +726,8 @@ export const cv = {
             en: "Projects — Ubaldo Santos Patón",
           },
           description: {
-            es: "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 y technical assessments en GitHub.",
-            ca: "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 i technical assessments a GitHub.",
+            es: "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 y evaluaciones técnicas en GitHub.",
+            ca: "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 i avaluacions tècniques a GitHub.",
             en: "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 and verifiable GitHub technical assessments.",
           },
           ogDescription: {
@@ -801,19 +809,47 @@ export const cv = {
     },
   },
   seo: {
-    knowsAbout: [
-      "TypeScript",
-      "PHP",
-      "Laravel",
-      "Vue",
-      "React",
-      "Edtech",
-      "MathType",
-      "Nubric",
-      "Arquitectura hexagonal",
-      "DevOps",
-      "IA aplicada",
-    ],
+    knowsAbout: {
+      es: [
+        "TypeScript",
+        "PHP",
+        "Laravel",
+        "Vue",
+        "React",
+        "Edtech",
+        "MathType",
+        "Nubric",
+        "Arquitectura hexagonal",
+        "DevOps",
+        "IA aplicada",
+      ],
+      ca: [
+        "TypeScript",
+        "PHP",
+        "Laravel",
+        "Vue",
+        "React",
+        "Edtech",
+        "MathType",
+        "Nubric",
+        "Arquitectura hexagonal",
+        "DevOps",
+        "IA aplicada",
+      ],
+      en: [
+        "TypeScript",
+        "PHP",
+        "Laravel",
+        "Vue",
+        "React",
+        "Edtech",
+        "MathType",
+        "Nubric",
+        "Hexagonal architecture",
+        "DevOps",
+        "Applied AI",
+      ],
+    } satisfies LocalizedList,
   },
   languages: [
     {

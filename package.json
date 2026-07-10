@@ -14,6 +14,7 @@
     "preview": "vite preview",
     "deploy": "vercel",
     "deploy:prod": "bun run build && vercel --prod",
+    "test": "bun test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",

@@ -51,10 +51,7 @@ export function OgCard({ width, height, theme }: OgCardProps) {
         </div>
 
         <div
-          className={cn(
-            "flex min-h-0 flex-1 flex-col justify-center",
-            isSquare ? "pt-4" : "pt-0",
-          )}
+          className={cn("flex min-h-0 flex-1 flex-col justify-center", isSquare ? "pt-4" : "pt-0")}
           style={{ maxWidth: isSquare ? "100%" : "92%" }}
         >
           <p

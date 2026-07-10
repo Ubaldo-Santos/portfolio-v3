@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Moon, Sun, Menu, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
 import { useTheme } from "@/hooks/use-theme";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -76,10 +76,48 @@ export function Header() {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const currentLang = (i18n.language?.slice(0, 2) as Lang) || "es";
+  const mobileMenuId = useId();
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const mobileNavRef = useRef<HTMLElement>(null);
+  const wasOpenRef = useRef(false);
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (open) {
+      wasOpenRef.current = true;
+      const frame = requestAnimationFrame(() => {
+        const firstLink = mobileNavRef.current?.querySelector("a");
+        if (firstLink instanceof HTMLElement) {
+          firstLink.focus();
+        } else {
+          mobileNavRef.current?.focus();
+        }
+      });
+      return () => cancelAnimationFrame(frame);
+    }
+
+    if (wasOpenRef.current) {
+      toggleRef.current?.focus();
+      wasOpenRef.current = false;
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   return (
     <header className="no-print sticky top-0 z-50 border-b border-hairline bg-background/70 backdrop-blur-md">
@@ -129,10 +167,12 @@ export function Header() {
           </motion.button>
 
           <motion.button
+            ref={toggleRef}
             type="button"
             onClick={() => setOpen((o) => !o)}
             aria-label={open ? t("actions.closeMenu") : t("actions.openMenu")}
             aria-expanded={open}
+            aria-controls={mobileMenuId}
             className="ml-1 rounded-full border border-hairline bg-surface p-2 text-muted-foreground md:hidden"
             whileHover={reduced ? undefined : { scale: 1.05 }}
             whileTap={reduced ? undefined : { scale: 0.95 }}
@@ -152,7 +192,10 @@ export function Header() {
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
             <nav
-              className="mx-auto flex max-w-6xl flex-col px-5 py-3 sm:px-8"
+              id={mobileMenuId}
+              ref={mobileNavRef}
+              tabIndex={-1}
+              className="mx-auto flex max-w-6xl flex-col px-5 py-3 sm:px-8 outline-none"
               aria-label={t("a11y.mobileNav")}
             >
               {NAV_ITEMS.map((item, i) => (

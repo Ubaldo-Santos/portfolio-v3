@@ -32,6 +32,7 @@ export function NavLink({ to, label, onClick, className, mobile, animated = fals
     <Link
       to={to}
       onClick={onClick}
+      aria-current={isActive ? "page" : undefined}
       className={cn(
         "relative transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15",
         mobile

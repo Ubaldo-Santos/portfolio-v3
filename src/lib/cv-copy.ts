@@ -53,6 +53,6 @@ export function cvMetaKeywords(): string {
   return cv.copy.meta.keywords;
 }
 
-export function cvKnowsAbout(): readonly string[] {
-  return cv.seo.knowsAbout;
+export function cvKnowsAbout(lang: Lang): readonly string[] {
+  return cv.seo.knowsAbout[lang];
 }

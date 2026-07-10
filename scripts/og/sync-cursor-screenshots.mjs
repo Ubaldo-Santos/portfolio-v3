@@ -40,7 +40,9 @@ async function main() {
       }
 
       if (destStat && destStat.mtimeMs > sourceStat.mtimeMs && !force) {
-        console.log(`↷ ${filename}: public/og is newer — skipped (use OG_FORCE_SYNC=1 to overwrite)`);
+        console.log(
+          `↷ ${filename}: public/og is newer — skipped (use OG_FORCE_SYNC=1 to overwrite)`,
+        );
         skipped += 1;
         continue;
       }
@@ -71,7 +73,9 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`\nCopied ${copied}/${OG_VARIANTS.length} → public/og/ (${skipped} skipped as newer)`);
+  console.log(
+    `\nCopied ${copied}/${OG_VARIANTS.length} → public/og/ (${skipped} skipped as newer)`,
+  );
 }
 
 main().catch((error) => {
