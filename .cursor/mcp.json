@@ -5,8 +5,8 @@
       "args": ["-y", "chrome-devtools-mcp@latest"]
     },
     "opengraph": {
-      "command": "npx",
-      "args": ["-y", "opengraph-mcp"]
+      "command": "node",
+      "args": ["node_modules/opengraph-mcp/dist/server.mjs"]
     }
   }
 }

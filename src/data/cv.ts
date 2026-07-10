@@ -684,9 +684,9 @@ export const cv = {
             en: "Ubaldo Santos Patón — Full-Stack Software Engineer",
           },
           description: {
-            es: "Ingeniero full-stack con {{years}} años en producto. En Wiris: equipo Assessment (Nubric); antes Integraciones (MathType en Google Workspace, Office, Moodle, WYSIWYG). Ex-Rotrafu (+50K servicios).",
-            ca: "Enginyer full-stack amb {{years}} anys en producte. A Wiris: equip Assessment (Nubric); abans Integracions (MathType a Google Workspace, Office, Moodle, WYSIWYG). Ex-Rotrafu (+50K serveis).",
-            en: "Full-stack engineer with {{years}} years in product. At Wiris: Assessment team (Nubric); previously Integrations (MathType across Google Workspace, Office, Moodle, WYSIWYG). Ex-Rotrafu (50K+ services).",
+            es: "Ingeniero full-stack con {{years}} años en producto. En Wiris: Assessment (Nubric) e integraciones MathType. Ex-Rotrafu (+50K servicios).",
+            ca: "Enginyer full-stack amb {{years}} anys en producte. A Wiris: Assessment (Nubric) i integracions MathType. Ex-Rotrafu (+50K serveis).",
+            en: "Full-stack engineer with {{years}} years in product. At Wiris: Assessment (Nubric) and MathType integrations. Ex-Rotrafu (50K+ services).",
           },
           ogDescription: {
             es: "En Wiris estoy construyendo Nubric con el equipo Assessment. Previamente en el equipo de integraciones de MathType.",

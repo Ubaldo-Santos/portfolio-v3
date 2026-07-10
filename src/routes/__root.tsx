@@ -87,13 +87,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: cvMetaDescription("home", "es") },
       { name: "author", content: cv.basics.name },
       { name: "keywords", content: cvMetaKeywords() },
-      { name: "twitter:creator", content: "@ubaldosantos" },
       ...socialMetaTags("home", `${SITE_URL}/`),
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
       { rel: "icon", href: "/code-sandbox.svg", type: "image/svg+xml" },
-      { rel: "apple-touch-icon", href: "/code-sandbox.svg" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/site.webmanifest" },
     ],
     scripts: [
       {
