@@ -13,8 +13,8 @@ import { useTranslation } from "react-i18next";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { cv } from "@/data/cv";
-import { BRAND_MARK_URL, OG_IMAGE_URL } from "@/lib/seo";
-import { translations } from "@/i18n/translations";
+import { OG_IMAGE_URL, SITE_URL, socialMetaTags } from "@/lib/seo";
+import { cvMetaDescription, cvMetaKeywords, cvMetaTitle, cvKnowsAbout } from "@/lib/cv-copy";
 import { I18nProvider } from "@/components/i18n-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -83,23 +83,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
       },
       { name: "format-detection", content: "telephone=no" },
-      { title: translations.es.meta.home.title },
-      { name: "description", content: translations.es.meta.home.description },
-      { name: "author", content: translations.es.meta.author },
-      { name: "keywords", content: translations.es.meta.keywords },
-      { property: "og:site_name", content: translations.es.meta.siteName },
-      { property: "og:type", content: "website" },
-      { property: "og:locale", content: "es_ES" },
-      { property: "og:locale:alternate", content: "ca_ES" },
-      { property: "og:locale:alternate", content: "en_US" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { title: cvMetaTitle("home", "es") },
+      { name: "description", content: cvMetaDescription("home", "es") },
+      { name: "author", content: cv.basics.name },
+      { name: "keywords", content: cvMetaKeywords() },
       { name: "twitter:creator", content: "@ubaldosantos" },
-      { name: "twitter:image", content: OG_IMAGE_URL },
-      { property: "og:image", content: OG_IMAGE_URL },
-      { property: "og:image:type", content: "image/png" },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: translations.es.meta.siteName },
+      ...socialMetaTags("home", `${SITE_URL}/`),
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -117,7 +106,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           givenName: cv.basics.givenName,
           familyName: cv.basics.familyName,
           jobTitle: cv.basics.label.en,
-          description: translations.es.meta.home.description,
+          description: cvMetaDescription("home", "es"),
           email: cv.basics.email,
           telephone: cv.basics.phone,
           url: cv.basics.url,
@@ -129,19 +118,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             addressCountry: cv.basics.address.countryCode,
           },
           knowsLanguage: cv.languages.map((language) => language.code),
-          knowsAbout: [
-            "TypeScript",
-            "PHP",
-            "Laravel",
-            "Vue",
-            "React",
-            "Edtech",
-            "MathType",
-            "Nubric",
-            "Arquitectura hexagonal",
-            "DevOps",
-            "IA aplicada",
-          ],
+          knowsAbout: [...cvKnowsAbout()],
           sameAs: cv.basics.profiles.map((profile) => profile.url),
         }),
       },
@@ -152,8 +129,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@type": "WebSite",
           "@id": `${cv.basics.url}#website`,
           url: cv.basics.url,
-          name: translations.es.meta.siteName,
-          description: translations.es.meta.home.description,
+          name: cv.basics.name,
+          description: cvMetaDescription("home", "es"),
           inLanguage: ["es", "ca", "en"],
           publisher: { "@id": `${cv.basics.url}#person` },
         }),

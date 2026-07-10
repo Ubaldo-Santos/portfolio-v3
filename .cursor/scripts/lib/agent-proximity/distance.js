@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Agent-space distance metric + collision avoidance (ECC 2.0, Layer 4 v0).
@@ -79,7 +79,7 @@ const DEFAULTS = {
   channelWeights: { overlap: 1.0, dependency: 0.9, tree: 0.25 },
   depDecay: 0.5, // γ in (4)
   recencyFloor: 0.15, // weight never decays below this so stale-but-relevant files still count
-  thresholds: { ta: 0.35, ra: 0.7 } // τ_TA, τ_RA
+  thresholds: { ta: 0.35, ra: 0.7 }, // τ_TA, τ_RA
 };
 
 function clamp01(x) {
@@ -88,14 +88,14 @@ function clamp01(x) {
 }
 
 function normalizePath(p) {
-  return String(p || '')
-    .replace(/\\/g, '/')
-    .replace(/^\.\//, '')
-    .replace(/\/+$/, '');
+  return String(p || "")
+    .replace(/\\/g, "/")
+    .replace(/^\.\//, "")
+    .replace(/\/+$/, "");
 }
 
 function segments(p) {
-  return normalizePath(p).split('/').filter(Boolean);
+  return normalizePath(p).split("/").filter(Boolean);
 }
 
 /**
@@ -124,7 +124,7 @@ function lineRangeOverlap(rangesA, rangesB) {
   const a = Array.isArray(rangesA) ? rangesA : [];
   const b = Array.isArray(rangesB) ? rangesB : [];
   if (a.length === 0 || b.length === 0) return 1; // file-level edit ⇒ whole-file overlap
-  const covered = ranges => {
+  const covered = (ranges) => {
     const set = new Set();
     for (const [s, e] of ranges) {
       const lo = Math.min(s, e);
@@ -155,7 +155,7 @@ function jaccard(setA, setB) {
 function overlapRisk(a, b) {
   const filesA = a.files || [];
   const filesB = b.files || [];
-  const byPathB = new Map(filesB.map(f => [normalizePath(f.path), f]));
+  const byPathB = new Map(filesB.map((f) => [normalizePath(f.path), f]));
   // Per shared file, the (line-precise) overlap — lineRangeOverlap returns 1 when
   // either side lacks ranges (a whole-file edit). The risk is the max across
   // shared files: even one fully-overlapping file is a collision, while the same
@@ -214,7 +214,10 @@ function dependencyRisk(a, b, graph, opts = {}) {
     for (const fb of filesB) {
       // A depends-on edge couples both endpoints, so use the smaller of the two
       // directed distances (importer→imported or imported→importer).
-      const d = Math.min(graphDistance(graph, fa.path, fb.path), graphDistance(graph, fb.path, fa.path));
+      const d = Math.min(
+        graphDistance(graph, fa.path, fb.path),
+        graphDistance(graph, fb.path, fa.path),
+      );
       if (d === Infinity || d === 0) continue;
       const coupling = Math.pow(decay, d - 1); // γ^{d-1}
       const w = (fa.weight ?? 1) * (fb.weight ?? 1);
@@ -248,7 +251,7 @@ function collisionRisk(a, b, graph = {}, options = {}) {
   const channels = {
     overlap: overlapRisk(a, b),
     dependency: dependencyRisk(a, b, graph, options),
-    tree: treeRisk(a, b)
+    tree: treeRisk(a, b),
   };
   let product = 1;
   for (const key of Object.keys(channels)) {
@@ -281,7 +284,7 @@ function advise(a, b, graph = {}, options = {}) {
   const { risk, channels, distance } = collisionRisk(a, b, graph, options);
 
   if (risk < thresholds.ta) {
-    return { level: 'clear', risk, distance, channels, transmit: false, steer: null, hold: null };
+    return { level: "clear", risk, distance, channels, transmit: false, steer: null, hold: null };
   }
 
   const pa = agentPriority(a);
@@ -298,10 +301,10 @@ function advise(a, b, graph = {}, options = {}) {
 
   if (risk < thresholds.ra) {
     // Traffic advisory: exchange intent, no one has to move yet.
-    return { level: 'advisory', risk, distance, channels, transmit: true, steer: null, hold: null };
+    return { level: "advisory", risk, distance, channels, transmit: true, steer: null, hold: null };
   }
   // Resolution advisory: the lower-priority agent steers away.
-  return { level: 'resolution', risk, distance, channels, transmit: true, steer, hold };
+  return { level: "resolution", risk, distance, channels, transmit: true, steer, hold };
 }
 
 /**
@@ -326,5 +329,5 @@ module.exports = {
   agentPriority,
   advise,
   closureRate,
-  _internal: { normalizePath, segments, jaccard }
+  _internal: { normalizePath, segments, jaccard },
 };

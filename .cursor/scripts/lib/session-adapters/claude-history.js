@@ -1,18 +1,18 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const sessionManager = require('../session-manager');
-const sessionAliases = require('../session-aliases');
-const { normalizeClaudeHistorySession, persistCanonicalSnapshot } = require('./canonical-session');
+const sessionManager = require("../session-manager");
+const sessionAliases = require("../session-aliases");
+const { normalizeClaudeHistorySession, persistCanonicalSnapshot } = require("./canonical-session");
 
 function parseClaudeTarget(target) {
-  if (typeof target !== 'string') {
+  if (typeof target !== "string") {
     return null;
   }
 
-  for (const prefix of ['claude-history:', 'claude:', 'history:']) {
+  for (const prefix of ["claude-history:", "claude:", "history:"]) {
     if (target.startsWith(prefix)) {
       return target.slice(prefix.length).trim();
     }
@@ -22,14 +22,16 @@ function parseClaudeTarget(target) {
 }
 
 function isSessionFileTarget(target, cwd) {
-  if (typeof target !== 'string' || target.length === 0) {
+  if (typeof target !== "string" || target.length === 0) {
     return false;
   }
 
   const absoluteTarget = path.resolve(cwd, target);
-  return fs.existsSync(absoluteTarget)
-    && fs.statSync(absoluteTarget).isFile()
-    && absoluteTarget.endsWith('.tmp');
+  return (
+    fs.existsSync(absoluteTarget) &&
+    fs.statSync(absoluteTarget).isFile() &&
+    absoluteTarget.endsWith(".tmp")
+  );
 }
 
 function hydrateSessionFromPath(sessionPath) {
@@ -47,10 +49,10 @@ function hydrateSessionFromPath(sessionPath) {
     sessionPath,
     content,
     metadata: sessionManager.parseSessionMetadata(content),
-    stats: sessionManager.getSessionStats(content || ''),
+    stats: sessionManager.getSessionStats(content || ""),
     size: stats.size,
     modifiedTime: stats.mtime,
-    createdTime: stats.birthtime || stats.ctime
+    createdTime: stats.birthtime || stats.ctime,
   };
 }
 
@@ -58,18 +60,18 @@ function resolveSessionRecord(target, cwd) {
   const explicitTarget = parseClaudeTarget(target);
 
   if (explicitTarget) {
-    if (explicitTarget === 'latest') {
+    if (explicitTarget === "latest") {
       const [latest] = sessionManager.getAllSessions({ limit: 1 }).sessions;
       if (!latest) {
-        throw new Error('No Claude session history found');
+        throw new Error("No Claude session history found");
       }
 
       return {
         session: sessionManager.getSessionById(latest.filename, true),
         sourceTarget: {
-          type: 'claude-history',
-          value: 'latest'
-        }
+          type: "claude-history",
+          value: "latest",
+        },
       };
     }
 
@@ -78,9 +80,9 @@ function resolveSessionRecord(target, cwd) {
       return {
         session: hydrateSessionFromPath(alias.sessionPath),
         sourceTarget: {
-          type: 'claude-alias',
-          value: explicitTarget
-        }
+          type: "claude-alias",
+          value: explicitTarget,
+        },
       };
     }
 
@@ -92,9 +94,9 @@ function resolveSessionRecord(target, cwd) {
     return {
       session,
       sourceTarget: {
-        type: 'claude-history',
-        value: explicitTarget
-      }
+        type: "claude-history",
+        value: explicitTarget,
+      },
     };
   }
 
@@ -102,9 +104,9 @@ function resolveSessionRecord(target, cwd) {
     return {
       session: hydrateSessionFromPath(path.resolve(cwd, target)),
       sourceTarget: {
-        type: 'session-file',
-        value: path.resolve(cwd, target)
-      }
+        type: "session-file",
+        value: path.resolve(cwd, target),
+      },
     };
   }
 
@@ -112,18 +114,19 @@ function resolveSessionRecord(target, cwd) {
 }
 
 function createClaudeHistoryAdapter(options = {}) {
-  const persistCanonicalSnapshotImpl = options.persistCanonicalSnapshotImpl || persistCanonicalSnapshot;
+  const persistCanonicalSnapshotImpl =
+    options.persistCanonicalSnapshotImpl || persistCanonicalSnapshot;
 
   return {
-    id: 'claude-history',
-    description: 'Claude local session history and session-file snapshots',
-    targetTypes: ['claude-history', 'claude-alias', 'session-file'],
+    id: "claude-history",
+    description: "Claude local session history and session-file snapshots",
+    targetTypes: ["claude-history", "claude-alias", "session-file"],
     canOpen(target, context = {}) {
-      if (context.adapterId && context.adapterId !== 'claude-history') {
+      if (context.adapterId && context.adapterId !== "claude-history") {
         return false;
       }
 
-      if (context.adapterId === 'claude-history') {
+      if (context.adapterId === "claude-history") {
         return true;
       }
 
@@ -134,7 +137,7 @@ function createClaudeHistoryAdapter(options = {}) {
       const cwd = context.cwd || process.cwd();
 
       return {
-        adapterId: 'claude-history',
+        adapterId: "claude-history",
         getSnapshot() {
           const { session, sourceTarget } = resolveSessionRecord(target, cwd);
           const canonicalSnapshot = normalizeClaudeHistorySession(session, sourceTarget);
@@ -143,18 +146,18 @@ function createClaudeHistoryAdapter(options = {}) {
             loadStateStoreImpl: options.loadStateStoreImpl,
             persist: context.persistSnapshots !== false && options.persistSnapshots !== false,
             recordingDir: context.recordingDir || options.recordingDir,
-            stateStore: options.stateStore
+            stateStore: options.stateStore,
           });
 
           return canonicalSnapshot;
-        }
+        },
       };
-    }
+    },
   };
 }
 
 module.exports = {
   createClaudeHistoryAdapter,
   isSessionFileTarget,
-  parseClaudeTarget
+  parseClaudeTarget,
 };

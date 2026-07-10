@@ -1,25 +1,21 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const { appendFile, ensureDir } = require('../utils');
+const { appendFile, ensureDir } = require("../utils");
 
-const VERSION_DIRECTORY_NAME = '.versions';
-const EVOLUTION_DIRECTORY_NAME = '.evolution';
-const EVOLUTION_LOG_TYPES = Object.freeze([
-  'observations',
-  'inspections',
-  'amendments',
-]);
+const VERSION_DIRECTORY_NAME = ".versions";
+const EVOLUTION_DIRECTORY_NAME = ".evolution";
+const EVOLUTION_LOG_TYPES = Object.freeze(["observations", "inspections", "amendments"]);
 
 function normalizeSkillDir(skillPath) {
-  if (!skillPath || typeof skillPath !== 'string') {
-    throw new Error('skillPath is required');
+  if (!skillPath || typeof skillPath !== "string") {
+    throw new Error("skillPath is required");
   }
 
   const resolvedPath = path.resolve(skillPath);
-  if (path.basename(resolvedPath) === 'SKILL.md') {
+  if (path.basename(resolvedPath) === "SKILL.md") {
     return path.dirname(resolvedPath);
   }
 
@@ -27,7 +23,7 @@ function normalizeSkillDir(skillPath) {
 }
 
 function getSkillFilePath(skillPath) {
-  return path.join(normalizeSkillDir(skillPath), 'SKILL.md');
+  return path.join(normalizeSkillDir(skillPath), "SKILL.md");
 }
 
 function ensureSkillExists(skillPath) {
@@ -67,7 +63,7 @@ function ensureSkillVersioning(skillPath) {
   for (const logType of EVOLUTION_LOG_TYPES) {
     const logPath = getEvolutionLogPath(skillPath, logType);
     if (!fs.existsSync(logPath)) {
-      fs.writeFileSync(logPath, '', 'utf8');
+      fs.writeFileSync(logPath, "", "utf8");
     }
   }
 
@@ -92,8 +88,9 @@ function listVersions(skillPath) {
     return [];
   }
 
-  return fs.readdirSync(versionsDir)
-    .map(fileName => {
+  return fs
+    .readdirSync(versionsDir)
+    .map((fileName) => {
       const version = parseVersionNumber(fileName);
       if (version === null) {
         return null;
@@ -137,9 +134,10 @@ function readJsonl(filePath) {
     return [];
   }
 
-  return fs.readFileSync(filePath, 'utf8')
-    .split('\n')
-    .map(line => line.trim())
+  return fs
+    .readFileSync(filePath, "utf8")
+    .split("\n")
+    .map((line) => line.trim())
     .filter(Boolean)
     .reduce((rows, line) => {
       try {
@@ -162,16 +160,16 @@ function createVersion(skillPath, options = {}) {
   const versions = listVersions(skillPath);
   const nextVersion = versions.length === 0 ? 1 : versions[versions.length - 1].version + 1;
   const snapshotPath = path.join(getVersionsDir(skillPath), `v${nextVersion}.md`);
-  const skillContent = fs.readFileSync(skillFilePath, 'utf8');
+  const skillContent = fs.readFileSync(skillFilePath, "utf8");
   const createdAt = options.timestamp || new Date().toISOString();
 
-  fs.writeFileSync(snapshotPath, skillContent, 'utf8');
-  appendEvolutionRecord(skillPath, 'amendments', {
-    event: 'snapshot',
+  fs.writeFileSync(snapshotPath, skillContent, "utf8");
+  appendEvolutionRecord(skillPath, "amendments", {
+    event: "snapshot",
     version: nextVersion,
     reason: options.reason || null,
     author: options.author || null,
-    status: 'applied',
+    status: "applied",
     created_at: createdAt,
   });
 
@@ -197,8 +195,8 @@ function rollbackTo(skillPath, targetVersion, options = {}) {
   }
 
   const currentVersion = getCurrentVersion(skillPath);
-  const targetContent = fs.readFileSync(targetPath, 'utf8');
-  fs.writeFileSync(getSkillFilePath(skillPath), targetContent, 'utf8');
+  const targetContent = fs.readFileSync(targetPath, "utf8");
+  fs.writeFileSync(getSkillFilePath(skillPath), targetContent, "utf8");
 
   const createdVersion = createVersion(skillPath, {
     timestamp: options.timestamp,
@@ -206,14 +204,14 @@ function rollbackTo(skillPath, targetVersion, options = {}) {
     author: options.author || null,
   });
 
-  appendEvolutionRecord(skillPath, 'amendments', {
-    event: 'rollback',
+  appendEvolutionRecord(skillPath, "amendments", {
+    event: "rollback",
     version: createdVersion.version,
     source_version: currentVersion,
     target_version: normalizedTargetVersion,
     reason: options.reason || null,
     author: options.author || null,
-    status: 'applied',
+    status: "applied",
     created_at: options.timestamp || new Date().toISOString(),
   });
 

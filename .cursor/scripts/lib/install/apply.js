@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const { writeInstallState } = require('../install-state');
-const { filterMcpConfig, parseDisabledMcpServers } = require('../mcp-config');
-const { buildInstallIndex, isNamespacedSource, rewriteRelativeLinks } = require('./link-rewrite');
+const { writeInstallState } = require("../install-state");
+const { filterMcpConfig, parseDisabledMcpServers } = require("../mcp-config");
+const { buildInstallIndex, isNamespacedSource, rewriteRelativeLinks } = require("./link-rewrite");
 
 function isMarkdownPath(filePath) {
-  return /\.(md|mdx|markdown)$/i.test(String(filePath || ''));
+  return /\.(md|mdx|markdown)$/i.test(String(filePath || ""));
 }
 
 // Map every copy-file operation to { sourceRel, destRel } so relative links in
@@ -20,7 +20,7 @@ function buildLinkIndexForPlan(plan) {
   }
   const mappings = [];
   for (const operation of plan.operations) {
-    if (operation.kind === 'copy-file' && operation.sourceRelativePath) {
+    if (operation.kind === "copy-file" && operation.sourceRelativePath) {
       mappings.push({
         sourceRel: operation.sourceRelativePath,
         destRel: path.relative(plan.targetRoot, operation.destinationPath),
@@ -33,12 +33,12 @@ function buildLinkIndexForPlan(plan) {
 function readJsonObject(filePath, label) {
   let parsed;
   try {
-    parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    parsed = JSON.parse(fs.readFileSync(filePath, "utf8"));
   } catch (error) {
     throw new Error(`Failed to parse ${label} at ${filePath}: ${error.message}`);
   }
 
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
     throw new Error(`Invalid ${label} at ${filePath}: expected a JSON object`);
   }
 
@@ -54,7 +54,7 @@ function cloneJsonValue(value) {
 }
 
 function isPlainObject(value) {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 function deepMergeJson(baseValue, patchValue) {
@@ -82,20 +82,20 @@ function replacePluginRootPlaceholders(value, pluginRoot) {
     return value;
   }
 
-  if (typeof value === 'string') {
-    return value.split('${CLAUDE_PLUGIN_ROOT}').join(pluginRoot);
+  if (typeof value === "string") {
+    return value.split("${CLAUDE_PLUGIN_ROOT}").join(pluginRoot);
   }
 
   if (Array.isArray(value)) {
-    return value.map(item => replacePluginRootPlaceholders(item, pluginRoot));
+    return value.map((item) => replacePluginRootPlaceholders(item, pluginRoot));
   }
 
-  if (value && typeof value === 'object') {
+  if (value && typeof value === "object") {
     return Object.fromEntries(
       Object.entries(value).map(([key, nestedValue]) => [
         key,
         replacePluginRootPlaceholders(nestedValue, pluginRoot),
-      ])
+      ]),
     );
   }
 
@@ -103,31 +103,36 @@ function replacePluginRootPlaceholders(value, pluginRoot) {
 }
 
 function findHooksSourcePath(plan, hooksDestinationPath) {
-  const operation = plan.operations.find(item => item.destinationPath === hooksDestinationPath);
+  const operation = plan.operations.find((item) => item.destinationPath === hooksDestinationPath);
   return operation ? operation.sourcePath : null;
 }
 
 function isMcpConfigPath(filePath) {
-  const basename = path.basename(String(filePath || ''));
-  return basename === '.mcp.json' || basename === 'mcp.json';
+  const basename = path.basename(String(filePath || ""));
+  return basename === ".mcp.json" || basename === "mcp.json";
 }
 
 function buildResolvedClaudeHooks(plan) {
-  if (!plan.adapter || (plan.adapter.target !== 'claude' && plan.adapter.target !== 'claude-project')) {
+  if (
+    !plan.adapter ||
+    (plan.adapter.target !== "claude" && plan.adapter.target !== "claude-project")
+  ) {
     return null;
   }
 
   const pluginRoot = plan.targetRoot;
-  const hooksDestinationPath = path.join(plan.targetRoot, 'hooks', 'hooks.json');
+  const hooksDestinationPath = path.join(plan.targetRoot, "hooks", "hooks.json");
   const hooksSourcePath = findHooksSourcePath(plan, hooksDestinationPath) || hooksDestinationPath;
   if (!fs.existsSync(hooksSourcePath)) {
     return null;
   }
 
-  const hooksConfig = readJsonObject(hooksSourcePath, 'hooks config');
+  const hooksConfig = readJsonObject(hooksSourcePath, "hooks config");
   const resolvedHooks = replacePluginRootPlaceholders(hooksConfig.hooks, pluginRoot);
-  if (!resolvedHooks || typeof resolvedHooks !== 'object' || Array.isArray(resolvedHooks)) {
-    throw new Error(`Invalid hooks config at ${hooksSourcePath}: expected "hooks" to be a JSON object`);
+  if (!resolvedHooks || typeof resolvedHooks !== "object" || Array.isArray(resolvedHooks)) {
+    throw new Error(
+      `Invalid hooks config at ${hooksSourcePath}: expected "hooks" to be a JSON object`,
+    );
   }
 
   return {
@@ -147,30 +152,33 @@ function applyInstallPlan(plan) {
   for (const operation of plan.operations) {
     fs.mkdirSync(path.dirname(operation.destinationPath), { recursive: true });
 
-    if (operation.kind === 'merge-json') {
+    if (operation.kind === "merge-json") {
       const payload = cloneJsonValue(operation.mergePayload);
       if (payload === undefined) {
         throw new Error(`Missing merge payload for ${operation.destinationPath}`);
       }
 
-      const filteredPayload = (
+      const filteredPayload =
         isMcpConfigPath(operation.destinationPath) && disabledServers.length > 0
-      )
-        ? filterMcpConfig(payload, disabledServers).config
-        : payload;
+          ? filterMcpConfig(payload, disabledServers).config
+          : payload;
 
       const currentValue = fs.existsSync(operation.destinationPath)
-        ? readJsonObject(operation.destinationPath, 'existing JSON config')
+        ? readJsonObject(operation.destinationPath, "existing JSON config")
         : {};
       const mergedValue = deepMergeJson(currentValue, filteredPayload);
-      fs.writeFileSync(operation.destinationPath, formatJson(mergedValue), 'utf8');
+      fs.writeFileSync(operation.destinationPath, formatJson(mergedValue), "utf8");
       continue;
     }
 
-    if (operation.kind === 'copy-file' && isMcpConfigPath(operation.destinationPath) && disabledServers.length > 0) {
-      const sourceConfig = readJsonObject(operation.sourcePath, 'MCP config');
+    if (
+      operation.kind === "copy-file" &&
+      isMcpConfigPath(operation.destinationPath) &&
+      disabledServers.length > 0
+    ) {
+      const sourceConfig = readJsonObject(operation.sourcePath, "MCP config");
       const filteredConfig = filterMcpConfig(sourceConfig, disabledServers).config;
-      fs.writeFileSync(operation.destinationPath, formatJson(filteredConfig), 'utf8');
+      fs.writeFileSync(operation.destinationPath, formatJson(filteredConfig), "utf8");
       continue;
     }
 
@@ -179,17 +187,17 @@ function applyInstallPlan(plan) {
     // (issue #2340). Files whose install path is unchanged (no namespace
     // injected) and all non-markdown files stay on the byte-for-byte copy path.
     if (
-      linkIndex
-      && operation.kind === 'copy-file'
-      && operation.sourceRelativePath
-      && isMarkdownPath(operation.destinationPath)
-      && isNamespacedSource(operation.sourceRelativePath, linkIndex)
+      linkIndex &&
+      operation.kind === "copy-file" &&
+      operation.sourceRelativePath &&
+      isMarkdownPath(operation.destinationPath) &&
+      isNamespacedSource(operation.sourceRelativePath, linkIndex)
     ) {
-      const rewritten = rewriteRelativeLinks(
-        fs.readFileSync(operation.sourcePath, 'utf8'),
-        { sourceRel: operation.sourceRelativePath, index: linkIndex }
-      );
-      fs.writeFileSync(operation.destinationPath, rewritten, 'utf8');
+      const rewritten = rewriteRelativeLinks(fs.readFileSync(operation.sourcePath, "utf8"), {
+        sourceRel: operation.sourceRelativePath,
+        index: linkIndex,
+      });
+      fs.writeFileSync(operation.destinationPath, rewritten, "utf8");
       continue;
     }
 
@@ -200,8 +208,8 @@ function applyInstallPlan(plan) {
     fs.mkdirSync(path.dirname(resolvedClaudeHooksPlan.hooksDestinationPath), { recursive: true });
     fs.writeFileSync(
       resolvedClaudeHooksPlan.hooksDestinationPath,
-      JSON.stringify(resolvedClaudeHooksPlan.resolvedHooksConfig, null, 2) + '\n',
-      'utf8'
+      JSON.stringify(resolvedClaudeHooksPlan.resolvedHooksConfig, null, 2) + "\n",
+      "utf8",
     );
   }
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-'use strict';
+"use strict";
 
 /**
  * MCP health-check hook.
@@ -12,12 +12,12 @@
  * survives compaction and later turns.
  */
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const http = require('http');
-const https = require('https');
-const { spawn, spawnSync } = require('child_process');
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const http = require("http");
+const https = require("https");
+const { spawn, spawnSync } = require("child_process");
 
 const MAX_STDIN = 1024 * 1024;
 const DEFAULT_TTL_MS = 2 * 60 * 1000;
@@ -29,14 +29,23 @@ const MAX_BACKOFF_MS = 10 * 60 * 1000;
 // reachable so the real MCP client can attempt the authenticated call. A
 // Streamable HTTP MCP server can also return 406 to a bare GET that omits
 // Accept: text/event-stream; that still proves the endpoint is alive.
-const HEALTHY_HTTP_CODES = new Set([200, 201, 202, 204, 301, 302, 303, 304, 307, 308, 400, 401, 403, 405, 406]);
+const HEALTHY_HTTP_CODES = new Set([
+  200, 201, 202, 204, 301, 302, 303, 304, 307, 308, 400, 401, 403, 405, 406,
+]);
 const RECONNECT_STATUS_CODES = new Set([401, 403, 429, 503]);
 const FAILURE_PATTERNS = [
-  { code: 401, pattern: /\b401\b|unauthori[sz]ed|auth(?:entication)?\s+(?:failed|expired|invalid)/i },
+  {
+    code: 401,
+    pattern: /\b401\b|unauthori[sz]ed|auth(?:entication)?\s+(?:failed|expired|invalid)/i,
+  },
   { code: 403, pattern: /\b403\b|forbidden|permission denied/i },
   { code: 429, pattern: /\b429\b|rate limit|too many requests/i },
   { code: 503, pattern: /\b503\b|service unavailable|overloaded|temporarily unavailable/i },
-  { code: 'transport', pattern: /ECONNREFUSED|ENOTFOUND|EAI_AGAIN|timed? out|socket hang up|connection (?:failed|lost|reset|closed)/i }
+  {
+    code: "transport",
+    pattern:
+      /ECONNREFUSED|ENOTFOUND|EAI_AGAIN|timed? out|socket hang up|connection (?:failed|lost|reset|closed)/i,
+  },
 ];
 
 function envNumber(name, fallback) {
@@ -48,32 +57,31 @@ function stateFilePath() {
   if (process.env.ECC_MCP_HEALTH_STATE_PATH) {
     return path.resolve(process.env.ECC_MCP_HEALTH_STATE_PATH);
   }
-  return path.join(os.homedir(), '.claude', 'mcp-health-cache.json');
+  return path.join(os.homedir(), ".claude", "mcp-health-cache.json");
 }
 
 function configPaths() {
   if (process.env.ECC_MCP_CONFIG_PATH) {
-    return process.env.ECC_MCP_CONFIG_PATH
-      .split(path.delimiter)
-      .map(entry => entry.trim())
+    return process.env.ECC_MCP_CONFIG_PATH.split(path.delimiter)
+      .map((entry) => entry.trim())
       .filter(Boolean)
-      .map(entry => path.resolve(entry));
+      .map((entry) => path.resolve(entry));
   }
 
   const cwd = process.cwd();
   const home = os.homedir();
 
   return [
-    path.join(cwd, '.claude.json'),
-    path.join(cwd, '.claude', 'settings.json'),
-    path.join(home, '.claude.json'),
-    path.join(home, '.claude', 'settings.json')
+    path.join(cwd, ".claude.json"),
+    path.join(cwd, ".claude", "settings.json"),
+    path.join(home, ".claude.json"),
+    path.join(home, ".claude", "settings.json"),
   ];
 }
 
 function readJsonFile(filePath) {
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
   } catch {
     return null;
   }
@@ -81,11 +89,11 @@ function readJsonFile(filePath) {
 
 function loadState(filePath) {
   const state = readJsonFile(filePath);
-  if (!state || typeof state !== 'object' || Array.isArray(state)) {
+  if (!state || typeof state !== "object" || Array.isArray(state)) {
     return { version: 1, servers: {} };
   }
 
-  if (!state.servers || typeof state.servers !== 'object' || Array.isArray(state.servers)) {
+  if (!state.servers || typeof state.servers !== "object" || Array.isArray(state.servers)) {
     state.servers = {};
   }
 
@@ -102,11 +110,11 @@ function saveState(filePath, state) {
 }
 
 function readRawStdin() {
-  return new Promise(resolve => {
-    let raw = '';
-    let truncated = /^(1|true|yes)$/i.test(String(process.env.ECC_HOOK_INPUT_TRUNCATED || ''));
-    process.stdin.setEncoding('utf8');
-    process.stdin.on('data', chunk => {
+  return new Promise((resolve) => {
+    let raw = "";
+    let truncated = /^(1|true|yes)$/i.test(String(process.env.ECC_HOOK_INPUT_TRUNCATED || ""));
+    process.stdin.setEncoding("utf8");
+    process.stdin.on("data", (chunk) => {
       if (raw.length < MAX_STDIN) {
         const remaining = MAX_STDIN - raw.length;
         raw += chunk.substring(0, remaining);
@@ -117,8 +125,8 @@ function readRawStdin() {
         truncated = true;
       }
     });
-    process.stdin.on('end', () => resolve({ raw, truncated }));
-    process.stdin.on('error', () => resolve({ raw, truncated }));
+    process.stdin.on("end", () => resolve({ raw, truncated }));
+    process.stdin.on("error", () => resolve({ raw, truncated }));
   });
 }
 
@@ -131,38 +139,36 @@ function safeParse(raw) {
 }
 
 function extractMcpTarget(input) {
-  const toolName = String(input.tool_name || input.name || '');
-  const explicitServer = input.server
-    || input.mcp_server
-    || input.tool_input?.server
-    || input.tool_input?.mcp_server
-    || input.tool_input?.connector
-    || null;
-  const explicitTool = input.tool
-    || input.mcp_tool
-    || input.tool_input?.tool
-    || input.tool_input?.mcp_tool
-    || null;
+  const toolName = String(input.tool_name || input.name || "");
+  const explicitServer =
+    input.server ||
+    input.mcp_server ||
+    input.tool_input?.server ||
+    input.tool_input?.mcp_server ||
+    input.tool_input?.connector ||
+    null;
+  const explicitTool =
+    input.tool || input.mcp_tool || input.tool_input?.tool || input.tool_input?.mcp_tool || null;
 
   if (explicitServer) {
     return {
       server: String(explicitServer),
-      tool: explicitTool ? String(explicitTool) : toolName
+      tool: explicitTool ? String(explicitTool) : toolName,
     };
   }
 
-  if (!toolName.startsWith('mcp__')) {
+  if (!toolName.startsWith("mcp__")) {
     return null;
   }
 
-  const segments = toolName.slice(5).split('__');
+  const segments = toolName.slice(5).split("__");
   if (segments.length < 2 || !segments[0]) {
     return null;
   }
 
   return {
     server: segments[0],
-    tool: segments.slice(1).join('__')
+    tool: segments.slice(1).join("__"),
   };
 }
 
@@ -172,23 +178,21 @@ function extractMcpTargetFromRaw(raw) {
   const toolMatch = raw.match(/"(?:tool|mcp_tool)"\s*:\s*"([^"]+)"/);
 
   return extractMcpTarget({
-    tool_name: toolNameMatch ? toolNameMatch[1] : '',
+    tool_name: toolNameMatch ? toolNameMatch[1] : "",
     server: serverMatch ? serverMatch[1] : undefined,
-    tool: toolMatch ? toolMatch[1] : undefined
+    tool: toolMatch ? toolMatch[1] : undefined,
   });
 }
 
 function resolveServerConfig(serverName) {
   for (const filePath of configPaths()) {
     const data = readJsonFile(filePath);
-    const server = data?.mcpServers?.[serverName]
-      || data?.mcp_servers?.[serverName]
-      || null;
+    const server = data?.mcpServers?.[serverName] || data?.mcp_servers?.[serverName] || null;
 
-    if (server && typeof server === 'object' && !Array.isArray(server)) {
+    if (server && typeof server === "object" && !Array.isArray(server)) {
       return {
         config: server,
-        source: filePath
+        source: filePath,
       };
     }
   }
@@ -198,53 +202,53 @@ function resolveServerConfig(serverName) {
 
 function markHealthy(state, serverName, now, details = {}) {
   state.servers[serverName] = {
-    status: 'healthy',
+    status: "healthy",
     checkedAt: now,
-    expiresAt: now + envNumber('ECC_MCP_HEALTH_TTL_MS', DEFAULT_TTL_MS),
+    expiresAt: now + envNumber("ECC_MCP_HEALTH_TTL_MS", DEFAULT_TTL_MS),
     failureCount: 0,
     lastError: null,
     lastFailureCode: null,
     nextRetryAt: now,
     lastRestoredAt: now,
-    ...details
+    ...details,
   };
 }
 
 function markUnhealthy(state, serverName, now, failureCode, errorMessage) {
   const previous = state.servers[serverName] || {};
   const failureCount = Number(previous.failureCount || 0) + 1;
-  const backoffBase = envNumber('ECC_MCP_HEALTH_BACKOFF_MS', DEFAULT_BACKOFF_MS);
-  const nextRetryDelay = Math.min(backoffBase * (2 ** Math.max(failureCount - 1, 0)), MAX_BACKOFF_MS);
+  const backoffBase = envNumber("ECC_MCP_HEALTH_BACKOFF_MS", DEFAULT_BACKOFF_MS);
+  const nextRetryDelay = Math.min(backoffBase * 2 ** Math.max(failureCount - 1, 0), MAX_BACKOFF_MS);
 
   state.servers[serverName] = {
-    status: 'unhealthy',
+    status: "unhealthy",
     checkedAt: now,
     expiresAt: now,
     failureCount,
     lastError: errorMessage || null,
     lastFailureCode: failureCode || null,
     nextRetryAt: now + nextRetryDelay,
-    lastRestoredAt: previous.lastRestoredAt || null
+    lastRestoredAt: previous.lastRestoredAt || null,
   };
 }
 
 function failureSummary(input) {
   const output = input.tool_output;
   const pieces = [
-    typeof input.error === 'string' ? input.error : '',
-    typeof input.message === 'string' ? input.message : '',
-    typeof input.tool_response === 'string' ? input.tool_response : '',
-    typeof output === 'string' ? output : '',
-    typeof output?.output === 'string' ? output.output : '',
-    typeof output?.stderr === 'string' ? output.stderr : '',
-    typeof input.tool_input?.error === 'string' ? input.tool_input.error : ''
+    typeof input.error === "string" ? input.error : "",
+    typeof input.message === "string" ? input.message : "",
+    typeof input.tool_response === "string" ? input.tool_response : "",
+    typeof output === "string" ? output : "",
+    typeof output?.output === "string" ? output.output : "",
+    typeof output?.stderr === "string" ? output.stderr : "",
+    typeof input.tool_input?.error === "string" ? input.tool_input.error : "",
   ].filter(Boolean);
 
-  return pieces.join('\n');
+  return pieces.join("\n");
 }
 
 function detectFailureCode(text) {
-  const summary = String(text || '');
+  const summary = String(text || "");
   for (const entry of FAILURE_PATTERNS) {
     if (entry.pattern.test(summary)) {
       return entry.code;
@@ -254,43 +258,43 @@ function detectFailureCode(text) {
 }
 
 function requestHttp(urlString, headers, timeoutMs) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     let settled = false;
     let timedOut = false;
 
     const url = new URL(urlString);
-    const client = url.protocol === 'https:' ? https : http;
+    const client = url.protocol === "https:" ? https : http;
 
     const req = client.request(
       url,
       {
-        method: 'GET',
+        method: "GET",
         headers,
       },
-      res => {
+      (res) => {
         if (settled) return;
         settled = true;
         res.resume();
         resolve({
           ok: HEALTHY_HTTP_CODES.has(res.statusCode),
           statusCode: res.statusCode,
-          reason: `HTTP ${res.statusCode}`
+          reason: `HTTP ${res.statusCode}`,
         });
-      }
+      },
     );
 
     req.setTimeout(timeoutMs, () => {
       timedOut = true;
-      req.destroy(new Error('timeout'));
+      req.destroy(new Error("timeout"));
     });
 
-    req.on('error', error => {
+    req.on("error", (error) => {
       if (settled) return;
       settled = true;
       resolve({
         ok: false,
         statusCode: null,
-        reason: timedOut ? 'request timed out' : error.message
+        reason: timedOut ? "request timed out" : error.message,
       });
     });
 
@@ -299,13 +303,15 @@ function requestHttp(urlString, headers, timeoutMs) {
 }
 
 function probeCommandServer(serverName, config) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const command = config.command;
-    const args = Array.isArray(config.args) ? config.args.map(arg => String(arg)) : [];
-    const timeoutMs = envNumber('ECC_MCP_HEALTH_TIMEOUT_MS', DEFAULT_TIMEOUT_MS);
+    const args = Array.isArray(config.args) ? config.args.map((arg) => String(arg)) : [];
+    const timeoutMs = envNumber("ECC_MCP_HEALTH_TIMEOUT_MS", DEFAULT_TIMEOUT_MS);
     const mergedEnv = {
       ...process.env,
-      ...(config.env && typeof config.env === 'object' && !Array.isArray(config.env) ? config.env : {})
+      ...(config.env && typeof config.env === "object" && !Array.isArray(config.env)
+        ? config.env
+        : {}),
     };
 
     let done = false;
@@ -320,16 +326,12 @@ function probeCommandServer(serverName, config) {
     // Probe bare PATH commands through platform-extension fallbacks, but keep
     // absolute/relative path commands as a single candidate so their existing
     // ENOENT failure semantics stay intact.
-    const commandIsString = typeof command === 'string' && command.length > 0;
-    const isPathLike = commandIsString && (
-      path.isAbsolute(command)
-      || command.includes('/')
-      || command.includes('\\')
-    );
-    const candidates = process.platform === 'win32'
-      && commandIsString
-      && !path.extname(command)
-      && !isPathLike
+    const commandIsString = typeof command === "string" && command.length > 0;
+    const isPathLike =
+      commandIsString &&
+      (path.isAbsolute(command) || command.includes("/") || command.includes("\\"));
+    const candidates =
+      process.platform === "win32" && commandIsString && !path.extname(command) && !isPathLike
         ? [command, `${command}.cmd`, `${command}.exe`, `${command}.bat`]
         : [command];
 
@@ -356,7 +358,7 @@ function probeCommandServer(serverName, config) {
     function attempt(idx) {
       const tryCommand = candidates[idx];
       const isLast = idx + 1 >= candidates.length;
-      let stderr = '';
+      let stderr = "";
       let attemptDone = false;
       let timer = null;
 
@@ -383,10 +385,11 @@ function probeCommandServer(serverName, config) {
       // Node 18.20+/20.12+ refuse to spawn .cmd/.bat directly on Windows
       // after the CVE-2024-27980 mitigation. Only those extension candidates
       // go through cmd.exe, after the command string is shell-character clean.
-      const useShell = process.platform === 'win32'
-        && typeof tryCommand === 'string'
-        && /\.(cmd|bat)$/i.test(tryCommand)
-        && !UNSAFE_SHELL_CHARS.test(tryCommand);
+      const useShell =
+        process.platform === "win32" &&
+        typeof tryCommand === "string" &&
+        /\.(cmd|bat)$/i.test(tryCommand) &&
+        !UNSAFE_SHELL_CHARS.test(tryCommand);
 
       let child;
       try {
@@ -395,58 +398,59 @@ function probeCommandServer(serverName, config) {
           // array with shell:true causes Node to concatenate without quoting
           // (DEP0190), which splits space-containing args (e.g. paths under
           // "C:\Program Files") at every space boundary.
-          const quotedCmdline = [tryCommand, ...args].map(quoteWin).join(' ');
+          const quotedCmdline = [tryCommand, ...args].map(quoteWin).join(" ");
           child = spawn(quotedCmdline, {
             env: mergedEnv,
             cwd: process.cwd(),
-            stdio: ['pipe', 'ignore', 'pipe'],
-            shell: true
+            stdio: ["pipe", "ignore", "pipe"],
+            shell: true,
           });
         } else {
           child = spawn(tryCommand, args, {
             env: mergedEnv,
             cwd: process.cwd(),
-            stdio: ['pipe', 'ignore', 'pipe'],
-            shell: false
+            stdio: ["pipe", "ignore", "pipe"],
+            shell: false,
           });
         }
       } catch (error) {
-        if ((error.code === 'ENOENT' || error.code === 'EINVAL') && !isLast) {
+        if ((error.code === "ENOENT" || error.code === "EINVAL") && !isLast) {
           retryNext();
           return;
         }
         attemptFinish({
           ok: false,
           statusCode: null,
-          reason: error.message
+          reason: error.message,
         });
         return;
       }
 
-      child.stderr.on('data', chunk => {
+      child.stderr.on("data", (chunk) => {
         if (stderr.length < 4000) {
           const remaining = 4000 - stderr.length;
           stderr += String(chunk).slice(0, remaining);
         }
       });
 
-      child.on('error', error => {
-        if ((error.code === 'ENOENT' || error.code === 'EINVAL') && !isLast) {
+      child.on("error", (error) => {
+        if ((error.code === "ENOENT" || error.code === "EINVAL") && !isLast) {
           retryNext();
           return;
         }
         attemptFinish({
           ok: false,
           statusCode: null,
-          reason: error.message
+          reason: error.message,
         });
       });
 
-      child.on('exit', (code, signal) => {
+      child.on("exit", (code, signal) => {
         attemptFinish({
           ok: false,
           statusCode: code,
-          reason: stderr.trim() || `process exited before handshake (${signal || code || 'unknown'})`
+          reason:
+            stderr.trim() || `process exited before handshake (${signal || code || "unknown"})`,
         });
       });
 
@@ -458,32 +462,41 @@ function probeCommandServer(serverName, config) {
           attemptFinish({
             ok: false,
             statusCode: child.exitCode,
-            reason: stderr.trim() || `process exited before handshake (${child.signalCode || child.exitCode || 'unknown'})`
+            reason:
+              stderr.trim() ||
+              `process exited before handshake (${child.signalCode || child.exitCode || "unknown"})`,
           });
           return;
         }
 
         try {
-          if (useShell && child.pid && process.platform === 'win32') {
+          if (useShell && child.pid && process.platform === "win32") {
             // When spawned via shell on Windows, child is cmd.exe. kill() only
             // terminates the shell and leaves the real server process orphaned.
             // taskkill /T kills the entire process tree rooted at cmd.exe.
-            const killResult = spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], {
-              stdio: 'ignore',
-              windowsHide: true
+            const killResult = spawnSync("taskkill", ["/PID", String(child.pid), "/T", "/F"], {
+              stdio: "ignore",
+              windowsHide: true,
             });
-            if (killResult.error || (typeof killResult.status === 'number' && killResult.status !== 0)) {
+            if (
+              killResult.error ||
+              (typeof killResult.status === "number" && killResult.status !== 0)
+            ) {
               // taskkill not on PATH, permission denied, or already exited.
               // Best-effort fallback: signal the cmd.exe shell directly. The
               // child tree may still leak if it already detached, but this at
               // least kills the shell we spawned.
-              try { child.kill('SIGKILL'); } catch { /* ignore */ }
+              try {
+                child.kill("SIGKILL");
+              } catch {
+                /* ignore */
+              }
             }
           } else {
-            child.kill('SIGTERM');
+            child.kill("SIGTERM");
             setTimeout(() => {
               try {
-                child.kill('SIGKILL');
+                child.kill("SIGKILL");
               } catch {
                 // ignore
               }
@@ -496,11 +509,11 @@ function probeCommandServer(serverName, config) {
         attemptFinish({
           ok: true,
           statusCode: null,
-          reason: `${serverName} accepted a new stdio process`
+          reason: `${serverName} accepted a new stdio process`,
         });
       }, timeoutMs);
 
-      if (typeof timer.unref === 'function') {
+      if (typeof timer.unref === "function") {
         timer.unref();
       }
     }
@@ -512,14 +525,18 @@ function probeCommandServer(serverName, config) {
 async function probeServer(serverName, resolvedConfig) {
   const config = resolvedConfig.config;
 
-  if (config.type === 'http' || config.url) {
-    const result = await requestHttp(config.url, config.headers || {}, envNumber('ECC_MCP_HEALTH_TIMEOUT_MS', DEFAULT_TIMEOUT_MS));
+  if (config.type === "http" || config.url) {
+    const result = await requestHttp(
+      config.url,
+      config.headers || {},
+      envNumber("ECC_MCP_HEALTH_TIMEOUT_MS", DEFAULT_TIMEOUT_MS),
+    );
 
     return {
       ok: result.ok,
       failureCode: RECONNECT_STATUS_CODES.has(result.statusCode) ? result.statusCode : null,
       reason: result.reason,
-      source: resolvedConfig.source
+      source: resolvedConfig.source,
     };
   }
 
@@ -530,42 +547,42 @@ async function probeServer(serverName, resolvedConfig) {
       ok: result.ok,
       failureCode: RECONNECT_STATUS_CODES.has(result.statusCode) ? result.statusCode : null,
       reason: result.reason,
-      source: resolvedConfig.source
+      source: resolvedConfig.source,
     };
   }
 
   return {
     ok: false,
     failureCode: null,
-    reason: 'unsupported MCP server config',
-    source: resolvedConfig.source
+    reason: "unsupported MCP server config",
+    source: resolvedConfig.source,
   };
 }
 
 function reconnectCommand(serverName) {
-  const key = `ECC_MCP_RECONNECT_${String(serverName).toUpperCase().replace(/[^A-Z0-9]/g, '_')}`;
-  const command = process.env[key] || process.env.ECC_MCP_RECONNECT_COMMAND || '';
+  const key = `ECC_MCP_RECONNECT_${String(serverName)
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "_")}`;
+  const command = process.env[key] || process.env.ECC_MCP_RECONNECT_COMMAND || "";
   if (!command.trim()) {
     return null;
   }
 
-  return command.includes('{server}')
-    ? command.replace(/\{server\}/g, serverName)
-    : command;
+  return command.includes("{server}") ? command.replace(/\{server\}/g, serverName) : command;
 }
 
 function attemptReconnect(serverName) {
   const command = reconnectCommand(serverName);
   if (!command) {
-    return { attempted: false, success: false, reason: 'no reconnect command configured' };
+    return { attempted: false, success: false, reason: "no reconnect command configured" };
   }
 
   const result = spawnSync(command, {
     shell: true,
     env: process.env,
     cwd: process.cwd(),
-    encoding: 'utf8',
-    timeout: envNumber('ECC_MCP_RECONNECT_TIMEOUT_MS', DEFAULT_TIMEOUT_MS)
+    encoding: "utf8",
+    timeout: envNumber("ECC_MCP_RECONNECT_TIMEOUT_MS", DEFAULT_TIMEOUT_MS),
   });
 
   if (result.error) {
@@ -576,15 +593,15 @@ function attemptReconnect(serverName) {
     return {
       attempted: true,
       success: false,
-      reason: (result.stderr || result.stdout || `reconnect exited ${result.status}`).trim()
+      reason: (result.stderr || result.stdout || `reconnect exited ${result.status}`).trim(),
     };
   }
 
-  return { attempted: true, success: true, reason: 'reconnect command completed' };
+  return { attempted: true, success: true, reason: "reconnect command completed" };
 }
 
 function shouldFailOpen() {
-  return /^(1|true|yes)$/i.test(String(process.env.ECC_MCP_HEALTH_FAIL_OPEN || ''));
+  return /^(1|true|yes)$/i.test(String(process.env.ECC_MCP_HEALTH_FAIL_OPEN || ""));
 }
 
 function emitLogs(logs) {
@@ -598,20 +615,22 @@ async function handlePreToolUse(rawInput, input, target, statePathValue, now) {
   const state = loadState(statePathValue);
   const previous = state.servers[target.server] || {};
 
-  if (previous.status === 'healthy' && Number(previous.expiresAt || 0) > now) {
+  if (previous.status === "healthy" && Number(previous.expiresAt || 0) > now) {
     return { rawInput, exitCode: 0, logs };
   }
 
-  if (previous.status === 'unhealthy' && Number(previous.nextRetryAt || 0) > now) {
+  if (previous.status === "unhealthy" && Number(previous.nextRetryAt || 0) > now) {
     logs.push(
-      `[MCPHealthCheck] ${target.server} is marked unhealthy until ${new Date(previous.nextRetryAt).toISOString()}; skipping ${target.tool || 'tool'}`
+      `[MCPHealthCheck] ${target.server} is marked unhealthy until ${new Date(previous.nextRetryAt).toISOString()}; skipping ${target.tool || "tool"}`,
     );
     return { rawInput, exitCode: shouldFailOpen() ? 0 : 2, logs };
   }
 
   const resolvedConfig = resolveServerConfig(target.server);
   if (!resolvedConfig) {
-    logs.push(`[MCPHealthCheck] No MCP config found for ${target.server}; skipping preflight probe`);
+    logs.push(
+      `[MCPHealthCheck] No MCP config found for ${target.server}; skipping preflight probe`,
+    );
     return { rawInput, exitCode: 0, logs };
   }
 
@@ -620,22 +639,22 @@ async function handlePreToolUse(rawInput, input, target, statePathValue, now) {
     markHealthy(state, target.server, now, { source: resolvedConfig.source });
     saveState(statePathValue, state);
 
-    if (previous.status === 'unhealthy') {
+    if (previous.status === "unhealthy") {
       logs.push(`[MCPHealthCheck] ${target.server} connection restored`);
     }
 
     return { rawInput, exitCode: 0, logs };
   }
 
-  let reconnect = { attempted: false, success: false, reason: 'probe failed' };
-  if (probe.failureCode || previous.status === 'unhealthy') {
+  let reconnect = { attempted: false, success: false, reason: "probe failed" };
+  if (probe.failureCode || previous.status === "unhealthy") {
     reconnect = attemptReconnect(target.server);
     if (reconnect.success) {
       const reprobe = await probeServer(target.server, resolvedConfig);
       if (reprobe.ok) {
         markHealthy(state, target.server, now, {
           source: resolvedConfig.source,
-          restoredBy: 'reconnect-command'
+          restoredBy: "reconnect-command",
         });
         saveState(statePathValue, state);
         logs.push(`[MCPHealthCheck] ${target.server} connection restored after reconnect`);
@@ -649,10 +668,10 @@ async function handlePreToolUse(rawInput, input, target, statePathValue, now) {
   saveState(statePathValue, state);
 
   const reconnectSuffix = reconnect.attempted
-    ? ` Reconnect attempt: ${reconnect.success ? 'ok' : reconnect.reason}.`
-    : '';
+    ? ` Reconnect attempt: ${reconnect.success ? "ok" : reconnect.reason}.`
+    : "";
   logs.push(
-    `[MCPHealthCheck] ${target.server} is unavailable (${probe.reason}). Blocking ${target.tool || 'tool'} so Claude can fall back to non-MCP tools.${reconnectSuffix}`
+    `[MCPHealthCheck] ${target.server} is unavailable (${probe.reason}). Blocking ${target.tool || "tool"} so Claude can fall back to non-MCP tools.${reconnectSuffix}`,
   );
 
   return { rawInput, exitCode: shouldFailOpen() ? 0 : 2, logs };
@@ -671,7 +690,9 @@ async function handlePostToolUseFailure(rawInput, input, target, statePathValue,
   markUnhealthy(state, target.server, now, failureCode, summary.slice(0, 500));
   saveState(statePathValue, state);
 
-  logs.push(`[MCPHealthCheck] ${target.server} reported ${failureCode}; marking server unhealthy and attempting reconnect`);
+  logs.push(
+    `[MCPHealthCheck] ${target.server} reported ${failureCode}; marking server unhealthy and attempting reconnect`,
+  );
 
   const reconnect = attemptReconnect(target.server);
   if (!reconnect.attempted) {
@@ -686,20 +707,24 @@ async function handlePostToolUseFailure(rawInput, input, target, statePathValue,
 
   const resolvedConfig = resolveServerConfig(target.server);
   if (!resolvedConfig) {
-    logs.push(`[MCPHealthCheck] ${target.server} reconnect completed but no config was available for a follow-up probe`);
+    logs.push(
+      `[MCPHealthCheck] ${target.server} reconnect completed but no config was available for a follow-up probe`,
+    );
     return { rawInput, exitCode: 0, logs };
   }
 
   const reprobe = await probeServer(target.server, resolvedConfig);
   if (!reprobe.ok) {
-    logs.push(`[MCPHealthCheck] ${target.server} reconnect command ran, but health probe still failed: ${reprobe.reason}`);
+    logs.push(
+      `[MCPHealthCheck] ${target.server} reconnect command ran, but health probe still failed: ${reprobe.reason}`,
+    );
     return { rawInput, exitCode: 0, logs };
   }
 
   const refreshed = loadState(statePathValue);
   markHealthy(refreshed, target.server, now, {
     source: resolvedConfig.source,
-    restoredBy: 'post-failure-reconnect'
+    restoredBy: "post-failure-reconnect",
   });
   saveState(statePathValue, refreshed);
   logs.push(`[MCPHealthCheck] ${target.server} connection restored`);
@@ -721,8 +746,8 @@ async function main() {
     const limit = Number(process.env.ECC_HOOK_INPUT_MAX_BYTES) || MAX_STDIN;
     const logs = [
       shouldFailOpen()
-        ? `[MCPHealthCheck] Hook input exceeded ${limit} bytes while checking ${target.server}; allowing ${target.tool || 'tool'} because fail-open mode is enabled`
-        : `[MCPHealthCheck] Hook input exceeded ${limit} bytes while checking ${target.server}; blocking ${target.tool || 'tool'} to avoid bypassing MCP health checks`
+        ? `[MCPHealthCheck] Hook input exceeded ${limit} bytes while checking ${target.server}; allowing ${target.tool || "tool"} because fail-open mode is enabled`
+        : `[MCPHealthCheck] Hook input exceeded ${limit} bytes while checking ${target.server}; blocking ${target.tool || "tool"} to avoid bypassing MCP health checks`,
     ];
     emitLogs(logs);
     process.stdout.write(rawInput);
@@ -730,20 +755,21 @@ async function main() {
     return;
   }
 
-  const eventName = process.env.CLAUDE_HOOK_EVENT_NAME || 'PreToolUse';
+  const eventName = process.env.CLAUDE_HOOK_EVENT_NAME || "PreToolUse";
   const now = Date.now();
   const statePathValue = stateFilePath();
 
-  const result = eventName === 'PostToolUseFailure'
-    ? await handlePostToolUseFailure(rawInput, input, target, statePathValue, now)
-    : await handlePreToolUse(rawInput, input, target, statePathValue, now);
+  const result =
+    eventName === "PostToolUseFailure"
+      ? await handlePostToolUseFailure(rawInput, input, target, statePathValue, now)
+      : await handlePreToolUse(rawInput, input, target, statePathValue, now);
 
   emitLogs(result.logs);
   process.stdout.write(result.rawInput);
   process.exit(result.exitCode);
 }
 
-main().catch(error => {
+main().catch((error) => {
   process.stderr.write(`[MCPHealthCheck] Unexpected error: ${error.message}\n`);
   process.exit(0);
 });

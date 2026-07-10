@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowUpRight, Printer } from "lucide-react";
 import { cv, type WorkItem } from "@/data/cv";
-import { currentLang, formatPeriod } from "@/lib/format";
+import { currentLang, cvSummary, formatPeriod } from "@/lib/format";
+import { cvPageSubtitle, cvPrintHint } from "@/lib/cv-copy";
 import { routeHead } from "@/lib/seo";
 import { Reveal } from "@/components/reveal";
 import {
@@ -46,7 +47,7 @@ function CvPage() {
     <MotionPage>
       <>
         <PageShell className={cn("no-print", pageShellLeadGapClass)}>
-          <PageHeader page="cv" subtitle={t("cv.subtitle")} />
+          <PageHeader page="cv" subtitle={cvPageSubtitle("cv", lang)} />
 
           <Reveal delay={0.04} onMount>
             <div
@@ -60,7 +61,7 @@ function CvPage() {
                 aria-hidden
               />
               <p className="relative max-w-md text-sm leading-relaxed text-muted-foreground">
-                {t("cv.printHint")}
+                {cvPrintHint(lang)}
               </p>
               <button
                 type="button"
@@ -94,7 +95,7 @@ function CvPage() {
             </header>
 
             <Section title={t("cv.profile")}>
-              <p className="leading-relaxed">{cv.basics.summary[lang]}</p>
+              <p className="leading-relaxed">{cvSummary(lang)}</p>
             </Section>
 
             <Section title={t("cv.experience")}>

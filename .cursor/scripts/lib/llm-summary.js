@@ -10,21 +10,21 @@
  * hooks fired by the subprocess do NOT re-enter LLM summarization.
  */
 
-'use strict';
+"use strict";
 
-const { spawnSync } = require('child_process');
-const fs = require('fs');
+const { spawnSync } = require("child_process");
+const fs = require("fs");
 
 const MAX_TRANSCRIPT_CHARS = 7000;
 const MAX_TURNS = 25;
 const LLM_TIMEOUT_MS = 90000;
 
 function getLLMModel() {
-  return process.env.ECC_LLM_SUMMARY_MODEL || 'haiku';
+  return process.env.ECC_LLM_SUMMARY_MODEL || "haiku";
 }
 
 function getContextThreshold() {
-  const raw = parseInt(process.env.ECC_LLM_SUMMARY_CONTEXT_THRESHOLD || '20', 10);
+  const raw = parseInt(process.env.ECC_LLM_SUMMARY_CONTEXT_THRESHOLD || "20", 10);
   return Number.isFinite(raw) && raw > 0 && raw <= 100 ? raw : 20;
 }
 
@@ -35,46 +35,46 @@ function getContextThreshold() {
 function extractConversationText(transcriptPath) {
   let content;
   try {
-    content = fs.readFileSync(transcriptPath, 'utf8');
+    content = fs.readFileSync(transcriptPath, "utf8");
   } catch {
     return null;
   }
 
-  const lines = content.split('\n').filter(Boolean);
+  const lines = content.split("\n").filter(Boolean);
   const turns = [];
 
   for (const line of lines) {
     try {
       const entry = JSON.parse(line);
-      const isUser = entry.type === 'user' || entry.message?.role === 'user';
-      const isAssistant = entry.type === 'assistant';
+      const isUser = entry.type === "user" || entry.message?.role === "user";
+      const isAssistant = entry.type === "assistant";
 
       if (isUser) {
         const rawContent = entry.message?.content ?? entry.content;
         const text =
-          typeof rawContent === 'string'
+          typeof rawContent === "string"
             ? rawContent
             : Array.isArray(rawContent)
               ? rawContent
-                  .filter(c => c?.type === 'text')
-                  .map(c => c.text)
-                  .join(' ')
-              : '';
-        const cleaned = text.replace(/\n+/g, ' ').trim();
+                  .filter((c) => c?.type === "text")
+                  .map((c) => c.text)
+                  .join(" ")
+              : "";
+        const cleaned = text.replace(/\n+/g, " ").trim();
         if (cleaned) {
-          turns.push({ role: 'User', text: cleaned.slice(0, 400) });
+          turns.push({ role: "User", text: cleaned.slice(0, 400) });
         }
       }
 
       if (isAssistant && Array.isArray(entry.message?.content)) {
         const textParts = entry.message.content
-          .filter(b => b?.type === 'text')
-          .map(b => b.text)
-          .join(' ')
-          .replace(/\n+/g, ' ')
+          .filter((b) => b?.type === "text")
+          .map((b) => b.text)
+          .join(" ")
+          .replace(/\n+/g, " ")
           .trim();
         if (textParts) {
-          turns.push({ role: 'Claude', text: textParts.slice(0, 600) });
+          turns.push({ role: "Claude", text: textParts.slice(0, 600) });
         }
       }
     } catch {
@@ -85,8 +85,10 @@ function extractConversationText(transcriptPath) {
   if (turns.length === 0) return null;
 
   const recent = turns.slice(-MAX_TURNS);
-  const formatted = recent.map(t => `**${t.role}:** ${t.text}`).join('\n\n');
-  return formatted.length > MAX_TRANSCRIPT_CHARS ? '...(前略)\n\n' + formatted.slice(-MAX_TRANSCRIPT_CHARS) : formatted;
+  const formatted = recent.map((t) => `**${t.role}:** ${t.text}`).join("\n\n");
+  return formatted.length > MAX_TRANSCRIPT_CHARS
+    ? "...(前略)\n\n" + formatted.slice(-MAX_TRANSCRIPT_CHARS)
+    : formatted;
 }
 
 /**
@@ -95,7 +97,7 @@ function extractConversationText(transcriptPath) {
  */
 function getContextRemainingPct(transcriptPath) {
   try {
-    const { readLatestContextTokens, resolveContextWindowTokens } = require('./transcript-context');
+    const { readLatestContextTokens, resolveContextWindowTokens } = require("./transcript-context");
     const usage = readLatestContextTokens(transcriptPath);
     if (!usage) return null;
     const windowTokens = resolveContextWindowTokens(usage.tokens, usage.model);
@@ -116,61 +118,67 @@ function generateSessionSummary(transcriptPath) {
   if (!conversation) return null;
 
   const prompt = [
-    'Below is a conversation log from a Claude Code coding session.',
-    'Create a summary to help the next session quickly understand the context.',
-    '',
-    '## Prioritize including',
-    '- Design decisions and technology choices made this session',
-    '- Bugs and problems solved',
-    '- Files changed or created, with a brief description of changes',
-    '- Unfinished tasks and work to continue in the next session',
-    '- Important context the next session needs to know',
-    '',
-    '## Conversation log',
+    "Below is a conversation log from a Claude Code coding session.",
+    "Create a summary to help the next session quickly understand the context.",
+    "",
+    "## Prioritize including",
+    "- Design decisions and technology choices made this session",
+    "- Bugs and problems solved",
+    "- Files changed or created, with a brief description of changes",
+    "- Unfinished tasks and work to continue in the next session",
+    "- Important context the next session needs to know",
+    "",
+    "## Conversation log",
     conversation,
-    '',
-    '## Output format (Markdown only, no preamble)',
-    '',
-    '## Session Summary',
-    '',
-    '### Tasks',
-    '(main tasks worked on this session)',
-    '',
-    '### Decisions Made',
-    '(design decisions and technology choices)',
-    '',
-    '### Files Modified',
-    '(files changed or created)',
-    '',
-    '### Unresolved Issues',
-    '(unfinished tasks and work to continue)',
-    '',
-    '### Next Session Context',
-    '(important context for the next session)'
-  ].join('\n');
+    "",
+    "## Output format (Markdown only, no preamble)",
+    "",
+    "## Session Summary",
+    "",
+    "### Tasks",
+    "(main tasks worked on this session)",
+    "",
+    "### Decisions Made",
+    "(design decisions and technology choices)",
+    "",
+    "### Files Modified",
+    "(files changed or created)",
+    "",
+    "### Unresolved Issues",
+    "(unfinished tasks and work to continue)",
+    "",
+    "### Next Session Context",
+    "(important context for the next session)",
+  ].join("\n");
 
   try {
-    const result = spawnSync('claude', ['--model', getLLMModel(), '-p'], {
+    const result = spawnSync("claude", ["--model", getLLMModel(), "-p"], {
       input: prompt,
-      encoding: 'utf8',
+      encoding: "utf8",
       env: {
         ...process.env,
-        CLAUDECODE: '',
-        ECC_SKIP_LLM_SUMMARY: '1'
+        CLAUDECODE: "",
+        ECC_SKIP_LLM_SUMMARY: "1",
       },
       timeout: LLM_TIMEOUT_MS,
-      shell: process.platform === 'win32'
+      shell: process.platform === "win32",
     });
 
     if (result.error || result.status !== 0) {
       return null;
     }
 
-    const output = (result.stdout || '').trim();
+    const output = (result.stdout || "").trim();
     return output || null;
   } catch {
     return null;
   }
 }
 
-module.exports = { generateSessionSummary, extractConversationText, getContextRemainingPct, getContextThreshold, getLLMModel };
+module.exports = {
+  generateSessionSummary,
+  extractConversationText,
+  getContextRemainingPct,
+  getContextThreshold,
+  getLLMModel,
+};

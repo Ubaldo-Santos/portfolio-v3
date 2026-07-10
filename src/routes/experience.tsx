@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { cv, type WorkItem } from "@/data/cv";
 import { currentLang, formatPeriod, workAnchorId } from "@/lib/format";
+import { cvPageSubtitle } from "@/lib/cv-copy";
 import { routeHead, seoBreadcrumbs } from "@/lib/seo";
 import { RevealGroup, RevealItem } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
@@ -20,7 +21,7 @@ function ExperiencePage() {
   return (
     <MotionPage>
       <PageShell>
-        <PageHeader page="experience" subtitle={t("experience.subtitle")} />
+        <PageHeader page="experience" subtitle={cvPageSubtitle("experience", lang)} />
 
         <Section title={t("experience.work")} items={cv.work as readonly WorkItem[]} lang={lang} />
         <Section

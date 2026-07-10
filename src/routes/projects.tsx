@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
+import { cvPageSubtitle } from "@/lib/cv-copy";
 import { routeHead, seoBreadcrumbs } from "@/lib/seo";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
@@ -22,7 +23,7 @@ function ProjectsPage() {
   return (
     <MotionPage>
       <PageShell>
-        <PageHeader page="projects" subtitle={t("projects.subtitle")} />
+        <PageHeader page="projects" subtitle={cvPageSubtitle("projects", lang)} />
 
         <RevealGroup className="mt-16 grid gap-6 sm:grid-cols-2" stagger={0.08}>
           {activeProjects.map((p) => {

@@ -17,13 +17,13 @@
  * Profiles: standard, strict
  */
 
-'use strict';
+"use strict";
 
-const { spawnSync, execFileSync } = require('child_process');
-const fs = require('fs');
-const { isMacOS, log } = require('../lib/utils');
+const { spawnSync, execFileSync } = require("child_process");
+const fs = require("fs");
+const { isMacOS, log } = require("../lib/utils");
 
-const TITLE = 'Claude Code';
+const TITLE = "Claude Code";
 const MAX_BODY_LENGTH = 100;
 const MAX_TTY_LOOKUP_DEPTH = 30;
 const PS_TIMEOUT_MS = 2000;
@@ -32,9 +32,9 @@ const PS_TIMEOUT_MS = 2000;
  * Memoized WSL detection at module load (avoids repeated /proc/version reads).
  */
 let isWSL = false;
-if (process.platform === 'linux') {
+if (process.platform === "linux") {
   try {
-    isWSL = fs.readFileSync('/proc/version', 'utf8').toLowerCase().includes('microsoft');
+    isWSL = fs.readFileSync("/proc/version", "utf8").toLowerCase().includes("microsoft");
   } catch {
     isWSL = false;
   }
@@ -48,16 +48,18 @@ function findPowerShell() {
   if (!isWSL) return null;
 
   const candidates = [
-    'pwsh.exe',        // WSL interop resolves from Windows PATH
-    'powershell.exe',  // WSL interop for Windows PowerShell
-    '/mnt/c/Program Files/PowerShell/7/pwsh.exe',      // PowerShell 7 (default install)
-    '/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe', // Windows PowerShell
+    "pwsh.exe", // WSL interop resolves from Windows PATH
+    "powershell.exe", // WSL interop for Windows PowerShell
+    "/mnt/c/Program Files/PowerShell/7/pwsh.exe", // PowerShell 7 (default install)
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe", // Windows PowerShell
   ];
 
   for (const path of candidates) {
     try {
-      const result = spawnSync(path, ['-Command', 'exit 0'],
-        { stdio: ['ignore', 'pipe', 'ignore'], timeout: 3000 });
+      const result = spawnSync(path, ["-Command", "exit 0"], {
+        stdio: ["ignore", "pipe", "ignore"],
+        timeout: 3000,
+      });
       if (result.status === 0) {
         return path;
       }
@@ -77,8 +79,10 @@ function notifyWindows(pwshPath, title, body) {
   const safeBody = body.replace(/'/g, "''");
   const safeTitle = title.replace(/'/g, "''");
   const command = `Import-Module BurntToast; New-BurntToastNotification -Text '${safeTitle}', '${safeBody}'`;
-  const result = spawnSync(pwshPath, ['-Command', command],
-    { stdio: ['ignore', 'pipe', 'pipe'], timeout: 5000 });
+  const result = spawnSync(pwshPath, ["-Command", command], {
+    stdio: ["ignore", "pipe", "pipe"],
+    timeout: 5000,
+  });
   if (result.status === 0) {
     return { success: true, reason: null };
   }
@@ -91,14 +95,14 @@ function notifyWindows(pwshPath, title, body) {
  * Takes the first non-empty line and truncates to MAX_BODY_LENGTH chars.
  */
 function extractSummary(message) {
-  if (!message || typeof message !== 'string') return 'Done';
+  if (!message || typeof message !== "string") return "Done";
 
   const firstLine = message
-    .split('\n')
-    .map(l => l.trim())
-    .find(l => l.length > 0);
+    .split("\n")
+    .map((l) => l.trim())
+    .find((l) => l.length > 0);
 
-  if (!firstLine) return 'Done';
+  if (!firstLine) return "Done";
 
   return firstLine.length > MAX_BODY_LENGTH
     ? `${firstLine.slice(0, MAX_BODY_LENGTH)}...`
@@ -115,17 +119,19 @@ function findTerminalTTY() {
   let pid = process.pid;
   for (let depth = 0; depth < MAX_TTY_LOOKUP_DEPTH; depth += 1) {
     try {
-      const out = execFileSync('ps', ['-o', 'ppid=,tty=', '-p', String(pid)], {
-        stdio: ['ignore', 'pipe', 'ignore'],
+      const out = execFileSync("ps", ["-o", "ppid=,tty=", "-p", String(pid)], {
+        stdio: ["ignore", "pipe", "ignore"],
         timeout: PS_TIMEOUT_MS,
-      }).toString().trim();
+      })
+        .toString()
+        .trim();
       const m = out.match(/^\s*(\d+)\s+(\S+)\s*$/);
       if (!m) return null;
       const [, ppidStr, tty] = m;
-      if (tty && !tty.startsWith('?')) {
+      if (tty && !tty.startsWith("?")) {
         // `ps -o tty=` may emit either "ttys001" or the short form "s001"
         // depending on macOS version; normalize so the resulting path exists.
-        const name = tty.startsWith('tty') ? tty : `tty${tty}`;
+        const name = tty.startsWith("tty") ? tty : `tty${tty}`;
         return `/dev/${name}`;
       }
       const ppid = parseInt(ppidStr, 10);
@@ -147,7 +153,7 @@ function findTerminalTTY() {
  */
 function isUnderMultiplexer() {
   if (process.env.TMUX) return true;
-  const term = process.env.TERM || '';
+  const term = process.env.TERM || "";
   return /^screen/.test(term) || /^tmux/.test(term);
 }
 
@@ -170,15 +176,14 @@ function isUnderMultiplexer() {
  */
 function notifyMacOS(title, body) {
   const osc9Capable =
-    process.env.TERM_PROGRAM === 'iTerm.app' ||
-    process.env.TERM_PROGRAM === 'ghostty';
+    process.env.TERM_PROGRAM === "iTerm.app" || process.env.TERM_PROGRAM === "ghostty";
   if (osc9Capable && !isUnderMultiplexer()) {
     try {
       const tty = findTerminalTTY();
       if (tty) {
         // Strip control chars (incl. ESC/BEL) to prevent escape-sequence injection.
         // eslint-disable-next-line no-control-regex
-        const message = `${title}: ${body}`.replace(/[\x00-\x1f\x7f]/g, ' ');
+        const message = `${title}: ${body}`.replace(/[\x00-\x1f\x7f]/g, " ");
         fs.writeFileSync(tty, `\x1b]9;${message}\x07`);
         return;
       }
@@ -186,12 +191,14 @@ function notifyMacOS(title, body) {
       log(`[DesktopNotify] iTerm escape failed, falling back to osascript: ${err.message}`);
     }
   }
-  const safeBody = body.replace(/\\/g, '').replace(/"/g, '\u201C');
-  const safeTitle = title.replace(/\\/g, '').replace(/"/g, '\u201C');
+  const safeBody = body.replace(/\\/g, "").replace(/"/g, "\u201C");
+  const safeTitle = title.replace(/\\/g, "").replace(/"/g, "\u201C");
   const script = `display notification "${safeBody}" with title "${safeTitle}"`;
-  const result = spawnSync('osascript', ['-e', script], { stdio: 'ignore', timeout: 5000 });
+  const result = spawnSync("osascript", ["-e", script], { stdio: "ignore", timeout: 5000 });
   if (result.error || result.status !== 0) {
-    log(`[DesktopNotify] osascript failed: ${result.error ? result.error.message : `exit ${result.status}`}`);
+    log(
+      `[DesktopNotify] osascript failed: ${result.error ? result.error.message : `exit ${result.status}`}`,
+    );
   }
 }
 
@@ -211,16 +218,16 @@ function run(raw) {
         const { success, reason } = notifyWindows(ps, TITLE, summary);
         if (success) {
           // notification sent successfully
-        } else if (reason && reason.toLowerCase().includes('burnttoast')) {
+        } else if (reason && reason.toLowerCase().includes("burnttoast")) {
           // BurntToast module not found
-          log('[DesktopNotify] Tip: Install BurntToast module to enable notifications');
+          log("[DesktopNotify] Tip: Install BurntToast module to enable notifications");
         } else if (reason) {
           // Other PowerShell/notification error - log for debugging
           log(`[DesktopNotify] Notification failed: ${reason}`);
         }
       } else {
         // No PowerShell found
-        log('[DesktopNotify] Tip: Install BurntToast module in PowerShell for notifications');
+        log("[DesktopNotify] Tip: Install BurntToast module in PowerShell for notifications");
       }
     }
   } catch (err) {
@@ -235,11 +242,11 @@ module.exports = { run };
 // Legacy stdin path (when invoked directly rather than via run-with-flags)
 if (require.main === module) {
   const MAX_STDIN = 1024 * 1024;
-  let data = '';
+  let data = "";
   let truncated = false;
 
-  process.stdin.setEncoding('utf8');
-  process.stdin.on('data', chunk => {
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => {
     if (data.length < MAX_STDIN) {
       const remaining = MAX_STDIN - data.length;
       data += chunk.substring(0, remaining);
@@ -248,12 +255,12 @@ if (require.main === module) {
       truncated = true;
     }
   });
-  process.stdin.on('end', () => {
+  process.stdin.on("end", () => {
     const output = run(data);
     // Never echo truncated stdin — invalid JSON on stdout is reported as a
     // Stop hook failure (#2090).
     if (truncated) {
-      log('[DesktopNotify] stdin exceeded 1MB; suppressing pass-through (fail-open)');
+      log("[DesktopNotify] stdin exceeded 1MB; suppressing pass-through (fail-open)");
       return;
     }
     if (output) process.stdout.write(output);

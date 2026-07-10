@@ -37,7 +37,7 @@ export function BrandLogo({ className, iconClassName, variant = "nav" }: BrandLo
       <span className="flex min-w-0 flex-col text-[oklch(0.34_0.01_80)] dark:text-[oklch(0.72_0.01_90)]">
         <span
           className={cn(
-            "font-display leading-none tracking-tight [font-weight:800] [font-variation-settings:'opsz'_72,'SOFT'_0]",
+            "font-display font-bold leading-none tracking-tight",
             isFooter ? "text-3xl sm:text-4xl" : "text-xl sm:text-2xl",
           )}
         >
@@ -45,7 +45,7 @@ export function BrandLogo({ className, iconClassName, variant = "nav" }: BrandLo
         </span>
         <span
           className={cn(
-            "font-display-italic leading-none [font-weight:750] [font-variation-settings:'opsz'_72,'SOFT'_0]",
+            "font-display-italic font-semibold leading-none",
             isFooter
               ? "-mt-1.5 text-2xl sm:-mt-2 sm:text-3xl"
               : "-mt-1 text-lg sm:-mt-1.5 sm:text-xl",

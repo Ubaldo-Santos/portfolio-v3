@@ -8,12 +8,12 @@
  * Reads bridge file from ecc-metrics-bridge.js and stdin from Claude Code runtime.
  */
 
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { sanitizeSessionId, readBridge, writeBridgeAtomic } = require('../lib/session-bridge');
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const { sanitizeSessionId, readBridge, writeBridgeAtomic } = require("../lib/session-bridge");
 
 const AUTO_COMPACT_BUFFER_PCT = 16.5;
 const MAX_STDIN = 1024 * 1024;
@@ -24,9 +24,9 @@ const MAX_STDIN = 1024 * 1024;
  * @returns {string} e.g. "5s", "12m", "1h23m"
  */
 function formatDuration(isoTimestamp) {
-  if (!isoTimestamp) return '?';
+  if (!isoTimestamp) return "?";
   const elapsed = Math.floor((Date.now() - new Date(isoTimestamp).getTime()) / 1000);
-  if (elapsed < 0) return '?';
+  if (elapsed < 0) return "?";
   if (elapsed < 60) return `${elapsed}s`;
   const mins = Math.floor(elapsed / 60);
   if (mins < 60) return `${mins}m`;
@@ -41,13 +41,16 @@ function formatDuration(isoTimestamp) {
  * @returns {string} Colored bar string
  */
 function buildContextBar(remaining) {
-  if (remaining === null || remaining === undefined) return '';
+  if (remaining === null || remaining === undefined) return "";
 
-  const usableRemaining = Math.max(0, ((remaining - AUTO_COMPACT_BUFFER_PCT) / (100 - AUTO_COMPACT_BUFFER_PCT)) * 100);
+  const usableRemaining = Math.max(
+    0,
+    ((remaining - AUTO_COMPACT_BUFFER_PCT) / (100 - AUTO_COMPACT_BUFFER_PCT)) * 100,
+  );
   const used = Math.max(0, Math.min(100, Math.round(100 - usableRemaining)));
 
   const filled = Math.floor(used / 10);
-  const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(10 - filled);
+  const bar = "\u2588".repeat(filled) + "\u2591".repeat(10 - filled);
 
   if (used < 50) return ` \x1b[32m${bar} ${used}%\x1b[0m`;
   if (used < 65) return ` \x1b[33m${bar} ${used}%\x1b[0m`;
@@ -63,44 +66,44 @@ function buildContextBar(remaining) {
 function readCurrentTask(sessionId) {
   try {
     const safeSessionId = sanitizeSessionId(sessionId);
-    if (!safeSessionId) return '';
+    if (!safeSessionId) return "";
 
-    const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
-    const todosDir = path.join(claudeDir, 'todos');
-    if (!fs.existsSync(todosDir)) return '';
+    const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), ".claude");
+    const todosDir = path.join(claudeDir, "todos");
+    if (!fs.existsSync(todosDir)) return "";
 
     const files = fs
       .readdirSync(todosDir)
-      .filter(f => f.startsWith(safeSessionId) && f.includes('-agent-') && f.endsWith('.json'))
-      .map(f => ({ name: f, mtime: fs.statSync(path.join(todosDir, f)).mtime }))
+      .filter((f) => f.startsWith(safeSessionId) && f.includes("-agent-") && f.endsWith(".json"))
+      .map((f) => ({ name: f, mtime: fs.statSync(path.join(todosDir, f)).mtime }))
       .sort((a, b) => b.mtime - a.mtime);
 
-    if (files.length === 0) return '';
+    if (files.length === 0) return "";
 
-    const todos = JSON.parse(fs.readFileSync(path.join(todosDir, files[0].name), 'utf8'));
-    const inProgress = todos.find(t => t.status === 'in_progress');
-    return inProgress?.activeForm || '';
+    const todos = JSON.parse(fs.readFileSync(path.join(todosDir, files[0].name), "utf8"));
+    const inProgress = todos.find((t) => t.status === "in_progress");
+    return inProgress?.activeForm || "";
   } catch {
-    return '';
+    return "";
   }
 }
 
 function runStatusline() {
-  let input = '';
+  let input = "";
   const stdinTimeout = setTimeout(() => process.exit(0), 3000);
-  process.stdin.setEncoding('utf8');
-  process.stdin.on('data', chunk => {
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => {
     if (input.length < MAX_STDIN) {
       input += chunk.substring(0, MAX_STDIN - input.length);
     }
   });
-  process.stdin.on('end', () => {
+  process.stdin.on("end", () => {
     clearTimeout(stdinTimeout);
     try {
       const data = JSON.parse(input);
-      const model = data.model?.display_name || 'Claude';
+      const model = data.model?.display_name || "Claude";
       const dir = data.workspace?.current_dir || process.cwd();
-      const session = data.session_id || '';
+      const session = data.session_id || "";
       const remaining = data.context_window?.remaining_percentage;
 
       const sessionId = sanitizeSessionId(session);
@@ -117,10 +120,10 @@ function runStatusline() {
       }
 
       // Current task
-      const task = sessionId ? readCurrentTask(sessionId) : '';
+      const task = sessionId ? readCurrentTask(sessionId) : "";
 
       // Metrics from bridge
-      let metricsStr = '';
+      let metricsStr = "";
       if (bridge) {
         const parts = [];
         if (bridge.total_cost_usd > 0) {
@@ -133,11 +136,11 @@ function runStatusline() {
           parts.push(`${bridge.files_modified_count}f`);
         }
         const dur = formatDuration(bridge.first_timestamp);
-        if (dur !== '?') {
+        if (dur !== "?") {
           parts.push(dur);
         }
         if (parts.length > 0) {
-          metricsStr = `\x1b[38;5;117m${parts.join(' ')}\x1b[0m`;
+          metricsStr = `\x1b[38;5;117m${parts.join(" ")}\x1b[0m`;
         }
       }
 
@@ -156,7 +159,7 @@ function runStatusline() {
       }
       segments.push(`\x1b[2m${dirname}\x1b[0m`);
 
-      process.stdout.write(segments.join(' \x1b[2m\u2502\x1b[0m ') + ctx);
+      process.stdout.write(segments.join(" \x1b[2m\u2502\x1b[0m ") + ctx);
     } catch {
       // Silent fail
     }

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Shared session bridge utilities for ECC hooks.
@@ -8,10 +8,10 @@
  * without scanning large JSONL logs on every invocation.
  */
 
-const crypto = require('crypto');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const crypto = require("crypto");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 
 const MAX_SESSION_ID_LENGTH = 64;
 
@@ -22,9 +22,9 @@ const MAX_SESSION_ID_LENGTH = 64;
  * @returns {string|null} Safe session ID or null if invalid
  */
 function sanitizeSessionId(raw) {
-  if (!raw || typeof raw !== 'string') return null;
+  if (!raw || typeof raw !== "string") return null;
   if (/[/\\]|\.\./.test(raw)) return null;
-  const safe = raw.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, MAX_SESSION_ID_LENGTH);
+  const safe = raw.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, MAX_SESSION_ID_LENGTH);
   return safe || null;
 }
 
@@ -44,7 +44,7 @@ function getBridgePath(sessionId) {
  */
 function readBridge(sessionId) {
   try {
-    const raw = fs.readFileSync(getBridgePath(sessionId), 'utf8');
+    const raw = fs.readFileSync(getBridgePath(sessionId), "utf8");
     return JSON.parse(raw);
   } catch {
     return null;
@@ -73,12 +73,16 @@ function readBridge(sessionId) {
  */
 function writeBridgeAtomic(sessionId, data) {
   const target = getBridgePath(sessionId);
-  const tmp = `${target}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify(data), 'utf8');
+  const tmp = `${target}.${process.pid}.${crypto.randomBytes(4).toString("hex")}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(data), "utf8");
   try {
     renameWithRetry(tmp, target);
   } catch (err) {
-    try { fs.unlinkSync(tmp); } catch { /* ignore */ }
+    try {
+      fs.unlinkSync(tmp);
+    } catch {
+      /* ignore */
+    }
     throw err;
   }
 }
@@ -105,7 +109,7 @@ function writeBridgeAtomic(sessionId, data) {
  * @param {string} target
  */
 function renameWithRetry(tmp, target) {
-  const RETRY_CODES = new Set(['EPERM', 'EACCES', 'EBUSY']);
+  const RETRY_CODES = new Set(["EPERM", "EACCES", "EBUSY"]);
   const MAX_ATTEMPTS = 5;
   for (let attempt = 0; ; attempt++) {
     try {
@@ -122,7 +126,9 @@ function renameWithRetry(tmp, target) {
         // Atomics.wait throws on the main thread in some older runtimes;
         // fall back to a brief busy-wait so the retry path still has a delay.
         const until = Date.now() + delayMs;
-        while (Date.now() < until) { /* spin */ }
+        while (Date.now() < until) {
+          /* spin */
+        }
       }
     }
   }
@@ -133,7 +139,7 @@ function renameWithRetry(tmp, target) {
  * @returns {string|null} Sanitized session ID or null
  */
 function resolveSessionId() {
-  const raw = process.env.ECC_SESSION_ID || process.env.CLAUDE_SESSION_ID || '';
+  const raw = process.env.ECC_SESSION_ID || process.env.CLAUDE_SESSION_ID || "";
   return sanitizeSessionId(raw);
 }
 
@@ -144,5 +150,5 @@ module.exports = {
   writeBridgeAtomic,
   renameWithRetry,
   resolveSessionId,
-  MAX_SESSION_ID_LENGTH
+  MAX_SESSION_ID_LENGTH,
 };

@@ -1,27 +1,27 @@
 #!/usr/bin/env node
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
-const { spawnSync } = require('child_process');
-const { ensureAgentDataHomeEnv } = require('../lib/agent-data-home');
+const fs = require("fs");
+const path = require("path");
+const { spawnSync } = require("child_process");
+const { ensureAgentDataHomeEnv } = require("../lib/agent-data-home");
 
 function readStdinRaw() {
   try {
-    return fs.readFileSync(0, 'utf8');
+    return fs.readFileSync(0, "utf8");
   } catch (_error) {
-    return '';
+    return "";
   }
 }
 
 function writeStderr(stderr) {
-  if (typeof stderr === 'string' && stderr.length > 0) {
+  if (typeof stderr === "string" && stderr.length > 0) {
     process.stderr.write(stderr);
   }
 }
 
 function passthrough(raw, result) {
-  const stdout = typeof result?.stdout === 'string' ? result.stdout : '';
+  const stdout = typeof result?.stdout === "string" ? result.stdout : "";
   if (stdout) {
     process.stdout.write(stdout);
     return;
@@ -33,7 +33,7 @@ function passthrough(raw, result) {
 }
 
 function normalizePluginRootForPlatform(rootDir, platform = process.platform) {
-  if (platform !== 'win32' || typeof rootDir !== 'string') {
+  if (platform !== "win32" || typeof rootDir !== "string") {
     return rootDir;
   }
 
@@ -42,17 +42,14 @@ function normalizePluginRootForPlatform(rootDir, platform = process.platform) {
     return rootDir;
   }
 
-  const [, driveLetter, rest = ''] = match;
+  const [, driveLetter, rest = ""] = match;
   return `${driveLetter.toUpperCase()}:/${rest}`;
 }
 
 function resolveTarget(rootDir, relPath) {
   const resolvedRoot = path.resolve(rootDir);
   const resolvedTarget = path.resolve(rootDir, relPath);
-  if (
-    resolvedTarget !== resolvedRoot &&
-    !resolvedTarget.startsWith(resolvedRoot + path.sep)
-  ) {
+  if (resolvedTarget !== resolvedRoot && !resolvedTarget.startsWith(resolvedRoot + path.sep)) {
     throw new Error(`Path traversal rejected: ${relPath}`);
   }
   return resolvedTarget;
@@ -63,7 +60,9 @@ let _cachedBash = undefined;
 
 function isPowerShellBin(bin) {
   const base = path.basename(bin).toLowerCase();
-  return base === 'pwsh.exe' || base === 'pwsh' || base === 'powershell.exe' || base === 'powershell';
+  return (
+    base === "pwsh.exe" || base === "pwsh" || base === "powershell.exe" || base === "powershell"
+  );
 }
 
 function findShellBinary() {
@@ -78,22 +77,22 @@ function findShellBinary() {
     candidates.push(process.env.BASH.trim());
   }
 
-  if (process.platform === 'win32') {
+  if (process.platform === "win32") {
     // Prefer PowerShell on Windows — it is native and does not leave zombie
     // bash.exe / conhost.exe processes the way MSYS2/Git Bash does.
     // Note: PowerShell is only suitable for .ps1 scripts; callers that need
     // to run .sh scripts (e.g. observe-runner.js) must not use this function.
-    candidates.push('pwsh.exe', 'powershell.exe', 'bash.exe', 'bash');
+    candidates.push("pwsh.exe", "powershell.exe", "bash.exe", "bash");
   } else {
-    candidates.push('bash', 'sh');
+    candidates.push("bash", "sh");
   }
 
-  const psProbeArgs = ['-NoProfile', '-NonInteractive', '-Command', 'exit 0'];
-  const shProbeArgs = ['-c', ':'];
+  const psProbeArgs = ["-NoProfile", "-NonInteractive", "-Command", "exit 0"];
+  const shProbeArgs = ["-c", ":"];
 
   for (const candidate of candidates) {
     const probe = spawnSync(candidate, isPowerShellBin(candidate) ? psProbeArgs : shProbeArgs, {
-      stdio: 'ignore',
+      stdio: "ignore",
       windowsHide: true,
       timeout: 30000,
     });
@@ -117,10 +116,14 @@ function findBashBinary() {
   if (process.env.BASH && process.env.BASH.trim() && !isPowerShellBin(process.env.BASH.trim())) {
     candidates.push(process.env.BASH.trim());
   }
-  candidates.push('bash.exe', 'bash');
+  candidates.push("bash.exe", "bash");
 
   for (const candidate of candidates) {
-    const probe = spawnSync(candidate, ['-c', ':'], { stdio: 'ignore', windowsHide: true, timeout: 30000 });
+    const probe = spawnSync(candidate, ["-c", ":"], {
+      stdio: "ignore",
+      windowsHide: true,
+      timeout: 30000,
+    });
     // Require a clean exit, not just a successful spawn: the Windows System32
     // bash.exe WSL stub spawns fine but exits non-zero with no distro installed.
     if (!probe.error && probe.status === 0) {
@@ -142,7 +145,7 @@ function spawnNode(rootDir, relPath, raw, args) {
   };
   return spawnSync(process.execPath, [resolveTarget(rootDir, relPath), ...args], {
     input: raw,
-    encoding: 'utf8',
+    encoding: "utf8",
     env: hookEnv,
     cwd: process.cwd(),
     timeout: 30000,
@@ -159,8 +162,8 @@ function spawnShell(rootDir, relPath, raw, args) {
   if (!shell) {
     return {
       status: 0,
-      stdout: '',
-      stderr: '[Hook] shell runtime unavailable; skipping shell-backed hook\n',
+      stdout: "",
+      stderr: "[Hook] shell runtime unavailable; skipping shell-backed hook\n",
     };
   }
 
@@ -175,18 +178,18 @@ function spawnShell(rootDir, relPath, raw, args) {
 
   // PowerShell cannot interpret bash scripts — fall back to a bash candidate
   // rather than silently failing the hook.
-  if (isPs && scriptPath.endsWith('.sh')) {
+  if (isPs && scriptPath.endsWith(".sh")) {
     const bash = findBashBinary();
     if (!bash) {
       return {
         status: 0,
-        stdout: '',
-        stderr: '[Hook] .sh script requested but no bash binary found on Windows; skipping\n',
+        stdout: "",
+        stderr: "[Hook] .sh script requested but no bash binary found on Windows; skipping\n",
       };
     }
     return spawnSync(bash, [scriptPath, ...args], {
       input: raw,
-      encoding: 'utf8',
+      encoding: "utf8",
       env: hookEnv,
       cwd: process.cwd(),
       timeout: 30000,
@@ -195,14 +198,14 @@ function spawnShell(rootDir, relPath, raw, args) {
   }
 
   const shellArgs = isPs
-    // -ExecutionPolicy Bypass: default Windows policy (Restricted) blocks -File
-    // execution of .ps1 scripts; Bypass scopes only to this child process.
-    ? ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', scriptPath, ...args]
+    ? // -ExecutionPolicy Bypass: default Windows policy (Restricted) blocks -File
+      // execution of .ps1 scripts; Bypass scopes only to this child process.
+      ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", scriptPath, ...args]
     : [scriptPath, ...args];
 
   return spawnSync(shell, shellArgs, {
     input: raw,
-    encoding: 'utf8',
+    encoding: "utf8",
     env: hookEnv,
     cwd: process.cwd(),
     timeout: 30000,
@@ -214,7 +217,7 @@ function main() {
   const [, , mode, relPath, ...args] = process.argv;
   const raw = readStdinRaw();
   const rootDir = normalizePluginRootForPlatform(
-    process.env.CLAUDE_PLUGIN_ROOT || process.env.ECC_PLUGIN_ROOT
+    process.env.CLAUDE_PLUGIN_ROOT || process.env.ECC_PLUGIN_ROOT,
   );
 
   if (!mode || !relPath || !rootDir) {
@@ -224,9 +227,9 @@ function main() {
 
   let result;
   try {
-    if (mode === 'node') {
+    if (mode === "node") {
       result = spawnNode(rootDir, relPath, raw, args);
-    } else if (mode === 'shell') {
+    } else if (mode === "shell") {
       result = spawnShell(rootDir, relPath, raw, args);
     } else {
       writeStderr(`[Hook] unknown bootstrap mode: ${mode}\n`);
@@ -247,7 +250,7 @@ function main() {
       ? result.error.message
       : result.signal
         ? `terminated by signal ${result.signal}`
-        : 'missing exit status';
+        : "missing exit status";
     writeStderr(`[Hook] bootstrap execution failed: ${reason}\n`);
     process.exit(0);
   }

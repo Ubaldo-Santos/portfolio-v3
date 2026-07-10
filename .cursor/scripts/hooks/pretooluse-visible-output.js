@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-'use strict';
+"use strict";
 
 function normalizeAdditionalContext(value) {
   if (Array.isArray(value)) {
     return value
-      .map(item => String(item || '').trim())
+      .map((item) => String(item || "").trim())
       .filter(Boolean)
-      .join('\n');
+      .join("\n");
   }
 
-  return String(value || '').trim();
+  return String(value || "").trim();
 }
 
 function combineAdditionalContext(current, next) {
@@ -24,11 +24,11 @@ function combineAdditionalContext(current, next) {
 
 function buildPreToolUseAdditionalContext(value) {
   const additionalContext = normalizeAdditionalContext(value);
-  if (!additionalContext) return '';
+  if (!additionalContext) return "";
 
   return JSON.stringify({
     hookSpecificOutput: {
-      hookEventName: 'PreToolUse',
+      hookEventName: "PreToolUse",
       additionalContext,
     },
   });

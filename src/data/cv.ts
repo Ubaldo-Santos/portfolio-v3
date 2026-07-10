@@ -1,13 +1,12 @@
-// CV business data. Keep portfolio UI labels, SEO copy and helper text in src/i18n/translations.ts.
+// Single source of truth for CV facts and all portfolio copy (narrative, SEO, page subtitles).
 //
 // This is intentionally a TypeScript "JSON-like" object instead of a .json file:
 // - comments explain each field for humans and AI agents generating CV content;
 // - TypeScript validates the shape at build time;
-// - all translatable CV content uses { es, ca, en } so the same data powers every language.
+// - all translatable content uses { es, ca, en } so the same data powers every language.
 //
-// Editing rule of thumb:
-// - Put facts about the person, companies, projects, education and skills here.
-// - Put button labels, section titles, page subtitles and interface descriptions in translations.ts.
+// UI chrome only (nav labels, buttons, a11y, errors) lives in src/i18n/translations.ts.
+// Use {{years}} where copy should reflect careerStartDate automatically (via withYears()).
 
 export type Lang = "es" | "ca" | "en";
 export type LocalizedString = Record<Lang, string>;
@@ -58,6 +57,14 @@ export interface EducationItem {
   summary: LocalizedString;
 }
 
+export type CvMetaPage = "home" | "experience" | "projects" | "skills" | "contact" | "cv";
+
+export interface MetaPageCopy {
+  title: LocalizedString;
+  description: LocalizedString;
+  ogDescription: LocalizedString;
+}
+
 export const cv = {
   basics: {
     name: "Ubaldo Santos Patón",
@@ -68,22 +75,31 @@ export const cv = {
       ca: "Enginyer de Programari Full-Stack · TypeScript · PHP · Laravel · Vue",
       en: "Full-Stack Software Engineer · TypeScript · PHP · Laravel · Vue",
     } satisfies LocalizedString,
+    /** First professional role — used to compute years of experience automatically. */
+    careerStartDate: "2020-06-01",
     tagline: {
+      /** Hero lead — home “Qué hago” block + OG card first line. */
       lead: {
-        es: "Ingeniero full-stack con 6+ años construyendo producto escalable.",
-        ca: "Enginyer full-stack amb més de 6 anys construint producte escalable.",
-        en: "Full-stack engineer with 6+ years shipping scalable product.",
-      },
+        es: "Ingeniero full-stack con {{years}} años de experiencia.",
+        ca: "Enginyer full-stack amb {{years}} anys d'experiència.",
+        en: "Full-stack engineer with {{years}} years of experience.",
+      } satisfies LocalizedString,
+      /** Short Wiris team arc — OG card + og:description on home. */
+      ogBriefing: {
+        es: "@WIRIS. Construyendo Nubric con el equipo Assessment. Anteriormente en el equipo de integraciones de MathType.",
+        ca: "@WIRIS. Construint Nubric amb l'equip Assessment. Anteriorment a l'equip d'integracions de MathType.",
+        en: "@WIRIS. Building Nubric with the Assessment team. Previously on the MathType Integrations team.",
+      } satisfies LocalizedString,
       detail: {
-        es: "En Wiris desarrollo Nubric en Assessment; antes integraciones MathType en Google Workspace, Office add-ins, Moodle y editores WYSIWYG. Antes lideré la transformación digital en Rotrafu (+50K servicios, −35% load time).",
-        ca: "A Wiris desenvolupo Nubric a Assessment; abans integracions MathType a Google Workspace, Office add-ins, Moodle i editors WYSIWYG. Abans vaig liderar la transformació digital a Rotrafu (+50K serveis, −35% temps de càrrega).",
-        en: "At Wiris I build Nubric on Assessment; previously MathType integrations across Google Workspace, Office add-ins, Moodle and WYSIWYG editors. Before that I led digital transformation at Rotrafu (50K+ services, −35% load time).",
-      },
+        es: "En Wiris estoy construyendo Nubric con el equipo Assessment. Previamente en el equipo de integraciones de MathType, integré MathType en Google Workspace, Office add-ins, Moodle y editores WYSIWYG. Anteriormente lideré la transformación digital en Rotrafu (+50K servicios, −35% load time).",
+        ca: "A Wiris estic construint Nubric amb l'equip Assessment. Prèviament a l'equip d'integracions de MathType, vaig integrar MathType a Google Workspace, Office add-ins, Moodle i editors WYSIWYG. Anteriorment vaig liderar la transformació digital a Rotrafu (+50K serveis, −35% temps de càrrega).",
+        en: "At Wiris I'm building Nubric with the Assessment team. Previously on the MathType Integrations team, I integrated MathType across Google Workspace, Office add-ins, Moodle and WYSIWYG editors. Earlier I led digital transformation at Rotrafu (50K+ services, −35% load time).",
+      } satisfies LocalizedString,
     },
     summary: {
-      es: "Ingeniero de Software Full-Stack con 6+ años de experiencia en producto. Especializado en TypeScript/JavaScript y PHP/Laravel, con foco en arquitectura mantenible (hexagonal, DDD, SOLID), calidad de código y rendimiento. En Wiris desarrollo Nubric en el equipo Assessment y, antes, integraciones MathType en Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author y más editores. En Rotrafu escalé la aplicación principal a más de 50.000 servicios activos, reduje tiempos de carga un 35% y lideré ROTRAFU 2.0.",
-      ca: "Enginyer de Programari Full-Stack amb més de 6 anys d'experiència en producte. Especialitzat en TypeScript/JavaScript i PHP/Laravel, amb focus en arquitectura mantenible (hexagonal, DDD, SOLID), qualitat de codi i rendiment. A Wiris desenvolupo Nubric a l'equip Assessment i, abans, integracions MathType a Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author i més editors. A Rotrafu vaig escalar l'aplicació principal a més de 50.000 serveis actius, vaig reduir temps de càrrega un 35% i vaig liderar ROTRAFU 2.0.",
-      en: "Full-Stack Software Engineer with 6+ years of product experience. Specialized in TypeScript/JavaScript and PHP/Laravel, focused on maintainable architecture (hexagonal, DDD, SOLID), code quality and performance. At Wiris I build Nubric on the Assessment team and, previously, MathType integrations across Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author and more editors. At Rotrafu I scaled the main application to 50,000+ active services, cut load times by 35% and led ROTRAFU 2.0.",
+      es: "Ingeniero de Software Full-Stack con {{years}} años de experiencia en producto. Especializado en TypeScript/JavaScript y PHP/Laravel, con foco en arquitectura mantenible (hexagonal, DDD, SOLID), calidad de código y rendimiento. En Wiris estoy construyendo Nubric con el equipo Assessment; previamente en el equipo de integraciones de MathType integré MathType en Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author y más editores. En Rotrafu escalé la aplicación principal a más de 50.000 servicios activos, reduje tiempos de carga un 35% y lideré ROTRAFU 2.0.",
+      ca: "Enginyer de Programari Full-Stack amb {{years}} anys d'experiència en producte. Especialitzat en TypeScript/JavaScript i PHP/Laravel, amb focus en arquitectura mantenible (hexagonal, DDD, SOLID), qualitat de codi i rendiment. A Wiris estic construint Nubric amb l'equip Assessment; prèviament a l'equip d'integracions de MathType vaig integrar MathType a Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author i més editors. A Rotrafu vaig escalar l'aplicació principal a més de 50.000 serveis actius, vaig reduir temps de càrrega un 35% i vaig liderar ROTRAFU 2.0.",
+      en: "Full-Stack Software Engineer with {{years}} years of product experience. Specialized in TypeScript/JavaScript and PHP/Laravel, focused on maintainable architecture (hexagonal, DDD, SOLID), code quality and performance. At Wiris I'm building Nubric with the Assessment team; previously on the MathType Integrations team, I integrated MathType across Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author and more editors. At Rotrafu I scaled the main application to 50,000+ active services, cut load times by 35% and led ROTRAFU 2.0.",
     } satisfies LocalizedString,
     email: "u.santospaton@gmail.com",
     phone: "+34 654 455 339",
@@ -562,8 +578,8 @@ export const cv = {
       frontend: ["TypeScript", "Vue"],
     },
     languages: ["TypeScript", "JavaScript", "PHP", "C#"],
-    backend: ["Laravel", "Deno", "Node.js", "REST", "OpenAPI"],
-    frontend: ["Vue.js", "HTML5", "CSS3", "Tailwind CSS"],
+    backend: ["Laravel", "Deno", "Node", "REST", "OpenAPI", "AI"],
+    frontend: ["Vue", "HTML5", "CSS3", "Tailwind CSS"],
     edtech: [
       "MathType",
       "Google Workspace",
@@ -581,9 +597,10 @@ export const cv = {
       "TypeScript",
       "PHP",
       "Laravel",
-      "Vue.js",
+      "Vue",
       "Deno",
-      "Node.js",
+      "Node",
+      "AI",
       "Docker",
       "Git",
       "MathType",
@@ -594,6 +611,208 @@ export const cv = {
       "CI/CD",
       "OpenAPI",
       "Electron",
+    ],
+  },
+  copy: {
+    pages: {
+      home: {
+        selectedWorkSub: {
+          es: "Roles donde he entregado producto con impacto medible.",
+          ca: "Rols on he lliurat producte amb impacte mesurable.",
+          en: "Roles where I've shipped product with measurable impact.",
+        },
+      },
+      experience: {
+        subtitle: {
+          es: "{{years}} años construyendo producto escalable con impacto medible.",
+          ca: "{{years}} anys construint producte escalable amb impacte mesurable.",
+          en: "{{years}} years building scalable product with measurable impact.",
+        },
+      },
+      projects: {
+        subtitle: {
+          es: "Producto en producción y technical assessments verificables.",
+          ca: "Producte en producció i technical assessments verificables.",
+          en: "Production product and verifiable technical assessments.",
+        },
+      },
+      skills: {
+        subtitle: {
+          es: "Stack verificado, prácticas de ingeniería e idiomas.",
+          ca: "Stack verificat, pràctiques d'enginyeria i idiomes.",
+          en: "Verified stack, engineering practices and languages.",
+        },
+      },
+      contact: {
+        subtitle: {
+          es: "Cuéntame en qué estás trabajando.",
+          ca: "Explica'm en què estàs treballant.",
+          en: "Tell me what you're working on.",
+        },
+        availability: {
+          es: "Respondo en menos de 24 h en días laborables.",
+          ca: "Responc en menys de 24 h en dies laborables.",
+          en: "I reply within 24 h on business days.",
+        },
+        preferred: {
+          es: "Preferiblemente por email para conversaciones técnicas; LinkedIn para presentaciones.",
+          ca: "Preferiblement per correu per a converses tècniques; LinkedIn per a presentacions.",
+          en: "Email is best for technical conversations; LinkedIn for intros.",
+        },
+      },
+      cv: {
+        subtitle: {
+          es: "Versión optimizada para impresión y parsers ATS.",
+          ca: "Versió optimitzada per a impressió i parsers ATS.",
+          en: "Optimized for print and ATS parsers.",
+        },
+        printHint: {
+          es: "Pulsa imprimir y guarda como PDF.",
+          ca: "Prem imprimir i desa com a PDF.",
+          en: "Hit print and save as PDF.",
+        },
+      },
+    },
+    meta: {
+      keywords:
+        "Ubaldo Santos, Ubaldo Santos Patón, full-stack engineer, TypeScript, PHP, Laravel, Vue, Wiris, Nubric, Barcelona, MathType, AI, Copilot, Cursor, OpenRouter, MCP",
+      pages: {
+        home: {
+          title: {
+            es: "Ubaldo Santos Patón — Full-Stack Software Engineer",
+            ca: "Ubaldo Santos Patón — Full-Stack Software Engineer",
+            en: "Ubaldo Santos Patón — Full-Stack Software Engineer",
+          },
+          description: {
+            es: "Ingeniero full-stack con {{years}} años en producto. En Wiris: equipo Assessment (Nubric); antes Integraciones (MathType en Google Workspace, Office, Moodle, WYSIWYG). Ex-Rotrafu (+50K servicios).",
+            ca: "Enginyer full-stack amb {{years}} anys en producte. A Wiris: equip Assessment (Nubric); abans Integracions (MathType a Google Workspace, Office, Moodle, WYSIWYG). Ex-Rotrafu (+50K serveis).",
+            en: "Full-stack engineer with {{years}} years in product. At Wiris: Assessment team (Nubric); previously Integrations (MathType across Google Workspace, Office, Moodle, WYSIWYG). Ex-Rotrafu (50K+ services).",
+          },
+          ogDescription: {
+            es: "En Wiris estoy construyendo Nubric con el equipo Assessment. Previamente en el equipo de integraciones de MathType.",
+            ca: "A Wiris estic construint Nubric amb l'equip Assessment. Prèviament a l'equip d'integracions de MathType.",
+            en: "At Wiris I'm building Nubric with the Assessment team. Previously on the MathType Integrations team.",
+          },
+        },
+        experience: {
+          title: {
+            es: "Experiencia — Ubaldo Santos Patón",
+            ca: "Experiència — Ubaldo Santos Patón",
+            en: "Experience — Ubaldo Santos Patón",
+          },
+          description: {
+            es: "{{years}} años en producto: Wiris (Assessment & MathType Integrations), Rotrafu (+50K servicios, −35% load time), Prime IT, iThinkUPC.",
+            ca: "{{years}} anys en producte: Wiris (Assessment & MathType Integrations), Rotrafu (+50K serveis, −35% temps de càrrega), Prime IT, iThinkUPC.",
+            en: "{{years}} years in product: Wiris (Assessment & MathType Integrations), Rotrafu (50K+ services, −35% load time), Prime IT, iThinkUPC.",
+          },
+          ogDescription: {
+            es: "Trayectoria en producto e ingeniería.",
+            ca: "Trajectòria en producte i enginyeria.",
+            en: "Trajectory in product and engineering.",
+          },
+        },
+        projects: {
+          title: {
+            es: "Proyectos — Ubaldo Santos Patón",
+            ca: "Projectes — Ubaldo Santos Patón",
+            en: "Projects — Ubaldo Santos Patón",
+          },
+          description: {
+            es: "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 y technical assessments en GitHub.",
+            ca: "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 i technical assessments a GitHub.",
+            en: "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 and verifiable GitHub technical assessments.",
+          },
+          ogDescription: {
+            es: "Producto real y proyectos de aprendizaje verificables.",
+            ca: "Producte real i projectes d'aprenentatge verificables.",
+            en: "Production product and verifiable learning projects.",
+          },
+        },
+        skills: {
+          title: {
+            es: "Skills & IA — Ubaldo Santos Patón",
+            ca: "Skills & IA — Ubaldo Santos Patón",
+            en: "Skills & AI — Ubaldo Santos Patón",
+          },
+          description: {
+            es: "Stack verificado: TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), arquitectura hexagonal, DevOps e IA aplicada.",
+            ca: "Stack verificat: TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), arquitectura hexagonal, DevOps i IA aplicada.",
+            en: "Verified stack: TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), hexagonal architecture, DevOps and applied AI.",
+          },
+          ogDescription: {
+            es: "Stack, prácticas e IA aplicada en producto.",
+            ca: "Stack, pràctiques i IA aplicada en producte.",
+            en: "Stack, practices and AI applied in product.",
+          },
+        },
+        cv: {
+          title: {
+            es: "CV — Ubaldo Santos Patón",
+            ca: "CV — Ubaldo Santos Patón",
+            en: "CV — Ubaldo Santos Patón",
+          },
+          description: {
+            es: "Curriculum imprimible y optimizado para parsers ATS de Ubaldo Santos Patón.",
+            ca: "Currículum imprimible i optimitzat per a parsers ATS d'Ubaldo Santos Patón.",
+            en: "Printable, ATS-friendly résumé of Ubaldo Santos Patón.",
+          },
+          ogDescription: {
+            es: "Pulsa imprimir y guarda como PDF.",
+            ca: "Prem imprimir i desa com a PDF.",
+            en: "Hit print and save as PDF.",
+          },
+        },
+        contact: {
+          title: {
+            es: "Contacto — Ubaldo Santos Patón",
+            ca: "Contacte — Ubaldo Santos Patón",
+            en: "Contact — Ubaldo Santos Patón",
+          },
+          description: {
+            es: "Contacta con Ubaldo Santos Patón: email, teléfono, LinkedIn y GitHub.",
+            ca: "Contacta amb Ubaldo Santos Patón: correu, telèfon, LinkedIn i GitHub.",
+            en: "Contact Ubaldo Santos Patón: email, phone, LinkedIn and GitHub.",
+          },
+          ogDescription: {
+            es: "Hablemos.",
+            ca: "Parlem.",
+            en: "Let's talk.",
+          },
+        },
+      } satisfies Record<CvMetaPage, MetaPageCopy>,
+    },
+    ai: {
+      kicker: {
+        es: "IA en mi día a día y en producto",
+        ca: "IA al meu dia a dia i al producte",
+        en: "AI in my workflow and in product",
+      },
+      title: {
+        es: "Skills + IA",
+        ca: "Skills + IA",
+        en: "Skills + AI",
+      },
+      body: {
+        es: "Uso IA como copiloto a diario (GitHub Copilot a nivel organización, Cursor CLI con reglas en el repo, OpenRouter para enrutar a varios modelos con fallback, MCP para conectar el modelo a datos reales). También la he integrado en producto, no solo en mi editor.",
+        ca: "Faig servir IA com a copilot a diari (GitHub Copilot a nivell d'organització, Cursor CLI amb regles al repo, OpenRouter per enrutar a diversos models amb fallback, MCP per connectar el model a dades reals). També l'he integrada en producte, no només al meu editor.",
+        en: "I use AI as a copilot daily (GitHub Copilot at the org level, Cursor CLI with rules versioned in the repo, OpenRouter to route between models with fallback, MCP to connect the model to real data). I've also shipped AI into product, not just my editor.",
+      },
+      tags: ["GitHub Copilot (org)", "Cursor CLI", "OpenRouter", "MCP", "Agent Skills"],
+    },
+  },
+  seo: {
+    knowsAbout: [
+      "TypeScript",
+      "PHP",
+      "Laravel",
+      "Vue",
+      "React",
+      "Edtech",
+      "MathType",
+      "Nubric",
+      "Arquitectura hexagonal",
+      "DevOps",
+      "IA aplicada",
     ],
   },
   languages: [

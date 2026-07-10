@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Plan Canvas artifact SDK — the script injected into the reviewed artifact.

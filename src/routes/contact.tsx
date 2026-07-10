@@ -4,6 +4,7 @@ import { Mail, Phone, MapPin, Printer, ArrowUpRight, Copy, Check } from "lucide-
 import { useState, type ReactNode } from "react";
 import { cv } from "@/data/cv";
 import { currentLang } from "@/lib/format";
+import { cvPageSubtitle, cvContactCopy } from "@/lib/cv-copy";
 import { routeHead, seoBreadcrumbs } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/reveal";
@@ -22,7 +23,7 @@ function ContactPage() {
   return (
     <MotionPage>
       <PageShell>
-        <PageHeader page="contact" subtitle={t("contact.subtitle")} />
+        <PageHeader page="contact" subtitle={cvPageSubtitle("contact", lang)} />
 
         {/* Primary email — full-width feature card */}
         <Reveal delay={0.04}>
@@ -49,7 +50,7 @@ function ContactPage() {
                   <ArrowUpRight className="size-7 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </a>
                 <p className="mt-4 max-w-md text-sm text-muted-foreground">
-                  {t("contact.availability")}
+                  {cvContactCopy("availability", lang)}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 lg:justify-end">
@@ -106,7 +107,9 @@ function ContactPage() {
             <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
               {t("contact.social")}
             </h2>
-            <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t("contact.preferred")}</p>
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+              {cvContactCopy("preferred", lang)}
+            </p>
           </Reveal>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {cv.basics.profiles.map((p, i) => (

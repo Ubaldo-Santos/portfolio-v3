@@ -1,8 +1,9 @@
 import { cv } from "@/data/cv";
-import { translations } from "@/i18n/translations";
 import codeSandboxLogo from "@/components/logo/code-sandbox.svg?url";
 import { cn } from "@/lib/utils";
-import type { OgTheme } from "@/lib/og-sizes";
+import { ogCopy } from "@/lib/og-copy";
+import { OG_LANG, type OgTheme } from "@/lib/og-sizes";
+import { OG_PALETTE, OG_TYPE, ogGap, ogGlowBackground, ogPx, ogScale } from "@/lib/og-theme";
 
 type OgCardProps = {
   width: number;
@@ -10,155 +11,129 @@ type OgCardProps = {
   theme: OgTheme;
 };
 
-const DEFAULT_LANG = "es" as const;
-
-/** Tech labels shown on OG cards — mirrors the landing ribbon subset. */
-const OG_TECH_ITEMS = cv.skills.ribbon.slice(0, 8);
-
-const PALETTE = {
-  light: {
-    background: "#FAFAF8",
-    foreground: "#2D2A26",
-    muted: "#6B6660",
-    hairline: "#E0DDD8",
-    accentA: "rgba(200, 240, 50, 0.2)",
-    accentB: "rgba(200, 240, 50, 0.08)",
-    logoFilter: undefined,
-  },
-  dark: {
-    background: "#1F1E1C",
-    foreground: "#F5F4F2",
-    muted: "#A8A5A0",
-    hairline: "#3A3835",
-    accentA: "rgba(200, 240, 50, 0.22)",
-    accentB: "rgba(200, 240, 50, 0.1)",
-    logoFilter: "invert(1)",
-  },
-} as const;
-
+/** Browser OG preview — same layout at every size; content scales to the canvas. */
 export function OgCard({ width, height, theme }: OgCardProps) {
-  const lang = DEFAULT_LANG;
-  const meta = translations[lang].meta;
-  const colors = PALETTE[theme];
+  const copy = ogCopy(OG_LANG);
+  const colors = OG_PALETTE[theme];
   const isSquare = height >= width * 0.95;
-  const scale = Math.min(width / 1200, height / (isSquare ? 1200 : 630));
-  const logoSize = Math.round(Math.max(48, Math.min(88, 72 * scale)));
-  const nameSize = Math.round(Math.max(52, Math.min(112, 96 * scale)));
-  const surnameSize = Math.round(Math.max(40, Math.min(88, 76 * scale)));
+  const scale = ogScale(width, height);
+  const padX = ogPx(48, width, height);
+  const padY = ogPx(40, width, height);
 
   return (
     <div
       data-og-ready="true"
       data-og-card
       data-og-theme={theme}
-      className="relative overflow-hidden"
+      className="relative overflow-hidden font-sans"
       style={{ width, height, backgroundColor: colors.background, color: colors.foreground }}
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute rounded-full blur-[120px]"
-        style={{
-          top: "-18%",
-          right: "-12%",
-          width: width * 0.55,
-          height: width * 0.55,
-          backgroundColor: colors.accentA,
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute rounded-full blur-[100px]"
-        style={{
-          bottom: "-8%",
-          left: "-14%",
-          width: width * 0.42,
-          height: width * 0.42,
-          backgroundColor: colors.accentB,
-        }}
+        className="pointer-events-none absolute inset-0"
+        style={{ background: ogGlowBackground(width, height, theme) }}
       />
 
       <div
-        className="relative flex h-full flex-col"
-        style={{ padding: `${Math.round(40 * scale)}px ${Math.round(48 * scale)}px` }}
+        className="relative flex h-full min-h-0 flex-col"
+        style={{ padding: `${padY}px ${padX}px` }}
       >
-        <div className="flex justify-end">
+        <div className="flex shrink-0 justify-end">
           <img
             src={codeSandboxLogo}
             alt=""
             aria-hidden
-            width={logoSize}
-            height={logoSize}
+            width={ogPx(OG_TYPE.logo, width, height)}
+            height={ogPx(OG_TYPE.logo, width, height)}
             className="shrink-0"
             style={{ filter: colors.logoFilter }}
           />
         </div>
 
         <div
-          className={cn("flex flex-1 flex-col justify-center", isSquare ? "pt-6" : "pt-2")}
-          style={{ maxWidth: isSquare ? "100%" : "78%" }}
+          className={cn(
+            "flex min-h-0 flex-1 flex-col justify-center",
+            isSquare ? "pt-4" : "pt-0",
+          )}
+          style={{ maxWidth: isSquare ? "100%" : "92%" }}
         >
           <p
-            className="font-display leading-[0.88] tracking-tight"
-            style={{ fontSize: nameSize, color: colors.foreground }}
+            className="font-display leading-[0.88]"
+            style={{
+              fontSize: ogPx(OG_TYPE.name, width, height),
+              color: colors.foreground,
+            }}
           >
             <span className="block">{cv.basics.givenName}</span>
-            <span className="font-display-italic block" style={{ color: colors.muted }}>
+            <span
+              className="font-display-italic block"
+              style={{
+                fontSize: ogPx(OG_TYPE.surname, width, height),
+                color: colors.muted,
+              }}
+            >
               {cv.basics.familyName}
             </span>
           </p>
 
           <div
             style={{
-              marginTop: Math.round(28 * scale),
-              marginBottom: Math.round(24 * scale),
-              height: 1,
+              marginTop: ogGap(28, width, height),
+              marginBottom: ogGap(24, width, height),
+              height: Math.max(1, Math.round(2 * scale)),
               width: "100%",
               backgroundColor: colors.hairline,
             }}
           />
 
           <p
-            className="font-display leading-snug text-balance"
+            className="font-display text-balance"
             style={{
-              fontSize: Math.round(Math.max(16, Math.min(28, 22 * scale))),
+              fontSize: ogPx(OG_TYPE.lead, width, height),
+              lineHeight: 1.15,
               color: colors.foreground,
             }}
           >
-            {cv.basics.tagline.lead[lang]}
+            {copy.lead}
           </p>
 
           <p
-            className="font-display leading-snug text-balance"
+            className="font-display text-balance"
             style={{
-              marginTop: Math.round(12 * scale),
-              fontSize: Math.round(Math.max(14, Math.min(24, 18 * scale))),
-              color: colors.muted,
+              marginTop: ogGap(12, width, height),
+              fontSize: ogPx(OG_TYPE.detail, width, height),
+              lineHeight: 1.2,
+              color: colors.detailMuted,
             }}
           >
-            {cv.basics.label[lang]} · {meta.siteName}
+            {copy.detail}
           </p>
 
           <p
-            className="font-mono uppercase tracking-[0.22em]"
+            className="font-mono uppercase tracking-[0.14em]"
             style={{
-              marginTop: Math.round(16 * scale),
-              fontSize: Math.round(Math.max(9, Math.min(13, 11 * scale))),
+              marginTop: ogGap(14, width, height),
+              fontSize: ogPx(OG_TYPE.tech, width, height),
+              lineHeight: 1.25,
               color: colors.muted,
             }}
           >
-            {OG_TECH_ITEMS.join(" · ")}
+            {copy.stack}
           </p>
         </div>
 
-        <div className="flex justify-end">
+        <div className="shrink-0 text-right">
           <p
-            className="font-mono uppercase tracking-[0.18em]"
+            className="font-mono tracking-tight"
             style={{
-              fontSize: Math.round(Math.max(11, Math.min(16, 13 * scale))),
-              color: colors.muted,
+              fontSize: ogPx(OG_TYPE.contact, width, height),
+              lineHeight: 1.2,
+              color: colors.accent,
             }}
           >
-            {cv.basics.url.replace(/^https?:\/\//, "")}
+            <span>{copy.linkedIn}</span>
+            <span style={{ color: colors.muted }}> · </span>
+            <span>{copy.site}</span>
           </p>
         </div>
       </div>

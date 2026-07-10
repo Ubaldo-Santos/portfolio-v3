@@ -1,19 +1,19 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const initSqlJs = require('sql.js');
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const initSqlJs = require("sql.js");
 
-const { applyMigrations, getAppliedMigrations } = require('./migrations');
-const { createQueryApi } = require('./queries');
-const { assertValidEntity, validateEntity } = require('./schema');
+const { applyMigrations, getAppliedMigrations } = require("./migrations");
+const { createQueryApi } = require("./queries");
+const { assertValidEntity, validateEntity } = require("./schema");
 
-const DEFAULT_STATE_STORE_RELATIVE_PATH = path.join('.claude', 'ecc', 'state.db');
+const DEFAULT_STATE_STORE_RELATIVE_PATH = path.join(".claude", "ecc", "state.db");
 
 function resolveStateStorePath(options = {}) {
   if (options.dbPath) {
-    if (options.dbPath === ':memory:') {
+    if (options.dbPath === ":memory:") {
       return options.dbPath;
     }
     return path.resolve(options.dbPath);
@@ -35,7 +35,7 @@ function wrapSqlJsDatabase(rawDb, dbPath) {
   let inTransaction = false;
 
   function saveToDisk() {
-    if (dbPath === ':memory:' || inTransaction) {
+    if (dbPath === ":memory:" || inTransaction) {
       return;
     }
     const data = rawDb.export();
@@ -61,7 +61,7 @@ function wrapSqlJsDatabase(rawDb, dbPath) {
       return {
         all(...positionalArgs) {
           const stmt = rawDb.prepare(sql);
-          if (positionalArgs.length === 1 && typeof positionalArgs[0] !== 'object') {
+          if (positionalArgs.length === 1 && typeof positionalArgs[0] !== "object") {
             stmt.bind([positionalArgs[0]]);
           } else if (positionalArgs.length > 1) {
             stmt.bind(positionalArgs);
@@ -77,7 +77,7 @@ function wrapSqlJsDatabase(rawDb, dbPath) {
 
         get(...positionalArgs) {
           const stmt = rawDb.prepare(sql);
-          if (positionalArgs.length === 1 && typeof positionalArgs[0] !== 'object') {
+          if (positionalArgs.length === 1 && typeof positionalArgs[0] !== "object") {
             stmt.bind([positionalArgs[0]]);
           } else if (positionalArgs.length > 1) {
             stmt.bind(positionalArgs);
@@ -93,7 +93,7 @@ function wrapSqlJsDatabase(rawDb, dbPath) {
 
         run(namedParams) {
           const stmt = rawDb.prepare(sql);
-          if (namedParams && typeof namedParams === 'object' && !Array.isArray(namedParams)) {
+          if (namedParams && typeof namedParams === "object" && !Array.isArray(namedParams)) {
             const sqlJsParams = {};
             for (const [key, value] of Object.entries(namedParams)) {
               sqlJsParams[`@${key}`] = value === undefined ? null : value;
@@ -109,17 +109,17 @@ function wrapSqlJsDatabase(rawDb, dbPath) {
 
     transaction(fn) {
       return (...args) => {
-        rawDb.run('BEGIN');
+        rawDb.run("BEGIN");
         inTransaction = true;
         try {
           const result = fn(...args);
-          rawDb.run('COMMIT');
+          rawDb.run("COMMIT");
           inTransaction = false;
           saveToDisk();
           return result;
         } catch (error) {
           try {
-            rawDb.run('ROLLBACK');
+            rawDb.run("ROLLBACK");
           } catch (_rollbackError) {
             // Transaction may already be rolled back.
           }
@@ -139,12 +139,12 @@ function wrapSqlJsDatabase(rawDb, dbPath) {
 }
 
 async function openDatabase(SQL, dbPath) {
-  if (dbPath !== ':memory:') {
+  if (dbPath !== ":memory:") {
     fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   }
 
   let rawDb;
-  if (dbPath !== ':memory:' && fs.existsSync(dbPath)) {
+  if (dbPath !== ":memory:" && fs.existsSync(dbPath)) {
     const fileBuffer = fs.readFileSync(dbPath);
     rawDb = new SQL.Database(fileBuffer);
   } else {
@@ -152,9 +152,9 @@ async function openDatabase(SQL, dbPath) {
   }
 
   const db = wrapSqlJsDatabase(rawDb, dbPath);
-  db.pragma('foreign_keys = ON');
+  db.pragma("foreign_keys = ON");
   try {
-    db.pragma('journal_mode = WAL');
+    db.pragma("journal_mode = WAL");
   } catch (_error) {
     // Some SQLite environments reject WAL for in-memory or readonly contexts.
   }

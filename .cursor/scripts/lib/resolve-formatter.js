@@ -6,11 +6,11 @@
  * quality-gate.js avoid duplicating work and filesystem lookups.
  */
 
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 
 // ── Caches (per-process, cleared on next hook invocation) ───────────
 const projectRootCache = new Map();
@@ -19,31 +19,31 @@ const binCache = new Map();
 
 // ── Config file lists (single source of truth) ─────────────────────
 
-const BIOME_CONFIGS = ['biome.json', 'biome.jsonc'];
+const BIOME_CONFIGS = ["biome.json", "biome.jsonc"];
 
 const PRETTIER_CONFIGS = [
-  '.prettierrc',
-  '.prettierrc.json',
-  '.prettierrc.js',
-  '.prettierrc.cjs',
-  '.prettierrc.mjs',
-  '.prettierrc.yml',
-  '.prettierrc.yaml',
-  '.prettierrc.toml',
-  'prettier.config.js',
-  'prettier.config.cjs',
-  'prettier.config.mjs'
+  ".prettierrc",
+  ".prettierrc.json",
+  ".prettierrc.js",
+  ".prettierrc.cjs",
+  ".prettierrc.mjs",
+  ".prettierrc.yml",
+  ".prettierrc.yaml",
+  ".prettierrc.toml",
+  "prettier.config.js",
+  "prettier.config.cjs",
+  "prettier.config.mjs",
 ];
 
-const PROJECT_ROOT_MARKERS = ['package.json', ...BIOME_CONFIGS, ...PRETTIER_CONFIGS];
+const PROJECT_ROOT_MARKERS = ["package.json", ...BIOME_CONFIGS, ...PRETTIER_CONFIGS];
 
 // ── Windows .cmd shim mapping ───────────────────────────────────────
-const WIN_CMD_SHIMS = { npx: 'npx.cmd', pnpm: 'pnpm.cmd', yarn: 'yarn.cmd', bunx: 'bunx.cmd' };
+const WIN_CMD_SHIMS = { npx: "npx.cmd", pnpm: "pnpm.cmd", yarn: "yarn.cmd", bunx: "bunx.cmd" };
 
 // ── Formatter → package name mapping ────────────────────────────────
 const FORMATTER_PACKAGES = {
-  biome: { binName: 'biome', pkgName: '@biomejs/biome' },
-  prettier: { binName: 'prettier', pkgName: 'prettier' }
+  biome: { binName: "biome", pkgName: "@biomejs/biome" },
+  prettier: { binName: "prettier", pkgName: "prettier" },
 };
 
 // ── Public helpers ──────────────────────────────────────────────────
@@ -90,19 +90,19 @@ function detectFormatter(projectRoot) {
 
   for (const cfg of BIOME_CONFIGS) {
     if (fs.existsSync(path.join(projectRoot, cfg))) {
-      formatterCache.set(projectRoot, 'biome');
-      return 'biome';
+      formatterCache.set(projectRoot, "biome");
+      return "biome";
     }
   }
 
   // Check package.json "prettier" key before config files
   try {
-    const pkgPath = path.join(projectRoot, 'package.json');
+    const pkgPath = path.join(projectRoot, "package.json");
     if (fs.existsSync(pkgPath)) {
-      const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-      if ('prettier' in pkg) {
-        formatterCache.set(projectRoot, 'prettier');
-        return 'prettier';
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+      if ("prettier" in pkg) {
+        formatterCache.set(projectRoot, "prettier");
+        return "prettier";
       }
     }
   } catch {
@@ -111,8 +111,8 @@ function detectFormatter(projectRoot) {
 
   for (const cfg of PRETTIER_CONFIGS) {
     if (fs.existsSync(path.join(projectRoot, cfg))) {
-      formatterCache.set(projectRoot, 'prettier');
-      return 'prettier';
+      formatterCache.set(projectRoot, "prettier");
+      return "prettier";
     }
   }
 
@@ -128,11 +128,11 @@ function detectFormatter(projectRoot) {
  * @returns {{ bin: string, prefix: string[] }}
  */
 function getRunnerFromPackageManager(projectRoot) {
-  const isWin = process.platform === 'win32';
-  const { getPackageManager } = require('./package-manager');
+  const isWin = process.platform === "win32";
+  const { getPackageManager } = require("./package-manager");
   const pm = getPackageManager({ projectDir: projectRoot });
-  const execCmd = pm?.config?.execCmd || 'npx';
-  const [rawBin = 'npx', ...prefix] = execCmd.split(/\s+/).filter(Boolean);
+  const execCmd = pm?.config?.execCmd || "npx";
+  const [rawBin = "npx", ...prefix] = execCmd.split(/\s+/).filter(Boolean);
   const bin = isWin ? WIN_CMD_SHIMS[rawBin] || rawBin : rawBin;
   return { bin, prefix };
 }
@@ -158,8 +158,13 @@ function resolveFormatterBin(projectRoot, formatter) {
     return null;
   }
 
-  const isWin = process.platform === 'win32';
-  const localBin = path.join(projectRoot, 'node_modules', '.bin', isWin ? `${pkg.binName}.cmd` : pkg.binName);
+  const isWin = process.platform === "win32";
+  const localBin = path.join(
+    projectRoot,
+    "node_modules",
+    ".bin",
+    isWin ? `${pkg.binName}.cmd` : pkg.binName,
+  );
 
   if (fs.existsSync(localBin)) {
     const result = { bin: localBin, prefix: [] };
@@ -186,5 +191,5 @@ module.exports = {
   findProjectRoot,
   detectFormatter,
   resolveFormatterBin,
-  clearCaches
+  clearCaches,
 };

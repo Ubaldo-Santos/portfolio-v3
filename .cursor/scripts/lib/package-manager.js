@@ -5,60 +5,60 @@
  * Supports: npm, pnpm, yarn, bun
  */
 
-const fs = require('fs');
-const path = require('path');
-const { commandExists, getClaudeDir, readFile, writeFile } = require('./utils');
+const fs = require("fs");
+const path = require("path");
+const { commandExists, getClaudeDir, readFile, writeFile } = require("./utils");
 
 // Package manager definitions
 const PACKAGE_MANAGERS = {
   npm: {
-    name: 'npm',
-    lockFile: 'package-lock.json',
-    installCmd: 'npm install',
-    runCmd: 'npm run',
-    execCmd: 'npx',
-    testCmd: 'npm test',
-    buildCmd: 'npm run build',
-    devCmd: 'npm run dev'
+    name: "npm",
+    lockFile: "package-lock.json",
+    installCmd: "npm install",
+    runCmd: "npm run",
+    execCmd: "npx",
+    testCmd: "npm test",
+    buildCmd: "npm run build",
+    devCmd: "npm run dev",
   },
   pnpm: {
-    name: 'pnpm',
-    lockFile: 'pnpm-lock.yaml',
-    installCmd: 'pnpm install',
-    runCmd: 'pnpm',
-    execCmd: 'pnpm dlx',
-    testCmd: 'pnpm test',
-    buildCmd: 'pnpm build',
-    devCmd: 'pnpm dev'
+    name: "pnpm",
+    lockFile: "pnpm-lock.yaml",
+    installCmd: "pnpm install",
+    runCmd: "pnpm",
+    execCmd: "pnpm dlx",
+    testCmd: "pnpm test",
+    buildCmd: "pnpm build",
+    devCmd: "pnpm dev",
   },
   yarn: {
-    name: 'yarn',
-    lockFile: 'yarn.lock',
-    installCmd: 'yarn',
-    runCmd: 'yarn',
-    execCmd: 'yarn dlx',
-    testCmd: 'yarn test',
-    buildCmd: 'yarn build',
-    devCmd: 'yarn dev'
+    name: "yarn",
+    lockFile: "yarn.lock",
+    installCmd: "yarn",
+    runCmd: "yarn",
+    execCmd: "yarn dlx",
+    testCmd: "yarn test",
+    buildCmd: "yarn build",
+    devCmd: "yarn dev",
   },
   bun: {
-    name: 'bun',
-    lockFile: 'bun.lockb',
-    installCmd: 'bun install',
-    runCmd: 'bun run',
-    execCmd: 'bunx',
-    testCmd: 'bun test',
-    buildCmd: 'bun run build',
-    devCmd: 'bun run dev'
-  }
+    name: "bun",
+    lockFile: "bun.lockb",
+    installCmd: "bun install",
+    runCmd: "bun run",
+    execCmd: "bunx",
+    testCmd: "bun test",
+    buildCmd: "bun run build",
+    devCmd: "bun run dev",
+  },
 };
 
 // Priority order for detection
-const DETECTION_PRIORITY = ['pnpm', 'bun', 'yarn', 'npm'];
+const DETECTION_PRIORITY = ["pnpm", "bun", "yarn", "npm"];
 
 // Config file path
 function getConfigPath() {
-  return path.join(getClaudeDir(), 'package-manager.json');
+  return path.join(getClaudeDir(), "package-manager.json");
 }
 
 /**
@@ -105,7 +105,7 @@ function detectFromLockFile(projectDir = process.cwd()) {
  * Detect package manager from package.json packageManager field
  */
 function detectFromPackageJson(projectDir = process.cwd()) {
-  const packageJsonPath = path.join(projectDir, 'package.json');
+  const packageJsonPath = path.join(projectDir, "package.json");
   const content = readFile(packageJsonPath);
 
   if (content) {
@@ -113,7 +113,7 @@ function detectFromPackageJson(projectDir = process.cwd()) {
       const pkg = JSON.parse(content);
       if (pkg.packageManager) {
         // Format: "pnpm@8.6.0" or just "pnpm"
-        const pmName = pkg.packageManager.split('@')[0];
+        const pmName = pkg.packageManager.split("@")[0];
         if (PACKAGE_MANAGERS[pmName]) {
           return pmName;
         }
@@ -169,12 +169,12 @@ function getPackageManager(options = {}) {
     return {
       name: envPm,
       config: PACKAGE_MANAGERS[envPm],
-      source: 'environment'
+      source: "environment",
     };
   }
 
   // 2. Check project-specific config
-  const projectConfigPath = path.join(projectDir, '.claude', 'package-manager.json');
+  const projectConfigPath = path.join(projectDir, ".claude", "package-manager.json");
   const projectConfig = readFile(projectConfigPath);
   if (projectConfig) {
     try {
@@ -183,7 +183,7 @@ function getPackageManager(options = {}) {
         return {
           name: config.packageManager,
           config: PACKAGE_MANAGERS[config.packageManager],
-          source: 'project-config'
+          source: "project-config",
         };
       }
     } catch {
@@ -197,7 +197,7 @@ function getPackageManager(options = {}) {
     return {
       name: fromPackageJson,
       config: PACKAGE_MANAGERS[fromPackageJson],
-      source: 'package.json'
+      source: "package.json",
     };
   }
 
@@ -207,17 +207,21 @@ function getPackageManager(options = {}) {
     return {
       name: fromLockFile,
       config: PACKAGE_MANAGERS[fromLockFile],
-      source: 'lock-file'
+      source: "lock-file",
     };
   }
 
   // 5. Check global user preference
   const globalConfig = loadConfig();
-  if (globalConfig && globalConfig.packageManager && PACKAGE_MANAGERS[globalConfig.packageManager]) {
+  if (
+    globalConfig &&
+    globalConfig.packageManager &&
+    PACKAGE_MANAGERS[globalConfig.packageManager]
+  ) {
     return {
       name: globalConfig.packageManager,
       config: PACKAGE_MANAGERS[globalConfig.packageManager],
-      source: 'global-config'
+      source: "global-config",
     };
   }
 
@@ -229,9 +233,9 @@ function getPackageManager(options = {}) {
   // Steps 1-5 already cover all config-based and file-based detection.
   // If none matched, npm is the safe default.
   return {
-    name: 'npm',
+    name: "npm",
     config: PACKAGE_MANAGERS.npm,
-    source: 'default'
+    source: "default",
   };
 }
 
@@ -264,12 +268,12 @@ function setProjectPackageManager(pmName, projectDir = process.cwd()) {
     throw new Error(`Unknown package manager: ${pmName}`);
   }
 
-  const configDir = path.join(projectDir, '.claude');
-  const configPath = path.join(configDir, 'package-manager.json');
+  const configDir = path.join(projectDir, ".claude");
+  const configPath = path.join(configDir, "package-manager.json");
 
   const config = {
     packageManager: pmName,
-    setAt: new Date().toISOString()
+    setAt: new Date().toISOString(),
   };
 
   try {
@@ -291,8 +295,8 @@ const SAFE_NAME_REGEX = /^[@a-zA-Z0-9_./-]+$/;
  * @throws {Error} If script name contains unsafe characters
  */
 function getRunCommand(script, options = {}) {
-  if (!script || typeof script !== 'string') {
-    throw new Error('Script name must be a non-empty string');
+  if (!script || typeof script !== "string") {
+    throw new Error("Script name must be a non-empty string");
   }
   if (!SAFE_NAME_REGEX.test(script)) {
     throw new Error(`Script name contains unsafe characters: ${script}`);
@@ -301,13 +305,13 @@ function getRunCommand(script, options = {}) {
   const pm = getPackageManager(options);
 
   switch (script) {
-    case 'install':
+    case "install":
       return pm.config.installCmd;
-    case 'test':
+    case "test":
       return pm.config.testCmd;
-    case 'build':
+    case "build":
       return pm.config.buildCmd;
-    case 'dev':
+    case "dev":
       return pm.config.devCmd;
     default:
       return `${pm.config.runCmd} ${script}`;
@@ -324,19 +328,19 @@ const SAFE_ARGS_REGEX = /^[@a-zA-Z0-9\s_./:=,'"*+-]+$/;
  * @param {string} args - Arguments to pass
  * @throws {Error} If binary name or args contain unsafe characters
  */
-function getExecCommand(binary, args = '', options = {}) {
-  if (!binary || typeof binary !== 'string') {
-    throw new Error('Binary name must be a non-empty string');
+function getExecCommand(binary, args = "", options = {}) {
+  if (!binary || typeof binary !== "string") {
+    throw new Error("Binary name must be a non-empty string");
   }
   if (!SAFE_NAME_REGEX.test(binary)) {
     throw new Error(`Binary name contains unsafe characters: ${binary}`);
   }
-  if (args && typeof args === 'string' && !SAFE_ARGS_REGEX.test(args)) {
+  if (args && typeof args === "string" && !SAFE_ARGS_REGEX.test(args)) {
     throw new Error(`Arguments contain unsafe characters: ${args}`);
   }
 
   const pm = getPackageManager(options);
-  return `${pm.config.execCmd} ${binary}${args ? ' ' + args : ''}`;
+  return `${pm.config.execCmd} ${binary}${args ? " " + args : ""}`;
 }
 
 /**
@@ -347,20 +351,20 @@ function getExecCommand(binary, args = '', options = {}) {
  * Lists all supported PMs and shows how to configure preference.
  */
 function getSelectionPrompt() {
-  let message = '[PackageManager] No package manager preference detected.\n';
-  message += 'Supported package managers: ' + Object.keys(PACKAGE_MANAGERS).join(', ') + '\n';
-  message += '\nTo set your preferred package manager:\n';
-  message += '  - Global: Set CLAUDE_PACKAGE_MANAGER environment variable\n';
+  let message = "[PackageManager] No package manager preference detected.\n";
+  message += "Supported package managers: " + Object.keys(PACKAGE_MANAGERS).join(", ") + "\n";
+  message += "\nTo set your preferred package manager:\n";
+  message += "  - Global: Set CLAUDE_PACKAGE_MANAGER environment variable\n";
   message += '  - Or add to ~/.claude/package-manager.json: {"packageManager": "pnpm"}\n';
   message += '  - Or add to package.json: {"packageManager": "pnpm@8"}\n';
-  message += '  - Or add a lock file to your project (e.g., pnpm-lock.yaml)\n';
+  message += "  - Or add a lock file to your project (e.g., pnpm-lock.yaml)\n";
 
   return message;
 }
 
 // Escape regex metacharacters in a string before interpolating into a pattern
 function escapeRegex(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 /**
@@ -373,34 +377,14 @@ function getCommandPattern(action) {
   // Trim spaces from action to handle leading/trailing whitespace gracefully
   const trimmedAction = action.trim();
 
-  if (trimmedAction === 'dev') {
-    patterns.push(
-      'npm run dev',
-      'pnpm( run)? dev',
-      'yarn dev',
-      'bun run dev'
-    );
-  } else if (trimmedAction === 'install') {
-    patterns.push(
-      'npm install',
-      'pnpm install',
-      'yarn( install)?',
-      'bun install'
-    );
-  } else if (trimmedAction === 'test') {
-    patterns.push(
-      'npm test',
-      'pnpm test',
-      'yarn test',
-      'bun test'
-    );
-  } else if (trimmedAction === 'build') {
-    patterns.push(
-      'npm run build',
-      'pnpm( run)? build',
-      'yarn build',
-      'bun run build'
-    );
+  if (trimmedAction === "dev") {
+    patterns.push("npm run dev", "pnpm( run)? dev", "yarn dev", "bun run dev");
+  } else if (trimmedAction === "install") {
+    patterns.push("npm install", "pnpm install", "yarn( install)?", "bun install");
+  } else if (trimmedAction === "test") {
+    patterns.push("npm test", "pnpm test", "yarn test", "bun test");
+  } else if (trimmedAction === "build") {
+    patterns.push("npm run build", "pnpm( run)? build", "yarn build", "bun run build");
   } else {
     // Generic run command — escape regex metacharacters in action
     const escaped = escapeRegex(trimmedAction);
@@ -408,11 +392,11 @@ function getCommandPattern(action) {
       `npm run ${escaped}`,
       `pnpm( run)? ${escaped}`,
       `yarn ${escaped}`,
-      `bun run ${escaped}`
+      `bun run ${escaped}`,
     );
   }
 
-  return `(${patterns.join('|')})`;
+  return `(${patterns.join("|")})`;
 }
 
 module.exports = {
@@ -427,5 +411,5 @@ module.exports = {
   getRunCommand,
   getExecCommand,
   getSelectionPrompt,
-  getCommandPattern
+  getCommandPattern,
 };

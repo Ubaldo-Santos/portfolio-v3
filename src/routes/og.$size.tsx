@@ -12,6 +12,12 @@ export const Route = createFileRoute("/og/$size")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [{ name: "robots", content: "noindex, nofollow" }],
+    style: [
+      {
+        children:
+          "html,body{margin:0;padding:0;overflow:hidden;height:100%;background:transparent}",
+      },
+    ],
   }),
   component: OgCardPage,
 });

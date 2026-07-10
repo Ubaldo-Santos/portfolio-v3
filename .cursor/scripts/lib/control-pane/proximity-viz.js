@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Self-contained 3D "agent airspace" visualization, served by the control pane.

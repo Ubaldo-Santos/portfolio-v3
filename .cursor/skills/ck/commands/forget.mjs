@@ -11,16 +11,16 @@
  * This script is the "do it" step — no confirmation prompt here.
  */
 
-import { rmSync } from 'fs';
-import { resolve } from 'path';
-import { resolveContext, readProjects, writeProjects, CONTEXTS_DIR } from './shared.mjs';
+import { rmSync } from "fs";
+import { resolve } from "path";
+import { resolveContext, readProjects, writeProjects, CONTEXTS_DIR } from "./shared.mjs";
 
 const arg = process.argv[2];
 const cwd = process.env.PWD || process.cwd();
 
 const resolved = resolveContext(arg, cwd);
 if (!resolved) {
-  const hint = arg ? `No project matching "${arg}".` : 'This directory is not registered.';
+  const hint = arg ? `No project matching "${arg}".` : "This directory is not registered.";
   console.log(`${hint}`);
   process.exit(1);
 }

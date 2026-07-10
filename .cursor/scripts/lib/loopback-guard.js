@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Host/Origin gating for ECC's loopback HTTP servers (control pane, plan
@@ -7,12 +7,12 @@
  * allowlist before the server does any work.
  */
 
-const LOOPBACK_HOSTNAMES = new Set(['127.0.0.1', 'localhost', '[::1]', '::1']);
+const LOOPBACK_HOSTNAMES = new Set(["127.0.0.1", "localhost", "[::1]", "::1"]);
 
 // Extract the hostname portion of an HTTP Host header value, stripping any
 // port. Returns null when the header is missing or malformed.
 function parseHostHeader(value) {
-  if (!value || typeof value !== 'string') return null;
+  if (!value || typeof value !== "string") return null;
   const trimmed = value.trim();
   if (!trimmed) return null;
   const match = trimmed.match(/^(\[[^\]]+\]|[^:]+)(?::\d+)?$/);
@@ -35,7 +35,7 @@ function isAllowedHostHeader(hostHeader, allowedHostnames) {
 // Origin is absent on same-origin navigations and CLI clients; when present
 // it must resolve to an allowed hostname.
 function isAllowedOrigin(originHeader, allowedHostnames) {
-  if (!originHeader || typeof originHeader !== 'string') return true;
+  if (!originHeader || typeof originHeader !== "string") return true;
   try {
     const url = new URL(originHeader);
     return allowedHostnames.has(url.hostname.toLowerCase());
@@ -49,5 +49,5 @@ module.exports = {
   buildAllowedHostnames,
   isAllowedHostHeader,
   isAllowedOrigin,
-  parseHostHeader
+  parseHostHeader,
 };

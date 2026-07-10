@@ -1,27 +1,27 @@
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 
 const PLATFORM_SOURCE_PATH_OWNERS = Object.freeze({
-  '.claude-plugin': 'claude',
-  '.codex': 'codex',
-  '.cursor': 'cursor',
-  '.gemini': 'gemini',
-  '.hermes': 'hermes',
-  '.kimi': 'kimi',
-  '.joycode': 'joycode',
-  '.opencode': 'opencode',
-  '.openclaw': 'openclaw',
-  '.codebuddy': 'codebuddy',
-  '.qwen': 'qwen',
-  '.zed': 'zed',
+  ".claude-plugin": "claude",
+  ".codex": "codex",
+  ".cursor": "cursor",
+  ".gemini": "gemini",
+  ".hermes": "hermes",
+  ".kimi": "kimi",
+  ".joycode": "joycode",
+  ".opencode": "opencode",
+  ".openclaw": "openclaw",
+  ".codebuddy": "codebuddy",
+  ".qwen": "qwen",
+  ".zed": "zed",
 });
 
 function normalizeRelativePath(relativePath) {
-  return String(relativePath || '')
-    .replace(/\\/g, '/')
-    .replace(/^\.\/+/, '')
-    .replace(/\/+$/, '');
+  return String(relativePath || "")
+    .replace(/\\/g, "/")
+    .replace(/^\.\/+/, "")
+    .replace(/\/+$/, "");
 }
 
 function isForeignPlatformPath(sourceRelativePath, adapterTarget) {
@@ -37,14 +37,14 @@ function isForeignPlatformPath(sourceRelativePath, adapterTarget) {
 }
 
 function resolveBaseRoot(scope, input = {}) {
-  if (scope === 'home') {
+  if (scope === "home") {
     return input.homeDir || os.homedir();
   }
 
-  if (scope === 'project') {
+  if (scope === "project") {
     const projectRoot = input.projectRoot || input.repoRoot;
     if (!projectRoot) {
-      throw new Error('projectRoot or repoRoot is required for project install targets');
+      throw new Error("projectRoot or repoRoot is required for project install targets");
     }
     return projectRoot;
   }
@@ -61,14 +61,14 @@ function buildValidationIssue(severity, code, message, extra = {}) {
   };
 }
 
-function listRelativeFiles(dirPath, prefix = '') {
+function listRelativeFiles(dirPath, prefix = "") {
   if (!fs.existsSync(dirPath)) {
     return [];
   }
 
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true }).sort((left, right) => (
-    left.name.localeCompare(right.name)
-  ));
+  const entries = fs
+    .readdirSync(dirPath, { withFileTypes: true })
+    .sort((left, right) => left.name.localeCompare(right.name));
   const files = [];
 
   for (const entry of entries) {
@@ -86,12 +86,12 @@ function listRelativeFiles(dirPath, prefix = '') {
 }
 
 function createManagedOperation({
-  kind = 'copy-path',
+  kind = "copy-path",
   moduleId,
   sourceRelativePath,
   destinationPath,
-  strategy = 'preserve-relative-path',
-  ownership = 'managed',
+  strategy = "preserve-relative-path",
+  ownership = "managed",
   scaffoldOnly = true,
   ...rest
 }) {
@@ -108,22 +108,22 @@ function createManagedOperation({
 }
 
 function defaultValidateAdapterInput(config, input = {}) {
-  if (config.kind === 'project' && !input.projectRoot && !input.repoRoot) {
+  if (config.kind === "project" && !input.projectRoot && !input.repoRoot) {
     return [
       buildValidationIssue(
-        'error',
-        'missing-project-root',
-        'projectRoot or repoRoot is required for project install targets'
+        "error",
+        "missing-project-root",
+        "projectRoot or repoRoot is required for project install targets",
       ),
     ];
   }
 
-  if (config.kind === 'home' && !input.homeDir && !os.homedir()) {
+  if (config.kind === "home" && !input.homeDir && !os.homedir()) {
     return [
       buildValidationIssue(
-        'error',
-        'missing-home-dir',
-        'homeDir is required for home install targets'
+        "error",
+        "missing-home-dir",
+        "homeDir is required for home install targets",
       ),
     ];
   }
@@ -131,32 +131,38 @@ function defaultValidateAdapterInput(config, input = {}) {
   return [];
 }
 
-function createRemappedOperation(adapter, moduleId, sourceRelativePath, destinationPath, options = {}) {
+function createRemappedOperation(
+  adapter,
+  moduleId,
+  sourceRelativePath,
+  destinationPath,
+  options = {},
+) {
   return createManagedOperation({
-    kind: options.kind || 'copy-path',
+    kind: options.kind || "copy-path",
     moduleId,
     sourceRelativePath,
     destinationPath,
-    strategy: options.strategy || 'preserve-relative-path',
-    ownership: options.ownership || 'managed',
-    scaffoldOnly: Object.hasOwn(options, 'scaffoldOnly') ? options.scaffoldOnly : true,
+    strategy: options.strategy || "preserve-relative-path",
+    ownership: options.ownership || "managed",
+    scaffoldOnly: Object.hasOwn(options, "scaffoldOnly") ? options.scaffoldOnly : true,
     ...options.extra,
   });
 }
 
 function createNamespacedFlatRuleOperations(adapter, moduleId, sourceRelativePath, input = {}) {
   const normalizedSourcePath = normalizeRelativePath(sourceRelativePath);
-  const sourceRoot = path.join(input.repoRoot || '', normalizedSourcePath);
+  const sourceRoot = path.join(input.repoRoot || "", normalizedSourcePath);
 
   if (!input.repoRoot || !fs.existsSync(sourceRoot) || !fs.statSync(sourceRoot).isDirectory()) {
     return [];
   }
 
-  const targetRulesDir = path.join(adapter.resolveRoot(input), 'rules');
+  const targetRulesDir = path.join(adapter.resolveRoot(input), "rules");
   const operations = [];
-  const entries = fs.readdirSync(sourceRoot, { withFileTypes: true }).sort((left, right) => (
-    left.name.localeCompare(right.name)
-  ));
+  const entries = fs
+    .readdirSync(sourceRoot, { withFileTypes: true })
+    .sort((left, right) => left.name.localeCompare(right.name));
 
   for (const entry of entries) {
     const namespace = entry.name;
@@ -165,22 +171,26 @@ function createNamespacedFlatRuleOperations(adapter, moduleId, sourceRelativePat
     if (entry.isDirectory()) {
       const relativeFiles = listRelativeFiles(entryPath);
       for (const relativeFile of relativeFiles) {
-        const flattenedFileName = `${namespace}-${normalizeRelativePath(relativeFile).replace(/\//g, '-')}`;
+        const flattenedFileName = `${namespace}-${normalizeRelativePath(relativeFile).replace(/\//g, "-")}`;
         const sourceRelativeFile = path.join(normalizedSourcePath, namespace, relativeFile);
-        operations.push(createManagedOperation({
-          moduleId,
-          sourceRelativePath: sourceRelativeFile,
-          destinationPath: path.join(targetRulesDir, flattenedFileName),
-          strategy: 'flatten-copy',
-        }));
+        operations.push(
+          createManagedOperation({
+            moduleId,
+            sourceRelativePath: sourceRelativeFile,
+            destinationPath: path.join(targetRulesDir, flattenedFileName),
+            strategy: "flatten-copy",
+          }),
+        );
       }
     } else if (entry.isFile()) {
-      operations.push(createManagedOperation({
-        moduleId,
-        sourceRelativePath: path.join(normalizedSourcePath, entry.name),
-        destinationPath: path.join(targetRulesDir, entry.name),
-        strategy: 'flatten-copy',
-      }));
+      operations.push(
+        createManagedOperation({
+          moduleId,
+          sourceRelativePath: path.join(normalizedSourcePath, entry.name),
+          destinationPath: path.join(targetRulesDir, entry.name),
+          strategy: "flatten-copy",
+        }),
+      );
     }
   }
 
@@ -195,16 +205,16 @@ function createFlatFileOperations({
   destinationNameTransform,
 }) {
   const normalizedSourcePath = normalizeRelativePath(sourceRelativePath);
-  const sourceRoot = path.join(repoRoot || '', normalizedSourcePath);
+  const sourceRoot = path.join(repoRoot || "", normalizedSourcePath);
 
   if (!repoRoot || !fs.existsSync(sourceRoot) || !fs.statSync(sourceRoot).isDirectory()) {
     return [];
   }
 
   const operations = [];
-  const entries = fs.readdirSync(sourceRoot, { withFileTypes: true }).sort((left, right) => (
-    left.name.localeCompare(right.name)
-  ));
+  const entries = fs
+    .readdirSync(sourceRoot, { withFileTypes: true })
+    .sort((left, right) => left.name.localeCompare(right.name));
 
   for (const entry of entries) {
     const namespace = entry.name;
@@ -213,35 +223,41 @@ function createFlatFileOperations({
     if (entry.isDirectory()) {
       const relativeFiles = listRelativeFiles(entryPath);
       for (const relativeFile of relativeFiles) {
-        const defaultFileName = `${namespace}-${normalizeRelativePath(relativeFile).replace(/\//g, '-')}`;
+        const defaultFileName = `${namespace}-${normalizeRelativePath(relativeFile).replace(/\//g, "-")}`;
         const sourceRelativeFile = path.join(normalizedSourcePath, namespace, relativeFile);
-        const flattenedFileName = typeof destinationNameTransform === 'function'
-          ? destinationNameTransform(defaultFileName, sourceRelativeFile)
-          : defaultFileName;
+        const flattenedFileName =
+          typeof destinationNameTransform === "function"
+            ? destinationNameTransform(defaultFileName, sourceRelativeFile)
+            : defaultFileName;
         if (!flattenedFileName) {
           continue;
         }
-        operations.push(createManagedOperation({
-          moduleId,
-          sourceRelativePath: sourceRelativeFile,
-          destinationPath: path.join(destinationDir, flattenedFileName),
-          strategy: 'flatten-copy',
-        }));
+        operations.push(
+          createManagedOperation({
+            moduleId,
+            sourceRelativePath: sourceRelativeFile,
+            destinationPath: path.join(destinationDir, flattenedFileName),
+            strategy: "flatten-copy",
+          }),
+        );
       }
     } else if (entry.isFile()) {
       const sourceRelativeFile = path.join(normalizedSourcePath, entry.name);
-      const destinationFileName = typeof destinationNameTransform === 'function'
-        ? destinationNameTransform(entry.name, sourceRelativeFile)
-        : entry.name;
+      const destinationFileName =
+        typeof destinationNameTransform === "function"
+          ? destinationNameTransform(entry.name, sourceRelativeFile)
+          : entry.name;
       if (!destinationFileName) {
         continue;
       }
-      operations.push(createManagedOperation({
-        moduleId,
-        sourceRelativePath: sourceRelativeFile,
-        destinationPath: path.join(destinationDir, destinationFileName),
-        strategy: 'flatten-copy',
-      }));
+      operations.push(
+        createManagedOperation({
+          moduleId,
+          sourceRelativePath: sourceRelativeFile,
+          destinationPath: path.join(destinationDir, destinationFileName),
+          strategy: "flatten-copy",
+        }),
+      );
     }
   }
 
@@ -274,8 +290,8 @@ function createInstallTargetAdapter(config) {
       const targetRoot = adapter.resolveRoot(input);
 
       if (
-        config.nativeRootRelativePath
-        && normalizedSourcePath === normalizeRelativePath(config.nativeRootRelativePath)
+        config.nativeRootRelativePath &&
+        normalizedSourcePath === normalizeRelativePath(config.nativeRootRelativePath)
       ) {
         return targetRoot;
       }
@@ -286,13 +302,13 @@ function createInstallTargetAdapter(config) {
       const normalizedSourcePath = normalizeRelativePath(sourceRelativePath);
 
       if (
-        config.nativeRootRelativePath
-        && normalizedSourcePath === normalizeRelativePath(config.nativeRootRelativePath)
+        config.nativeRootRelativePath &&
+        normalizedSourcePath === normalizeRelativePath(config.nativeRootRelativePath)
       ) {
-        return 'sync-root-children';
+        return "sync-root-children";
       }
 
-      return 'preserve-relative-path';
+      return "preserve-relative-path";
     },
     createScaffoldOperation(moduleId, sourceRelativePath, input = {}) {
       const normalizedSourcePath = normalizeRelativePath(sourceRelativePath);
@@ -304,42 +320,38 @@ function createInstallTargetAdapter(config) {
       });
     },
     planOperations(input = {}) {
-      if (typeof config.planOperations === 'function') {
+      if (typeof config.planOperations === "function") {
         return config.planOperations(input, adapter);
       }
 
       if (Array.isArray(input.modules)) {
-        return input.modules.flatMap(module => {
+        return input.modules.flatMap((module) => {
           const paths = Array.isArray(module.paths) ? module.paths : [];
           return paths
-            .filter(p => !isForeignPlatformPath(p, config.target))
-            .map(sourceRelativePath => adapter.createScaffoldOperation(
-              module.id,
-              sourceRelativePath,
-              input
-            ));
+            .filter((p) => !isForeignPlatformPath(p, config.target))
+            .map((sourceRelativePath) =>
+              adapter.createScaffoldOperation(module.id, sourceRelativePath, input),
+            );
         });
       }
 
       const module = input.module || {};
       const paths = Array.isArray(module.paths) ? module.paths : [];
       return paths
-        .filter(p => !isForeignPlatformPath(p, config.target))
-        .map(sourceRelativePath => adapter.createScaffoldOperation(
-          module.id,
-          sourceRelativePath,
-          input
-        ));
+        .filter((p) => !isForeignPlatformPath(p, config.target))
+        .map((sourceRelativePath) =>
+          adapter.createScaffoldOperation(module.id, sourceRelativePath, input),
+        );
     },
     supportsModule(module, input = {}) {
-      if (typeof config.supportsModule === 'function') {
+      if (typeof config.supportsModule === "function") {
         return config.supportsModule(module, input, adapter);
       }
 
       return true;
     },
     validate(input = {}) {
-      if (typeof config.validate === 'function') {
+      if (typeof config.validate === "function") {
         return config.validate(input, adapter);
       }
 
@@ -356,14 +368,13 @@ module.exports = {
   createFlatRuleOperations,
   createInstallTargetAdapter,
   createManagedOperation,
-  createManagedScaffoldOperation: (moduleId, sourceRelativePath, destinationPath, strategy) => (
+  createManagedScaffoldOperation: (moduleId, sourceRelativePath, destinationPath, strategy) =>
     createManagedOperation({
       moduleId,
       sourceRelativePath,
       destinationPath,
       strategy,
-    })
-  ),
+    }),
   createNamespacedFlatRuleOperations,
   createRemappedOperation,
   isForeignPlatformPath,

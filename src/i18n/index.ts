@@ -2,9 +2,12 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import { translations } from "./translations";
+import { yearsOfExperienceLabel } from "@/lib/format";
 
 export const SUPPORTED_LANGS = ["es", "ca", "en"] as const;
 export type Lang = (typeof SUPPORTED_LANGS)[number];
+
+const yearsLabel = yearsOfExperienceLabel();
 
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
@@ -17,7 +20,10 @@ if (!i18n.isInitialized) {
     fallbackLng: "es",
     supportedLngs: SUPPORTED_LANGS as unknown as string[],
     nonExplicitSupportedLngs: true,
-    interpolation: { escapeValue: false },
+    interpolation: {
+      escapeValue: false,
+      defaultVariables: { years: yearsLabel },
+    },
   });
 }
 

@@ -215,13 +215,13 @@ expect(await axe(container)).toHaveNoViolations();
 
 ## Coverage Targets
 
-| Layer | Target |
-|---|---|
-| Pure utilities | >=90% |
-| Custom hooks | >=85% |
-| Presentational components | >=80% |
-| Container components | >=70% |
-| Pages | E2E covered separately |
+| Layer                     | Target                 |
+| ------------------------- | ---------------------- |
+| Pure utilities            | >=90%                  |
+| Custom hooks              | >=85%                  |
+| Presentational components | >=80%                  |
+| Container components      | >=70%                  |
+| Pages                     | E2E covered separately |
 
 Configure in `vitest.config.ts` / `jest.config.js` to enforce thresholds in CI.
 

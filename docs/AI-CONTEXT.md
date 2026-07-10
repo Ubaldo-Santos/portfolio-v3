@@ -4,15 +4,15 @@
 
 ## Quick facts
 
-| Item | Value |
-|------|-------|
-| URL | `https://ubaldo.is-a.dev` |
-| Repo | `Ubaldo-Santos/portfolio-v3` |
-| Runtime | Bun 1.3.14+ only |
-| Framework | TanStack Start (SSR) + TanStack Router |
-| Content source of truth | `src/data/cv.ts` |
-| UI strings | `src/i18n/translations.ts` (ES / CA / EN) |
-| Authoritative rules | `.cursor/rules/project-context.mdc` |
+| Item                    | Value                                     |
+| ----------------------- | ----------------------------------------- |
+| URL                     | `https://ubaldo.is-a.dev`                 |
+| Repo                    | `Ubaldo-Santos/portfolio-v3`              |
+| Runtime                 | Bun 1.3.14+ only                          |
+| Framework               | TanStack Start (SSR) + TanStack Router    |
+| Content source of truth | `src/data/cv.ts`                          |
+| UI strings              | `src/i18n/translations.ts` (ES / CA / EN) |
+| Authoritative rules     | `.cursor/rules/project-context.mdc`       |
 
 ## Architecture (30-second mental model)
 
@@ -31,34 +31,34 @@ cv.ts (facts)          translations.ts (UI labels)
 
 ## File map — where to edit what
 
-| Task | File(s) | Notes |
-|------|---------|-------|
-| Add/edit job, project, skill | `src/data/cv.ts` | Use `LocalizedString` / `LocalizedList`; run through `pick(obj, lang)` |
-| Change UI text (nav, buttons, meta) | `src/i18n/translations.ts` | Update **all three** locales: `es`, `ca`, `en` |
-| New page/route | `src/routes/<name>.tsx` | File-based routing; add `head()` with `routeHead()` |
-| SEO (title, OG, canonical) | `src/lib/seo.ts` | SSR meta always uses `es` default; see `routeHead()` |
-| Breadcrumbs JSON-LD | `seoBreadcrumbs()` in `seo.ts` | Used in route `head()` — also ES default |
-| Date/period formatting | `src/lib/format.ts` | `formatPeriod()`, `currentLang()`, `workAnchorId()` |
-| Theme (light/dark) | `src/hooks/use-theme.ts` + `src/lib/bootstrap-script.ts` | View Transitions API |
-| Language detection | `src/lib/detect-lang.ts` | Cookie → Accept-Language (SSR); localStorage (client) |
-| Print/PDF CV | `src/routes/cv.tsx` + `@media print` in `styles.css` | Uses `window.print()`, **not** html2pdf |
-| OG image preview | `src/routes/og.$size.tsx` + `src/lib/og-sizes.ts` | `/og/1200x630?theme=light` |
-| Design tokens / fonts | `src/styles.css` | Tailwind v4 `@theme inline`, oklch colors |
-| Navigation items | `src/lib/nav.ts` | `NAV_ITEMS` constant |
-| Site URL | `src/lib/site.ts` | `SITE_URL` — single export |
-| Machine-readable summary | `public/llms.txt` | Keep in sync with `cv.ts` |
+| Task                                | File(s)                                                  | Notes                                                                  |
+| ----------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Add/edit job, project, skill        | `src/data/cv.ts`                                         | Use `LocalizedString` / `LocalizedList`; run through `pick(obj, lang)` |
+| Change UI text (nav, buttons, meta) | `src/i18n/translations.ts`                               | Update **all three** locales: `es`, `ca`, `en`                         |
+| New page/route                      | `src/routes/<name>.tsx`                                  | File-based routing; add `head()` with `routeHead()`                    |
+| SEO (title, OG, canonical)          | `src/lib/seo.ts`                                         | SSR meta always uses `es` default; see `routeHead()`                   |
+| Breadcrumbs JSON-LD                 | `seoBreadcrumbs()` in `seo.ts`                           | Used in route `head()` — also ES default                               |
+| Date/period formatting              | `src/lib/format.ts`                                      | `formatPeriod()`, `currentLang()`, `workAnchorId()`                    |
+| Theme (light/dark)                  | `src/hooks/use-theme.ts` + `src/lib/bootstrap-script.ts` | View Transitions API                                                   |
+| Language detection                  | `src/lib/detect-lang.ts`                                 | Cookie → Accept-Language (SSR); localStorage (client)                  |
+| Print/PDF CV                        | `src/routes/cv.tsx` + `@media print` in `styles.css`     | Uses `window.print()`, **not** html2pdf                                |
+| OG image preview                    | `src/routes/og.$size.tsx` + `src/lib/og-sizes.ts`        | `/og/1200x630?theme=light`                                             |
+| Design tokens / fonts               | `src/styles.css`                                         | Tailwind v4 `@theme inline`, oklch colors                              |
+| Navigation items                    | `src/lib/nav.ts`                                         | `NAV_ITEMS` constant                                                   |
+| Site URL                            | `src/lib/site.ts`                                        | `SITE_URL` — single export                                             |
+| Machine-readable summary            | `public/llms.txt`                                        | Keep in sync with `cv.ts`                                              |
 
 ## Route inventory
 
-| Path | File | Indexed | Purpose |
-|------|------|---------|---------|
-| `/` | `index.tsx` | yes | Hero, featured work, tech ribbon |
-| `/experience` | `experience.tsx` | yes | Work + trainee timelines |
-| `/projects` | `projects.tsx` | yes | Project cards |
-| `/skills` | `skills.tsx` | yes | Skills, education, languages |
-| `/contact` | `contact.tsx` | yes | mailto, phone, social |
-| `/cv` | `cv.tsx` | **noindex** | Printable ATS CV |
-| `/og/$size` | `og.$size.tsx` | **noindex** | Social preview renderer |
+| Path          | File             | Indexed     | Purpose                          |
+| ------------- | ---------------- | ----------- | -------------------------------- |
+| `/`           | `index.tsx`      | yes         | Hero, featured work, tech ribbon |
+| `/experience` | `experience.tsx` | yes         | Work + trainee timelines         |
+| `/projects`   | `projects.tsx`   | yes         | Project cards                    |
+| `/skills`     | `skills.tsx`     | yes         | Skills, education, languages     |
+| `/contact`    | `contact.tsx`    | yes         | mailto, phone, social            |
+| `/cv`         | `cv.tsx`         | **noindex** | Printable ATS CV                 |
+| `/og/$size`   | `og.$size.tsx`   | **noindex** | Social preview renderer          |
 
 ## Page composition pattern
 
@@ -136,11 +136,11 @@ Every content route follows this stack:
 
 ## Dead code (known, safe to ignore)
 
-| File | Status |
-|------|--------|
-| `src/data/site.ts` | `siteStack` unused — intended for future "built with" section |
-| `src/lib/api/example.functions.ts` | Lovable scaffold — example `createServerFn` |
-| `src/hooks/use-mobile.tsx` | Only used by unused `ui/sidebar.tsx` |
+| File                               | Status                                                        |
+| ---------------------------------- | ------------------------------------------------------------- |
+| `src/data/site.ts`                 | `siteStack` unused — intended for future "built with" section |
+| `src/lib/api/example.functions.ts` | Lovable scaffold — example `createServerFn`                   |
+| `src/hooks/use-mobile.tsx`         | Only used by unused `ui/sidebar.tsx`                          |
 
 ## Verification checklist
 
@@ -160,15 +160,15 @@ Manual smoke (if UI changed):
 
 ## Common mistakes to avoid
 
-| Mistake | Correct approach |
-|---------|------------------|
-| Edit content in route files | Edit `cv.ts` only |
-| Add JSON locale files | Use `translations.ts` |
-| Hardcode Spanish in components | Use `t()` or `pick()` |
-| Add Vite plugins manually | Use Lovable config |
-| Use `npm`/`pnpm`/`yarn` | Use `bun` |
-| Import from `node:fs` etc. | Use Bun APIs or avoid |
-| Duplicate `SITE_URL` | Import from `@/lib/site` |
+| Mistake                               | Correct approach         |
+| ------------------------------------- | ------------------------ |
+| Edit content in route files           | Edit `cv.ts` only        |
+| Add JSON locale files                 | Use `translations.ts`    |
+| Hardcode Spanish in components        | Use `t()` or `pick()`    |
+| Add Vite plugins manually             | Use Lovable config       |
+| Use `npm`/`pnpm`/`yarn`               | Use `bun`                |
+| Import from `node:fs` etc.            | Use Bun APIs or avoid    |
+| Duplicate `SITE_URL`                  | Import from `@/lib/site` |
 | Create `download-cv.ts` with html2pdf | CV uses `window.print()` |
 
 ## Related docs

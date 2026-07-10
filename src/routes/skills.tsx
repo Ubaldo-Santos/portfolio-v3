@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Sparkles } from "lucide-react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
+import { cvAiCopy, cvAiTags, cvPageSubtitle } from "@/lib/cv-copy";
 import { routeHead, seoBreadcrumbs } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/skills")({
 function SkillsPage() {
   const { t, i18n } = useTranslation();
   const lang = currentLang(i18n.language);
-  const aiTags = t("skills.aiCallout.tags", { returnObjects: true }) as string[];
+  const aiTags = cvAiTags();
 
   const groups = [
     { key: "languages", items: cv.skills.languages },
@@ -33,7 +34,7 @@ function SkillsPage() {
   return (
     <MotionPage>
       <PageShell>
-        <PageHeader page="skills" subtitle={t("skills.subtitle")} />
+        <PageHeader page="skills" subtitle={cvPageSubtitle("skills", lang)} />
 
         {/* Primary stack callout */}
         <Reveal delay={0.04}>
@@ -79,16 +80,16 @@ function SkillsPage() {
               <div className="flex items-center gap-2 text-accent">
                 <Sparkles className="size-4" aria-hidden />
                 <span className="font-mono text-[11px] uppercase tracking-[0.25em]">
-                  {t("skills.aiCallout.kicker")}
+                  {cvAiCopy("kicker", lang)}
                 </span>
               </div>
               <h2 className="mt-3 font-display text-4xl leading-[1.05] sm:text-5xl">
-                {t("skills.aiCallout.title")}
+                {cvAiCopy("title", lang)}
               </h2>
             </header>
             <div>
               <p className="text-base leading-relaxed text-foreground/90 sm:text-lg">
-                {t("skills.aiCallout.body")}
+                {cvAiCopy("body", lang)}
               </p>
               <ul className="mt-5 flex flex-wrap gap-1.5">
                 {aiTags.map((tag) => (

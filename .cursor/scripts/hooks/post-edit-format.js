@@ -17,13 +17,17 @@
  * Fails silently if no formatter is found or installed.
  */
 
-const { execFileSync, spawnSync } = require('child_process');
-const path = require('path');
+const { execFileSync, spawnSync } = require("child_process");
+const path = require("path");
 
 // Shell metacharacters that cmd.exe interprets as command separators/operators
 const UNSAFE_PATH_CHARS = /[&|<>^%!;`()$]/;
 
-const { findProjectRoot, detectFormatter, resolveFormatterBin } = require('../lib/resolve-formatter');
+const {
+  findProjectRoot,
+  detectFormatter,
+  resolveFormatterBin,
+} = require("../lib/resolve-formatter");
 
 const MAX_STDIN = 1024 * 1024; // 1MB limit
 
@@ -51,29 +55,34 @@ function run(rawInput) {
 
         // Biome: `check --write` = format + lint in one pass
         // Prettier: `--write` = format only
-        const args = formatter === 'biome' ? [...resolved.prefix, 'check', '--write', resolvedFilePath] : [...resolved.prefix, '--write', resolvedFilePath];
+        const args =
+          formatter === "biome"
+            ? [...resolved.prefix, "check", "--write", resolvedFilePath]
+            : [...resolved.prefix, "--write", resolvedFilePath];
 
-        if (process.platform === 'win32' && resolved.bin.endsWith('.cmd')) {
+        if (process.platform === "win32" && resolved.bin.endsWith(".cmd")) {
           // Windows: .cmd files require shell to execute. Guard against
           // command injection by rejecting paths with shell metacharacters.
           if (UNSAFE_PATH_CHARS.test(resolvedFilePath)) {
-            throw new Error('File path contains unsafe shell characters');
+            throw new Error("File path contains unsafe shell characters");
           }
           const result = spawnSync(resolved.bin, args, {
             cwd: projectRoot,
             shell: true,
-            stdio: 'pipe',
-            timeout: 15000
+            stdio: "pipe",
+            timeout: 15000,
           });
           if (result.error) throw result.error;
-          if (typeof result.status === 'number' && result.status !== 0) {
-            throw new Error(result.stderr?.toString() || `Formatter exited with status ${result.status}`);
+          if (typeof result.status === "number" && result.status !== 0) {
+            throw new Error(
+              result.stderr?.toString() || `Formatter exited with status ${result.status}`,
+            );
           }
         } else {
           execFileSync(resolved.bin, args, {
             cwd: projectRoot,
-            stdio: ['pipe', 'pipe', 'pipe'],
-            timeout: 15000
+            stdio: ["pipe", "pipe", "pipe"],
+            timeout: 15000,
           });
         }
       } catch {
@@ -89,17 +98,17 @@ function run(rawInput) {
 
 // ── stdin entry point (backwards-compatible) ────────────────────
 if (require.main === module) {
-  let data = '';
-  process.stdin.setEncoding('utf8');
+  let data = "";
+  process.stdin.setEncoding("utf8");
 
-  process.stdin.on('data', chunk => {
+  process.stdin.on("data", (chunk) => {
     if (data.length < MAX_STDIN) {
       const remaining = MAX_STDIN - data.length;
       data += chunk.substring(0, remaining);
     }
   });
 
-  process.stdin.on('end', () => {
+  process.stdin.on("end", () => {
     data = run(data);
     process.stdout.write(data);
     process.exit(0);

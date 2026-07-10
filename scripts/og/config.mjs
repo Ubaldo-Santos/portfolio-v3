@@ -1,4 +1,4 @@
-/** Shared OG generation config for Playwright scripts (mirrors src/lib/og-sizes.ts). */
+/** Shared OG generation config (mirrors src/lib/og-sizes.ts). */
 export const SITE_URL = "https://ubaldo.is-a.dev";
 
 export const OG_THEMES = ["light", "dark"];

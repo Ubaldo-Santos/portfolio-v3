@@ -8,15 +8,10 @@
  * - YYYY-MM-DD-<short-id>-session.tmp (new format)
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const {
-  getSessionsDir,
-  getSessionSearchDirs,
-  readFile,
-  log
-} = require('./utils');
+const { getSessionsDir, getSessionSearchDirs, readFile, log } = require("./utils");
 
 // Session filename pattern: YYYY-MM-DD-[session-id]-session.tmp
 // The session-id is optional (old format) and can include letters, digits,
@@ -24,7 +19,8 @@ const {
 // Matches: "2026-02-01-session.tmp", "2026-02-01-a1b2c3d4-session.tmp",
 // "2026-02-01-frontend-worktree-1-session.tmp", and
 // "2026-02-01-ChezMoi_2-session.tmp"
-const SESSION_FILENAME_REGEX = /^(\d{4}-\d{2}-\d{2})(?:-([a-zA-Z0-9_][a-zA-Z0-9_-]*))?-session\.tmp$/;
+const SESSION_FILENAME_REGEX =
+  /^(\d{4}-\d{2}-\d{2})(?:-([a-zA-Z0-9_][a-zA-Z0-9_-]*))?-session\.tmp$/;
 
 /**
  * Resolve a file's creation time, preferring birthtime but falling back to
@@ -44,14 +40,14 @@ function resolveCreatedTime(stats) {
  * @returns {object|null} Parsed metadata or null if invalid
  */
 function parseSessionFilename(filename) {
-  if (!filename || typeof filename !== 'string') return null;
+  if (!filename || typeof filename !== "string") return null;
   const match = filename.match(SESSION_FILENAME_REGEX);
   if (!match) return null;
 
   const dateStr = match[1];
 
   // Validate date components are calendar-accurate (not just format)
-  const [year, month, day] = dateStr.split('-').map(Number);
+  const [year, month, day] = dateStr.split("-").map(Number);
   if (month < 1 || month > 12 || day < 1 || day > 31) return null;
   // Reject impossible dates like Feb 31, Apr 31 — Date constructor rolls
   // over invalid days (e.g., Feb 31 → Mar 3), so check month roundtrips
@@ -59,7 +55,7 @@ function parseSessionFilename(filename) {
   if (d.getMonth() !== month - 1 || d.getDate() !== day) return null;
 
   // match[2] is undefined for old format (no ID)
-  const shortId = match[2] || 'no-id';
+  const shortId = match[2] || "no-id";
 
   return {
     filename,
@@ -68,7 +64,7 @@ function parseSessionFilename(filename) {
     // Use local-time constructor (consistent with validation on line 40)
     // new Date(dateStr) interprets YYYY-MM-DD as UTC midnight which shows
     // as the previous day in negative UTC offset timezones
-    datetime: new Date(year, month - 1, day)
+    datetime: new Date(year, month - 1, day),
   };
 }
 
@@ -82,10 +78,7 @@ function getSessionPath(filename) {
 }
 
 function getSessionCandidates(options = {}) {
-  const {
-    date = null,
-    search = null
-  } = options;
+  const { date = null, search = null } = options;
 
   const candidates = [];
 
@@ -103,7 +96,7 @@ function getSessionCandidates(options = {}) {
     }
 
     for (const entry of entries) {
-      if (!entry.isFile() || !entry.name.endsWith('.tmp')) continue;
+      if (!entry.isFile() || !entry.name.endsWith(".tmp")) continue;
 
       const filename = entry.name;
       const metadata = parseSessionFilename(filename);
@@ -128,7 +121,7 @@ function getSessionCandidates(options = {}) {
         hasContent: stats.size > 0,
         size: stats.size,
         modifiedTime: stats.mtime,
-        createdTime: resolveCreatedTime(stats)
+        createdTime: resolveCreatedTime(stats),
       });
     }
   }
@@ -163,15 +156,18 @@ function buildSessionRecord(sessionPath, metadata) {
     hasContent: stats.size > 0,
     size: stats.size,
     modifiedTime: stats.mtime,
-    createdTime: resolveCreatedTime(stats)
+    createdTime: resolveCreatedTime(stats),
   };
 }
 
 function sessionMatchesId(metadata, normalizedSessionId) {
   const filename = metadata.filename;
-  const shortIdMatch = metadata.shortId !== 'no-id' && metadata.shortId.startsWith(normalizedSessionId);
-  const filenameMatch = filename === normalizedSessionId || filename === `${normalizedSessionId}.tmp`;
-  const noIdMatch = metadata.shortId === 'no-id' && filename === `${normalizedSessionId}-session.tmp`;
+  const shortIdMatch =
+    metadata.shortId !== "no-id" && metadata.shortId.startsWith(normalizedSessionId);
+  const filenameMatch =
+    filename === normalizedSessionId || filename === `${normalizedSessionId}.tmp`;
+  const noIdMatch =
+    metadata.shortId === "no-id" && filename === `${normalizedSessionId}-session.tmp`;
 
   return shortIdMatch || filenameMatch || noIdMatch;
 }
@@ -194,7 +190,7 @@ function getMatchingSessionCandidates(normalizedSessionId) {
     }
 
     for (const entry of entries) {
-      if (!entry.isFile() || !entry.name.endsWith('.tmp')) continue;
+      if (!entry.isFile() || !entry.name.endsWith(".tmp")) continue;
 
       const metadata = parseSessionFilename(entry.name);
       if (!metadata || !sessionMatchesId(metadata, normalizedSessionId)) {
@@ -245,8 +241,8 @@ function parseSessionMetadata(content) {
     worktree: null,
     completed: [],
     inProgress: [],
-    notes: '',
-    context: ''
+    notes: "",
+    context: "",
   };
 
   if (!content) return metadata;
@@ -296,7 +292,7 @@ function parseSessionMetadata(content) {
   if (completedSection) {
     const items = completedSection[1].match(/- \[x\]\s*(.+)/g);
     if (items) {
-      metadata.completed = items.map(item => item.replace(/- \[x\]\s*/, '').trim());
+      metadata.completed = items.map((item) => item.replace(/- \[x\]\s*/, "").trim());
     }
   }
 
@@ -305,7 +301,7 @@ function parseSessionMetadata(content) {
   if (progressSection) {
     const items = progressSection[1].match(/- \[ \]\s*(.+)/g);
     if (items) {
-      metadata.inProgress = items.map(item => item.replace(/- \[ \]\s*/, '').trim());
+      metadata.inProgress = items.map((item) => item.replace(/- \[ \]\s*/, "").trim());
     }
   }
 
@@ -336,13 +332,12 @@ function getSessionStats(sessionPathOrContent) {
   // If the argument looks like a file path (no newlines, ends with .tmp,
   // starts with / on Unix or drive letter on Windows), read from disk.
   // Otherwise treat it as content.
-  const looksLikePath = typeof sessionPathOrContent === 'string' &&
-    !sessionPathOrContent.includes('\n') &&
-    sessionPathOrContent.endsWith('.tmp') &&
-    (sessionPathOrContent.startsWith('/') || /^[A-Za-z]:[/\\]/.test(sessionPathOrContent));
-  const content = looksLikePath
-    ? getSessionContent(sessionPathOrContent)
-    : sessionPathOrContent;
+  const looksLikePath =
+    typeof sessionPathOrContent === "string" &&
+    !sessionPathOrContent.includes("\n") &&
+    sessionPathOrContent.endsWith(".tmp") &&
+    (sessionPathOrContent.startsWith("/") || /^[A-Za-z]:[/\\]/.test(sessionPathOrContent));
+  const content = looksLikePath ? getSessionContent(sessionPathOrContent) : sessionPathOrContent;
 
   const metadata = parseSessionMetadata(content);
 
@@ -350,9 +345,9 @@ function getSessionStats(sessionPathOrContent) {
     totalItems: metadata.completed.length + metadata.inProgress.length,
     completedItems: metadata.completed.length,
     inProgressItems: metadata.inProgress.length,
-    lineCount: content ? content.split('\n').length : 0,
+    lineCount: content ? content.split("\n").length : 0,
     hasNotes: !!metadata.notes,
-    hasContext: !!metadata.context
+    hasContext: !!metadata.context,
   };
 }
 
@@ -366,12 +361,7 @@ function getSessionStats(sessionPathOrContent) {
  * @returns {object} Object with sessions array and pagination info
  */
 function getAllSessions(options = {}) {
-  const {
-    limit: rawLimit = 50,
-    offset: rawOffset = 0,
-    date = null,
-    search = null
-  } = options;
+  const { limit: rawLimit = 50, offset: rawOffset = 0, date = null, search = null } = options;
 
   // Clamp offset and limit to safe non-negative integers.
   // Without this, negative offset causes slice() to count from the end,
@@ -396,7 +386,7 @@ function getAllSessions(options = {}) {
     total: sessions.length,
     offset,
     limit,
-    hasMore: offset + limit < sessions.length
+    hasMore: offset + limit < sessions.length,
   };
 }
 
@@ -407,7 +397,7 @@ function getAllSessions(options = {}) {
  * @returns {object|null} Session object or null if not found
  */
 function getSessionById(sessionId, includeContent = false) {
-  if (typeof sessionId !== 'string') {
+  if (typeof sessionId !== "string") {
     return null;
   }
 
@@ -425,7 +415,7 @@ function getSessionById(sessionId, includeContent = false) {
       sessionRecord.content = getSessionContent(sessionRecord.sessionPath);
       sessionRecord.metadata = parseSessionMetadata(sessionRecord.content);
       // Pass pre-read content to avoid a redundant disk read
-      sessionRecord.stats = getSessionStats(sessionRecord.content || '');
+      sessionRecord.stats = getSessionStats(sessionRecord.content || "");
     }
 
     return sessionRecord;
@@ -443,7 +433,7 @@ function getSessionTitle(sessionPath) {
   const content = getSessionContent(sessionPath);
   const metadata = parseSessionMetadata(content);
 
-  return metadata.title || 'Untitled Session';
+  return metadata.title || "Untitled Session";
 }
 
 /**
@@ -456,7 +446,7 @@ function getSessionSize(sessionPath) {
   try {
     stats = fs.statSync(sessionPath);
   } catch {
-    return '0 B';
+    return "0 B";
   }
   const size = stats.size;
 
@@ -473,7 +463,7 @@ function getSessionSize(sessionPath) {
  */
 function writeSessionContent(sessionPath, content) {
   try {
-    fs.writeFileSync(sessionPath, content, 'utf8');
+    fs.writeFileSync(sessionPath, content, "utf8");
     return true;
   } catch (err) {
     log(`[SessionManager] Error writing session: ${err.message}`);
@@ -489,7 +479,7 @@ function writeSessionContent(sessionPath, content) {
  */
 function appendSessionContent(sessionPath, content) {
   try {
-    fs.appendFileSync(sessionPath, content, 'utf8');
+    fs.appendFileSync(sessionPath, content, "utf8");
     return true;
   } catch (err) {
     log(`[SessionManager] Error appending to session: ${err.message}`);
@@ -541,5 +531,5 @@ module.exports = {
   writeSessionContent,
   appendSessionContent,
   deleteSession,
-  sessionExists
+  sessionExists,
 };

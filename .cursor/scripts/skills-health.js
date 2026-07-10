@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-'use strict';
+"use strict";
 
-const { collectSkillHealth, formatHealthReport } = require('./lib/skill-evolution/health');
-const { renderDashboard } = require('./lib/skill-evolution/dashboard');
+const { collectSkillHealth, formatHealthReport } = require("./lib/skill-evolution/health");
+const { renderDashboard } = require("./lib/skill-evolution/dashboard");
 
 function showHelp() {
   console.log(`
@@ -25,7 +25,7 @@ Options:
 
 function requireValue(argv, index, argName) {
   const value = argv[index + 1];
-  if (!value || value.startsWith('--')) {
+  if (!value || value.startsWith("--")) {
     throw new Error(`Missing value for ${argName}`);
   }
 
@@ -38,65 +38,65 @@ function parseArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
 
-    if (arg === '--json') {
+    if (arg === "--json") {
       options.json = true;
       continue;
     }
 
-    if (arg === '--help' || arg === '-h') {
+    if (arg === "--help" || arg === "-h") {
       options.help = true;
       continue;
     }
 
-    if (arg === '--skills-root') {
-      options.skillsRoot = requireValue(argv, index, '--skills-root');
+    if (arg === "--skills-root") {
+      options.skillsRoot = requireValue(argv, index, "--skills-root");
       index += 1;
       continue;
     }
 
-    if (arg === '--learned-root') {
-      options.learnedRoot = requireValue(argv, index, '--learned-root');
+    if (arg === "--learned-root") {
+      options.learnedRoot = requireValue(argv, index, "--learned-root");
       index += 1;
       continue;
     }
 
-    if (arg === '--imported-root') {
-      options.importedRoot = requireValue(argv, index, '--imported-root');
+    if (arg === "--imported-root") {
+      options.importedRoot = requireValue(argv, index, "--imported-root");
       index += 1;
       continue;
     }
 
-    if (arg === '--home') {
-      options.homeDir = requireValue(argv, index, '--home');
+    if (arg === "--home") {
+      options.homeDir = requireValue(argv, index, "--home");
       index += 1;
       continue;
     }
 
-    if (arg === '--runs-file') {
-      options.runsFilePath = requireValue(argv, index, '--runs-file');
+    if (arg === "--runs-file") {
+      options.runsFilePath = requireValue(argv, index, "--runs-file");
       index += 1;
       continue;
     }
 
-    if (arg === '--now') {
-      options.now = requireValue(argv, index, '--now');
+    if (arg === "--now") {
+      options.now = requireValue(argv, index, "--now");
       index += 1;
       continue;
     }
 
-    if (arg === '--warn-threshold') {
-      options.warnThreshold = Number(requireValue(argv, index, '--warn-threshold'));
+    if (arg === "--warn-threshold") {
+      options.warnThreshold = Number(requireValue(argv, index, "--warn-threshold"));
       index += 1;
       continue;
     }
 
-    if (arg === '--dashboard') {
+    if (arg === "--dashboard") {
       options.dashboard = true;
       continue;
     }
 
-    if (arg === '--panel') {
-      options.panel = requireValue(argv, index, '--panel');
+    if (arg === "--panel") {
+      options.panel = requireValue(argv, index, "--panel");
       index += 1;
       continue;
     }
@@ -118,7 +118,9 @@ function main() {
 
     if (options.dashboard || options.panel) {
       const result = renderDashboard(options);
-      process.stdout.write(options.json ? `${JSON.stringify(result.data, null, 2)}\n` : result.text);
+      process.stdout.write(
+        options.json ? `${JSON.stringify(result.data, null, 2)}\n` : result.text,
+      );
     } else {
       const report = collectSkillHealth(options);
       process.stdout.write(formatHealthReport(report, { json: options.json }));

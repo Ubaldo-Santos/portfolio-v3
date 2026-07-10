@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Split a shell command into segments by operators (&&, ||, ;, &)
@@ -7,7 +7,7 @@
  */
 function splitShellSegments(command) {
   const segments = [];
-  let current = '';
+  let current = "";
   let quote = null;
 
   for (let i = 0; i < command.length; i++) {
@@ -15,7 +15,7 @@ function splitShellSegments(command) {
 
     // Inside quotes: handle escapes and closing quote
     if (quote) {
-      if (ch === '\\' && i + 1 < command.length) {
+      if (ch === "\\" && i + 1 < command.length) {
         current += ch + command[i + 1];
         i++;
         continue;
@@ -26,7 +26,7 @@ function splitShellSegments(command) {
     }
 
     // Backslash escape outside quotes
-    if (ch === '\\' && i + 1 < command.length) {
+    if (ch === "\\" && i + 1 < command.length) {
       current += ch + command[i + 1];
       i++;
       continue;
@@ -39,40 +39,40 @@ function splitShellSegments(command) {
       continue;
     }
 
-    const next = command[i + 1] || '';
-    const prev = i > 0 ? command[i - 1] : '';
+    const next = command[i + 1] || "";
+    const prev = i > 0 ? command[i - 1] : "";
 
     // && operator
-    if (ch === '&' && next === '&') {
+    if (ch === "&" && next === "&") {
       if (current.trim()) segments.push(current.trim());
-      current = '';
+      current = "";
       i++;
       continue;
     }
 
     // || operator
-    if (ch === '|' && next === '|') {
+    if (ch === "|" && next === "|") {
       if (current.trim()) segments.push(current.trim());
-      current = '';
+      current = "";
       i++;
       continue;
     }
 
     // ; separator
-    if (ch === ';') {
+    if (ch === ";") {
       if (current.trim()) segments.push(current.trim());
-      current = '';
+      current = "";
       continue;
     }
 
     // Single & — but skip redirection patterns (&>, >&, digit>&)
-    if (ch === '&' && next !== '&') {
-      if (next === '>' || prev === '>') {
+    if (ch === "&" && next !== "&") {
+      if (next === ">" || prev === ">") {
         current += ch;
         continue;
       }
       if (current.trim()) segments.push(current.trim());
-      current = '';
+      current = "";
       continue;
     }
 

@@ -13,39 +13,39 @@
  * nothing to resume.
  */
 
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
 
 function stateDir() {
   const override = process.env.ECC_PLAN_CANVAS_STATE_DIR;
   if (override && override.trim()) return path.resolve(override.trim());
-  return path.join(os.homedir(), '.claude', 'plan-canvas');
+  return path.join(os.homedir(), ".claude", "plan-canvas");
 }
 
 function openSessions() {
   try {
-    const parsed = JSON.parse(fs.readFileSync(path.join(stateDir(), 'sessions.json'), 'utf8'));
-    return Object.values(parsed.sessions || {}).filter(session => session.status !== 'ended');
+    const parsed = JSON.parse(fs.readFileSync(path.join(stateDir(), "sessions.json"), "utf8"));
+    return Object.values(parsed.sessions || {}).filter((session) => session.status !== "ended");
   } catch {
     return [];
   }
 }
 
 function buildContext(sessions) {
-  const lines = [
-    '[PlanCanvas] Open browser review sessions from a previous run:'
-  ];
+  const lines = ["[PlanCanvas] Open browser review sessions from a previous run:"];
   for (const session of sessions.slice(0, 5)) {
     const pending = session.pendingFeedback && session.pendingFeedback.length;
-    lines.push(`  - ${session.file}${pending ? ` (${pending} undelivered feedback item${pending === 1 ? '' : 's'})` : ''}`);
+    lines.push(
+      `  - ${session.file}${pending ? ` (${pending} undelivered feedback item${pending === 1 ? "" : "s"})` : ""}`,
+    );
   }
   lines.push(
-    'Resume with `node scripts/plan-canvas.js await <file>` (plan-canvas skill), or `end <file>` if the review is obsolete.'
+    "Resume with `node scripts/plan-canvas.js await <file>` (plan-canvas skill), or `end <file>` if the review is obsolete.",
   );
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function run() {

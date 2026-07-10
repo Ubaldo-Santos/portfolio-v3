@@ -11,10 +11,10 @@
  * Exit code 0 always (warns only, never blocks).
  */
 
-'use strict';
+"use strict";
 
-const path = require('path');
-const { buildPreToolUseAdditionalContext } = require('./pretooluse-visible-output');
+const path = require("path");
+const { buildPreToolUseAdditionalContext } = require("./pretooluse-visible-output");
 
 const MAX_STDIN = 1024 * 1024;
 
@@ -22,10 +22,11 @@ const MAX_STDIN = 1024 * 1024;
 const ADHOC_FILENAMES = /^(NOTES|TODO|SCRATCH|TEMP|DRAFT|BRAINSTORM|SPIKE|DEBUG|WIP)\.(md|txt)$/;
 
 // Structured directories where even ad-hoc names are intentional
-const STRUCTURED_DIRS = /(^|\/)(docs|\.claude|\.github|commands|skills|benchmarks|templates|\.history|memory)\//;
+const STRUCTURED_DIRS =
+  /(^|\/)(docs|\.claude|\.github|commands|skills|benchmarks|templates|\.history|memory)\//;
 
 function isSuspiciousDocPath(filePath) {
-  const normalized = filePath.replace(/\\/g, '/');
+  const normalized = filePath.replace(/\\/g, "/");
   const basename = path.basename(normalized);
 
   // Only inspect .md and .txt files (case-sensitive, consistent with ADHOC_FILENAMES)
@@ -47,21 +48,24 @@ function isSuspiciousDocPath(filePath) {
 function run(inputOrRaw, _options = {}) {
   let input;
   try {
-    input = typeof inputOrRaw === 'string'
-      ? (inputOrRaw.trim() ? JSON.parse(inputOrRaw) : {})
-      : (inputOrRaw || {});
+    input =
+      typeof inputOrRaw === "string"
+        ? inputOrRaw.trim()
+          ? JSON.parse(inputOrRaw)
+          : {}
+        : inputOrRaw || {};
   } catch {
     return { exitCode: 0 };
   }
-  const filePath = String(input?.tool_input?.file_path || '');
+  const filePath = String(input?.tool_input?.file_path || "");
 
   if (filePath && isSuspiciousDocPath(filePath)) {
     return {
       exitCode: 0,
       additionalContext: [
-        '[Hook] WARNING: Ad-hoc documentation filename detected',
+        "[Hook] WARNING: Ad-hoc documentation filename detected",
         `[Hook] File: ${filePath}`,
-        '[Hook] Consider using a structured path (e.g. docs/, .claude/, skills/, .github/, benchmarks/, templates/)',
+        "[Hook] Consider using a structured path (e.g. docs/, .claude/, skills/, .github/, benchmarks/, templates/)",
       ],
     };
   }
@@ -76,23 +80,23 @@ function run(inputOrRaw, _options = {}) {
  * stdin listeners are not leaked into a parent that loads this hook in-process.
  */
 function main() {
-  let data = '';
-  process.stdin.setEncoding('utf8');
-  process.stdin.on('data', c => {
+  let data = "";
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (c) => {
     if (data.length < MAX_STDIN) {
       const remaining = MAX_STDIN - data.length;
       data += c.substring(0, remaining);
     }
   });
 
-  process.stdin.on('end', () => {
+  process.stdin.on("end", () => {
     const result = run(data);
 
     if (result.stderr) {
-      process.stderr.write(result.stderr + '\n');
+      process.stderr.write(result.stderr + "\n");
     }
 
-    if (Object.prototype.hasOwnProperty.call(result, 'additionalContext')) {
+    if (Object.prototype.hasOwnProperty.call(result, "additionalContext")) {
       process.stdout.write(buildPreToolUseAdditionalContext(result.additionalContext));
     } else {
       process.stdout.write(data);

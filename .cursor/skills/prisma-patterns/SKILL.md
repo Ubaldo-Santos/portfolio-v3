@@ -16,6 +16,7 @@ Production patterns and non-obvious traps for Prisma ORM in TypeScript backends.
 > ```
 >
 > Notable API differences across versions:
+>
 > - `relationJoins` can load relations via JOIN rather than separate queries, but may cause row explosion on large 1:N relations or deep `include` — benchmark both approaches
 > - `omit` field modifier and `prisma.$extends` Client Extensions API were added
 > - **Newer installs**: the package may be named `prisma` instead of `@prisma/client`; `PrismaClient` may require a driver adapter (e.g. `@prisma/adapter-pg`); `datasource.url` may live in `prisma.config.ts` instead of `schema.prisma`
@@ -34,11 +35,11 @@ Production patterns and non-obvious traps for Prisma ORM in TypeScript backends.
 
 ### ID Strategy
 
-| Strategy | Use When | Avoid When |
-|---|---|---|
-| `@default(cuid())` | Default choice — URL-safe, sortable, no collisions | Sequential IDs needed for external systems |
-| `@default(uuid())` | Interoperability with non-Prisma systems required | High-write tables (random UUIDs fragment B-tree indexes) |
-| `@default(autoincrement())` | Internal join tables, audit logs | Public-facing IDs (exposes record count) |
+| Strategy                    | Use When                                           | Avoid When                                               |
+| --------------------------- | -------------------------------------------------- | -------------------------------------------------------- |
+| `@default(cuid())`          | Default choice — URL-safe, sortable, no collisions | Sequential IDs needed for external systems               |
+| `@default(uuid())`          | Interoperability with non-Prisma systems required  | High-write tables (random UUIDs fragment B-tree indexes) |
+| `@default(autoincrement())` | Internal join tables, audit logs                   | Public-facing IDs (exposes record count)                 |
 
 ### Schema Defaults
 
@@ -64,12 +65,12 @@ model User {
 
 ### `include` vs `select`
 
-| | `include` | `select` |
-|---|---|---|
-| Returns | All scalar fields + specified relations | Only specified fields |
-| Use when | You need most fields plus a relation | Hot paths, large tables, avoiding over-fetch |
-| Performance | May over-fetch on wide tables | Minimal payload, faster on large datasets |
-| Prisma 5 note | Uses JOIN by default (`relationJoins`) | Same |
+|               | `include`                               | `select`                                     |
+| ------------- | --------------------------------------- | -------------------------------------------- |
+| Returns       | All scalar fields + specified relations | Only specified fields                        |
+| Use when      | You need most fields plus a relation    | Hot paths, large tables, avoiding over-fetch |
+| Performance   | May over-fetch on wide tables           | Minimal payload, faster on large datasets    |
+| Prisma 5 note | Uses JOIN by default (`relationJoins`)  | Same                                         |
 
 ```ts
 // include — all columns + relation
@@ -98,11 +99,11 @@ return { id: user.id, name: user.name, email: user.email };
 
 ### Transaction Form Selection
 
-| Situation | Use |
-|---|---|
-| Independent operations, no inter-dependency | Array form |
-| Later step depends on earlier result | Interactive form |
-| External calls (email, HTTP) involved | Outside transaction entirely |
+| Situation                                   | Use                          |
+| ------------------------------------------- | ---------------------------- |
+| Independent operations, no inter-dependency | Array form                   |
+| Later step depends on earlier result        | Interactive form             |
+| External calls (email, HTTP) involved       | Outside transaction entirely |
 
 ```ts
 // Array form — batched in one round trip
@@ -114,7 +115,7 @@ const [user, post] = await prisma.$transaction([
 // Interactive form — use tx client only, never the outer prisma client
 const post = await prisma.$transaction(async (tx) => {
   const user = await tx.user.findUniqueOrThrow({ where: { id } });
-  if (user.role !== 'ADMIN') throw new Error('Forbidden');
+  if (user.role !== "ADMIN") throw new Error("Forbidden");
   return tx.post.create({ data: { title, authorId: user.id } });
 });
 ```
@@ -127,8 +128,8 @@ Each `PrismaClient` instance opens its own connection pool. Instantiate once.
 // lib/prisma.ts
 
 // Option A — adapter-based initialization (required by newer Prisma installs)
-import { PrismaClient } from '@prisma/client'; // or the generated client path for your setup
-import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from "@prisma/client"; // or the generated client path for your setup
+import { PrismaPg } from "@prisma/adapter-pg";
 
 function createPrismaClient() {
   const adapter = new PrismaPg({
@@ -136,7 +137,7 @@ function createPrismaClient() {
   });
   return new PrismaClient({
     adapter,
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error'] : ['error'],
+    log: process.env.NODE_ENV === "development" ? ["query", "error"] : ["error"],
   });
 }
 
@@ -144,7 +145,7 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 // Option B — direct initialization (older installs, no adapter needed)
 // import { PrismaClient } from '@prisma/client';
@@ -182,8 +183,8 @@ async function getPosts(cursor?: string, limit = 20) {
   const items = await prisma.post.findMany({
     where: { published: true },
     orderBy: [
-      { createdAt: 'desc' },
-      { id: 'desc' }, // secondary sort prevents unstable pagination on duplicate timestamps
+      { createdAt: "desc" },
+      { id: "desc" }, // secondary sort prevents unstable pagination on duplicate timestamps
     ],
     take: limit + 1,
     ...(cursor && { cursor: { id: cursor }, skip: 1 }),
@@ -211,15 +212,15 @@ await prisma.user.update({ where: { id }, data: { deletedAt: null } }); // resto
 ### Error Handling
 
 ```ts
-import { Prisma } from '@prisma/client'; // or the generated client path for your setup
+import { Prisma } from "@prisma/client"; // or the generated client path for your setup
 
 try {
   await prisma.user.create({ data: { email } });
 } catch (e) {
   if (e instanceof Prisma.PrismaClientKnownRequestError) {
-    if (e.code === 'P2002') throw new ConflictError('Email already exists');
-    if (e.code === 'P2025') throw new NotFoundError('Record not found');
-    if (e.code === 'P2003') throw new BadRequestError('Referenced record does not exist');
+    if (e.code === "P2002") throw new ConflictError("Email already exists");
+    if (e.code === "P2025") throw new NotFoundError("Record not found");
+    if (e.code === "P2003") throw new BadRequestError("Referenced record does not exist");
   }
   throw e;
 }
@@ -246,8 +247,8 @@ DATABASE_URL="postgresql://user:pass@host/db?pgbouncer=true&connection_limit=1"
 // cap pool to 1 per instance; connection_limit and pool_timeout controlled via DATABASE_URL
 
 // Adapter-based setup (if your Prisma install requires an adapter):
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
@@ -263,15 +264,15 @@ const prisma = new PrismaClient({
 
 ```ts
 // BAD: result is { count: 2 } — users[0] is undefined
-const users = await prisma.user.updateMany({ where: { role: 'GUEST' }, data: { role: 'USER' } });
+const users = await prisma.user.updateMany({ where: { role: "GUEST" }, data: { role: "USER" } });
 
 // GOOD: capture IDs first, then update, then fetch only the affected rows
 const targets = await prisma.user.findMany({
-  where: { role: 'GUEST' },
+  where: { role: "GUEST" },
   select: { id: true },
 });
 const ids = targets.map((u) => u.id);
-await prisma.user.updateMany({ where: { id: { in: ids } }, data: { role: 'USER' } });
+await prisma.user.updateMany({ where: { id: { in: ids } }, data: { role: "USER" } });
 const updated = await prisma.user.findMany({ where: { id: { in: ids } } });
 ```
 
@@ -383,15 +384,15 @@ await prisma.post.deleteMany({ where: { authorId: userId } });
 
 ## Best Practices
 
-| Rule | Reason |
-|---|---|
-| `migrate deploy` in CI/CD, `migrate dev` only locally | `migrate dev` can reset the DB on drift |
-| Map entities to response DTOs | Prevents leaking internal fields |
-| Catch `PrismaClientKnownRequestError` at service boundary | Translate to domain errors |
-| Prefer `*OrThrow` methods over manual null checks | Throws P2025 automatically; use `findFirstOrThrow` when filtering non-unique fields |
-| `connection_limit=1` + external pooler in serverless | Prevents connection exhaustion |
-| Always provide `where` on `deleteMany` | Prevents accidental table wipe |
-| Set `updatedAt: new Date()` manually in `updateMany` | `@updatedAt` skips bulk writes |
+| Rule                                                      | Reason                                                                              |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `migrate deploy` in CI/CD, `migrate dev` only locally     | `migrate dev` can reset the DB on drift                                             |
+| Map entities to response DTOs                             | Prevents leaking internal fields                                                    |
+| Catch `PrismaClientKnownRequestError` at service boundary | Translate to domain errors                                                          |
+| Prefer `*OrThrow` methods over manual null checks         | Throws P2025 automatically; use `findFirstOrThrow` when filtering non-unique fields |
+| `connection_limit=1` + external pooler in serverless      | Prevents connection exhaustion                                                      |
+| Always provide `where` on `deleteMany`                    | Prevents accidental table wipe                                                      |
+| Set `updatedAt: new Date()` manually in `updateMany`      | `@updatedAt` skips bulk writes                                                      |
 
 ## Related Skills
 

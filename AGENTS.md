@@ -16,15 +16,15 @@ Personal portfolio at `https://ubaldo.is-a.dev`. Static SSR site with TanStack S
 
 This repo runs **[Everything Claude Code (ECC)](https://github.com/affaan-m/ECC)** adapted for Cursor (`profile: developer`).
 
-| Path | Purpose |
-|------|---------|
-| `.cursor/hooks.json` | Lifecycle hooks (memory, format, secrets, git guards) |
-| `.cursor/skills/` | Workflow skills — read `SKILL.md` when task matches |
-| `.cursor/agents/` | Specialized subagents (`ecc-*`) |
-| `.cursor/commands/` | Slash command definitions |
-| `.cursor/rules/` | File-scoped coding standards |
-| `ecc-install.json` | Reproducible ECC install manifest |
-| `.cursor/ecc-agent-data.json` | Memory root: `~/.cursor/ecc` |
+| Path                          | Purpose                                               |
+| ----------------------------- | ----------------------------------------------------- |
+| `.cursor/hooks.json`          | Lifecycle hooks (memory, format, secrets, git guards) |
+| `.cursor/skills/`             | Workflow skills — read `SKILL.md` when task matches   |
+| `.cursor/agents/`             | Specialized subagents (`ecc-*`)                       |
+| `.cursor/commands/`           | Slash command definitions                             |
+| `.cursor/rules/`              | File-scoped coding standards                          |
+| `ecc-install.json`            | Reproducible ECC install manifest                     |
+| `.cursor/ecc-agent-data.json` | Memory root: `~/.cursor/ecc`                          |
 
 **Harness awareness rule:** `.cursor/rules/ecc-harness.mdc`
 
@@ -52,11 +52,11 @@ After changes: `bun run lint && bun run build`
 
 ## Documentation
 
-| File | Purpose |
-|------|---------|
+| File                 | Purpose                       |
+| -------------------- | ----------------------------- |
 | `docs/AI-CONTEXT.md` | AI codemap and change recipes |
-| `docs/AUDIT.md` | Production audit (2026-07-10) |
-| `public/llms.txt` | Machine-readable site summary |
+| `docs/AUDIT.md`      | Production audit (2026-07-10) |
+| `public/llms.txt`    | Machine-readable site summary |
 
 ## Out of scope
 

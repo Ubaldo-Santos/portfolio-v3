@@ -88,12 +88,12 @@ bootstrap();
 })
 export class UsersModule {}
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':id')
-  getById(@Param('id', ParseUUIDPipe) id: string) {
+  @Get(":id")
+  getById(@Param("id", ParseUUIDPipe) id: string) {
     return this.usersService.getById(id);
   }
 
@@ -171,7 +171,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     return response.status(500).json({
       path: request.url,
-      error: 'Internal server error',
+      error: "Internal server error",
     });
   }
 }
@@ -203,7 +203,7 @@ ConfigModule.forRoot({
 ## Testing
 
 ```ts
-describe('UsersController', () => {
+describe("UsersController", () => {
   let app: INestApplication;
 
   beforeAll(async () => {

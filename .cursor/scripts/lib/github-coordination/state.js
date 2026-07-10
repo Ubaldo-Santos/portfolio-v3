@@ -1,33 +1,35 @@
-'use strict';
+"use strict";
 
-const { DEFAULT_POLICY, DEFAULT_SCHEMA_VERSION } = require('./policy');
-const { extractIssueReferences, extractTasks } = require('./parsing');
-const { normalizeLabels, listIssues, editIssue } = require('./gh-api');
+const { DEFAULT_POLICY, DEFAULT_SCHEMA_VERSION } = require("./policy");
+const { extractIssueReferences, extractTasks } = require("./parsing");
+const { normalizeLabels, listIssues, editIssue } = require("./gh-api");
 
 function slugifySegment(value) {
-  return String(value || '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'unknown';
+  return (
+    String(value || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "unknown"
+  );
 }
 
 function defaultCoordinationState(issue, policy = DEFAULT_POLICY) {
   return {
     schemaVersion: policy.schemaVersion || DEFAULT_SCHEMA_VERSION,
-    kind: 'epic',
-    status: 'available',
+    kind: "epic",
+    status: "available",
     owner: issue && issue.author && issue.author.login ? issue.author.login : null,
     branch: null,
-    validation: 'pending',
-    review: 'not-requested',
+    validation: "pending",
+    review: "not-requested",
     project: {
-      state: 'backlog',
+      state: "backlog",
       fields: {},
     },
-    dependencies: extractIssueReferences(issue && issue.body ? issue.body : ''),
-    tasks: extractTasks(issue && issue.body ? issue.body : ''),
+    dependencies: extractIssueReferences(issue && issue.body ? issue.body : ""),
+    tasks: extractTasks(issue && issue.body ? issue.body : ""),
     labels: normalizeLabels(issue && issue.labels),
-    lastAction: 'sync',
+    lastAction: "sync",
     lastActionAt: new Date().toISOString(),
     lastSyncAt: new Date().toISOString(),
     notes: null,
@@ -35,12 +37,14 @@ function defaultCoordinationState(issue, policy = DEFAULT_POLICY) {
 }
 
 function getCoordinationState(issue, policy = DEFAULT_POLICY) {
-  const { extractCoordinationState } = require('./parsing'); // lazy to avoid circular init order
+  const { extractCoordinationState } = require("./parsing"); // lazy to avoid circular init order
   let existing;
   try {
     existing = extractCoordinationState(issue && issue.body, policy);
   } catch (error) {
-    process.stderr.write(`[github-coordination] Warning: ${error.message} (issue #${issue && issue.number})\n`);
+    process.stderr.write(
+      `[github-coordination] Warning: ${error.message} (issue #${issue && issue.number})\n`,
+    );
     existing = null;
   }
   if (existing) {
@@ -51,25 +55,39 @@ function getCoordinationState(issue, policy = DEFAULT_POLICY) {
         ...defaultCoordinationState(issue, policy).project,
         ...(existing.project || {}),
       },
-      tasks: Array.isArray(existing.tasks) ? existing.tasks : extractTasks(issue && issue.body ? issue.body : ''),
-      dependencies: Array.isArray(existing.dependencies) ? existing.dependencies : extractIssueReferences(issue && issue.body ? issue.body : ''),
-      labels: Array.isArray(existing.labels) ? existing.labels : normalizeLabels(issue && issue.labels),
+      tasks: Array.isArray(existing.tasks)
+        ? existing.tasks
+        : extractTasks(issue && issue.body ? issue.body : ""),
+      dependencies: Array.isArray(existing.dependencies)
+        ? existing.dependencies
+        : extractIssueReferences(issue && issue.body ? issue.body : ""),
+      labels: Array.isArray(existing.labels)
+        ? existing.labels
+        : normalizeLabels(issue && issue.labels),
     };
   }
   return defaultCoordinationState(issue, policy);
 }
 
-function buildIssueStateFromAction(issue, currentState, action, options = {}, policy = DEFAULT_POLICY) {
+function buildIssueStateFromAction(
+  issue,
+  currentState,
+  action,
+  options = {},
+  policy = DEFAULT_POLICY,
+) {
   const now = new Date().toISOString();
   const next = {
     ...currentState,
     schemaVersion: policy.schemaVersion || DEFAULT_SCHEMA_VERSION,
-    kind: 'epic',
+    kind: "epic",
     lastAction: action,
     lastActionAt: now,
     lastSyncAt: now,
     labels: normalizeLabels(issue.labels),
-    dependencies: Array.isArray(currentState.dependencies) ? currentState.dependencies : extractIssueReferences(issue.body),
+    dependencies: Array.isArray(currentState.dependencies)
+      ? currentState.dependencies
+      : extractIssueReferences(issue.body),
     tasks: Array.isArray(currentState.tasks) ? currentState.tasks : extractTasks(issue.body),
   };
 
@@ -95,15 +113,15 @@ function desiredLabelsForState(state, policy = DEFAULT_POLICY) {
   labels.push(known.epic);
   labels.push(known.synced);
 
-  if (state.status === 'available') labels.push(known.available);
-  if (state.status === 'claimed') labels.push(known.claimed);
-  if (state.status === 'ready') labels.push(known.ready);
-  if (state.status === 'blocked') labels.push(known.blocked);
-  if (state.validation === 'passed') labels.push(known.validated);
-  if (state.review === 'requested') labels.push(known.reviewRequested);
-  if (state.review === 'approved') labels.push(known.reviewApproved);
-  if (state.review === 'changes-requested') labels.push(known.reviewChangesRequested);
-  if (state.status === 'published') labels.push(known.published);
+  if (state.status === "available") labels.push(known.available);
+  if (state.status === "claimed") labels.push(known.claimed);
+  if (state.status === "ready") labels.push(known.ready);
+  if (state.status === "blocked") labels.push(known.blocked);
+  if (state.validation === "passed") labels.push(known.validated);
+  if (state.review === "requested") labels.push(known.reviewRequested);
+  if (state.review === "approved") labels.push(known.reviewApproved);
+  if (state.review === "changes-requested") labels.push(known.reviewChangesRequested);
+  if (state.status === "published") labels.push(known.published);
 
   return Array.from(new Set(labels.filter(Boolean))).sort();
 }
@@ -111,9 +129,9 @@ function desiredLabelsForState(state, policy = DEFAULT_POLICY) {
 function syncIssueLabels(repo, issue, state, policy = DEFAULT_POLICY, options = {}) {
   const desired = new Set(desiredLabelsForState(state, policy));
   const current = new Set(normalizeLabels(issue.labels));
-  const addLabels = Array.from(desired).filter(label => !current.has(label));
-  const removeLabels = Array.from(current).filter(label => {
-    if (!label.startsWith('coordination:') && label !== (policy.labels && policy.labels.epic)) {
+  const addLabels = Array.from(desired).filter((label) => !current.has(label));
+  const removeLabels = Array.from(current).filter((label) => {
+    if (!label.startsWith("coordination:") && label !== (policy.labels && policy.labels.epic)) {
       return false;
     }
     return !desired.has(label);
@@ -131,7 +149,7 @@ function syncIssueLabels(repo, issue, state, policy = DEFAULT_POLICY, options = 
 }
 
 function findIssueByNumber(issues, issueNumber) {
-  return issues.find(issue => Number(issue.number) === Number(issueNumber)) || null;
+  return issues.find((issue) => Number(issue.number) === Number(issueNumber)) || null;
 }
 
 function buildIssueComment(action, repo, issueNumber, state, extra = {}) {
@@ -140,43 +158,43 @@ function buildIssueComment(action, repo, issueNumber, state, extra = {}) {
     `Repo: ${repo}`,
     `Issue: #${issueNumber}`,
     `Status: ${state.status}`,
-    `Owner: ${state.owner || '(unassigned)'}`,
-    `Branch: ${state.branch || '(none)'}`,
-    `Validation: ${state.validation || 'pending'}`,
-    `Review: ${state.review || 'not-requested'}`,
+    `Owner: ${state.owner || "(unassigned)"}`,
+    `Branch: ${state.branch || "(none)"}`,
+    `Validation: ${state.validation || "pending"}`,
+    `Review: ${state.review || "not-requested"}`,
   ];
 
   for (const [key, value] of Object.entries(extra)) {
     summary.push(`${key}: ${value}`);
   }
 
-  summary.push('', 'This comment is part of the append-only coordination audit trail.');
-  return summary.join('\n');
+  summary.push("", "This comment is part of the append-only coordination audit trail.");
+  return summary.join("\n");
 }
 
 function mapStateToWorkItemStatus(state) {
   switch (state) {
-    case 'blocked':
-      return 'blocked';
-    case 'published':
-      return 'done';
-    case 'validated':
-    case 'reviewing':
-    case 'claimed':
-    case 'ready':
-      return 'in-progress';
-    case 'changes-requested':
-      return 'needs-review';
-    case 'available':
+    case "blocked":
+      return "blocked";
+    case "published":
+      return "done";
+    case "validated":
+    case "reviewing":
+    case "claimed":
+    case "ready":
+      return "in-progress";
+    case "changes-requested":
+      return "needs-review";
+    case "available":
     default:
-      return 'open';
+      return "open";
   }
 }
 
 function summarizeProjectProjection(state, policy = DEFAULT_POLICY) {
   return {
     enabled: Boolean(policy.project && policy.project.enabled),
-    state: state.project && state.project.state ? state.project.state : 'backlog',
+    state: state.project && state.project.state ? state.project.state : "backlog",
     fields: {
       ...(state.project && state.project.fields ? state.project.fields : {}),
     },
@@ -194,8 +212,8 @@ function summarizeStateForOutput(repo, issue, state, action, policy = DEFAULT_PO
     status: state.status,
     owner: state.owner || null,
     branch: state.branch || null,
-    validation: state.validation || 'pending',
-    review: state.review || 'not-requested',
+    validation: state.validation || "pending",
+    review: state.review || "not-requested",
     project: summarizeProjectProjection(state, policy),
     dependencies: Array.isArray(state.dependencies) ? state.dependencies : [],
     tasks: Array.isArray(state.tasks) ? state.tasks : [],
@@ -207,12 +225,12 @@ function summarizeStateForOutput(repo, issue, state, action, policy = DEFAULT_PO
 }
 
 function assertIssueClaimable(issue, state) {
-  if (String(issue.state || '').toLowerCase() !== 'open') {
+  if (String(issue.state || "").toLowerCase() !== "open") {
     throw new Error(`Issue #${issue.number} is not open`);
   }
 
-  if (state.status === 'claimed') {
-    throw new Error(`Issue #${issue.number} is already claimed by ${state.owner || 'unknown'}`);
+  if (state.status === "claimed") {
+    throw new Error(`Issue #${issue.number} is already claimed by ${state.owner || "unknown"}`);
   }
 }
 
@@ -221,13 +239,16 @@ function verifyDependenciesClosed(repo, dependencyNumbers, options = {}, allIssu
     return [];
   }
 
-  const issueList = allIssues || listIssues(repo, { ...options, state: 'all', limit: options.limit || 200 });
+  const issueList =
+    allIssues || listIssues(repo, { ...options, state: "all", limit: options.limit || 200 });
   const closed = [];
   for (const dependencyNumber of dependencyNumbers) {
     const issue = findIssueByNumber(issueList, dependencyNumber);
     if (!issue) {
-      process.stderr.write(`[github-coordination] Warning: dependency issue #${dependencyNumber} not found in issue list (may be in a different repo or beyond limit)\n`);
-    } else if (String(issue.state || '').toLowerCase() === 'closed') {
+      process.stderr.write(
+        `[github-coordination] Warning: dependency issue #${dependencyNumber} not found in issue list (may be in a different repo or beyond limit)\n`,
+      );
+    } else if (String(issue.state || "").toLowerCase() === "closed") {
       closed.push(dependencyNumber);
     }
   }

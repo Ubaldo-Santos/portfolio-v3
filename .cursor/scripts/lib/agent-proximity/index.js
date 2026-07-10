@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Agent-proximity orchestration: scan all agents in a codebase, compute the
@@ -11,18 +11,18 @@
  *     renderViz(scan.positions, scan.advisories)        // 3D crawl view
  */
 
-const crypto = require('crypto');
-const { advise, collisionRisk, DEFAULTS } = require('./distance');
-const { buildDependencyGraph, buildDependencyGraphFromSources } = require('./graph');
+const crypto = require("crypto");
+const { advise, collisionRisk, DEFAULTS } = require("./distance");
+const { buildDependencyGraph, buildDependencyGraphFromSources } = require("./graph");
 
-const { normalizePath, segments } = require('./distance')._internal;
+const { normalizePath, segments } = require("./distance")._internal;
 
 /**
  * Deterministic hash of a string to a unit-ish vector in R^dims (components in
  * roughly [-1, 1]). Used to place tree prefixes in space.
  */
 function hashVec(str, dims) {
-  const digest = crypto.createHash('sha256').update(String(str)).digest();
+  const digest = crypto.createHash("sha256").update(String(str)).digest();
   const v = new Array(dims).fill(0);
   for (let d = 0; d < dims; d += 1) {
     // Two bytes per dim → [-1, 1).
@@ -42,9 +42,9 @@ function hashVec(str, dims) {
 function fileCoordinate(filePath, dims = 3) {
   const segs = segments(filePath);
   const v = new Array(dims).fill(0);
-  let prefix = '';
+  let prefix = "";
   for (let i = 0; i < segs.length; i += 1) {
-    prefix += '/' + segs[i];
+    prefix += "/" + segs[i];
     const h = hashVec(prefix, dims);
     const scale = 1 / Math.pow(2, i);
     for (let d = 0; d < dims; d += 1) v[d] += h[d] * scale;
@@ -62,7 +62,7 @@ function smoothByDependency(coords, graph, alpha = 0.35) {
   const out = {};
   for (const file of Object.keys(coords)) {
     const base = coords[file];
-    const neighbours = (adj[file] || []).map(normalizePath).filter(n => coords[n]);
+    const neighbours = (adj[file] || []).map(normalizePath).filter((n) => coords[n]);
     if (neighbours.length === 0) {
       out[file] = base.slice();
       continue;
@@ -105,10 +105,10 @@ function embedAgents(agents, graph = {}, options = {}) {
     }
   }
   const smoothed = smoothByDependency(fileCoords, graph, options.dependencyPull ?? 0.35);
-  const positions = agents.map(agent => ({
+  const positions = agents.map((agent) => ({
     agentId: agent.agentId,
     position: weightedCentroid(agent.files || [], smoothed, dims),
-    fileCount: (agent.files || []).length
+    fileCount: (agent.files || []).length,
   }));
   return { dims, positions, fileCoordinates: smoothed };
 }
@@ -122,7 +122,9 @@ function embedAgents(agents, graph = {}, options = {}) {
  * @returns {{ advisories, positions, links, generatedAt }}
  */
 function scanAirspace(agents, graph = {}, options = {}) {
-  const list = Array.isArray(agents) ? agents.filter(a => a && a.agentId !== null && a.agentId !== undefined) : [];
+  const list = Array.isArray(agents)
+    ? agents.filter((a) => a && a.agentId !== null && a.agentId !== undefined)
+    : [];
   const advisories = [];
   const links = [];
   for (let i = 0; i < list.length; i += 1) {
@@ -135,9 +137,9 @@ function scanAirspace(agents, graph = {}, options = {}) {
         b: b.agentId,
         risk: verdict.risk,
         distance: verdict.distance,
-        level: verdict.level
+        level: verdict.level,
       });
-      if (verdict.level !== 'clear') {
+      if (verdict.level !== "clear") {
         advisories.push({ a: a.agentId, b: b.agentId, ...verdict });
       }
     }
@@ -153,8 +155,8 @@ function scanAirspace(agents, graph = {}, options = {}) {
     counts: {
       agents: list.length,
       advisories: advisories.length,
-      resolutions: advisories.filter(a => a.level === 'resolution').length
-    }
+      resolutions: advisories.filter((a) => a.level === "resolution").length,
+    },
   };
 }
 
@@ -173,37 +175,37 @@ function pct(x) {
 function buildProximityTriggers(advisories) {
   const triggers = [];
   for (const adv of advisories || []) {
-    if (adv.level === 'advisory') {
+    if (adv.level === "advisory") {
       // Traffic Advisory: both agents exchange intent.
       triggers.push({
         to: adv.a,
         from: adv.b,
-        type: 'proximity_transmit',
+        type: "proximity_transmit",
         risk: adv.risk,
-        content: `Proximity ${pct(adv.risk)}%: you and ${adv.b} are converging in code-space. Share what you're working on and check for overlap before continuing.`
+        content: `Proximity ${pct(adv.risk)}%: you and ${adv.b} are converging in code-space. Share what you're working on and check for overlap before continuing.`,
       });
       triggers.push({
         to: adv.b,
         from: adv.a,
-        type: 'proximity_transmit',
+        type: "proximity_transmit",
         risk: adv.risk,
-        content: `Proximity ${pct(adv.risk)}%: you and ${adv.a} are converging in code-space. Share what you're working on and check for overlap before continuing.`
+        content: `Proximity ${pct(adv.risk)}%: you and ${adv.a} are converging in code-space. Share what you're working on and check for overlap before continuing.`,
       });
-    } else if (adv.level === 'resolution') {
+    } else if (adv.level === "resolution") {
       // Resolution Advisory: the lower-priority agent steers; the other holds.
       triggers.push({
         to: adv.steer,
         from: adv.hold,
-        type: 'proximity_steer',
+        type: "proximity_steer",
         risk: adv.risk,
-        content: `Collision risk ${pct(adv.risk)}% with ${adv.hold}, which holds right-of-way. Steer away: move to a different file/area, or coordinate with ${adv.hold} before editing the shared region.`
+        content: `Collision risk ${pct(adv.risk)}% with ${adv.hold}, which holds right-of-way. Steer away: move to a different file/area, or coordinate with ${adv.hold} before editing the shared region.`,
       });
       triggers.push({
         to: adv.hold,
         from: adv.steer,
-        type: 'proximity_hold',
+        type: "proximity_hold",
         risk: adv.risk,
-        content: `Collision risk ${pct(adv.risk)}% with ${adv.steer}; you hold right-of-way. ${adv.steer} has been asked to steer away — continue, but expect a handoff if they can't.`
+        content: `Collision risk ${pct(adv.risk)}% with ${adv.steer}; you hold right-of-way. ${adv.steer} has been asked to steer away — continue, but expect a handoff if they can't.`,
       });
     }
   }
@@ -219,5 +221,5 @@ module.exports = {
   advise,
   buildProximityTriggers,
   buildDependencyGraph,
-  buildDependencyGraphFromSources
+  buildDependencyGraphFromSources,
 };

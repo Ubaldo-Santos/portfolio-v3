@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Plan Canvas browser chrome: the editor shell that frames an artifact,
@@ -9,15 +9,15 @@
  * gradient. Everything is served inline — no CDNs, no external assets.
  */
 
-const path = require('path');
+const path = require("path");
 
-const { escapeHtml } = require('./markdown');
+const { escapeHtml } = require("./markdown");
 
 // Pinned Mermaid ESM build, loaded in the browser only when an artifact
 // actually contains a diagram. Override with a local/vendored URL (e.g. an
 // air-gapped mirror) via ECC_PLAN_CANVAS_MERMAID_URL. If the fetch fails, the
 // diagram source stays visible as a styled code block — nothing breaks.
-const DEFAULT_MERMAID_URL = 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs';
+const DEFAULT_MERMAID_URL = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs";
 
 function mermaidUrl(env = process.env) {
   const override = env.ECC_PLAN_CANVAS_MERMAID_URL;
@@ -378,15 +378,15 @@ function canvasClientJs() {
 }
 
 // The chrome page: header bar, artifact iframe, conversation rail.
-function renderCanvasHtml(session, { clientPath = '/client.js', cssPath = '/canvas.css' } = {}) {
+function renderCanvasHtml(session, { clientPath = "/client.js", cssPath = "/canvas.css" } = {}) {
   const name = path.basename(session.file);
   const bootstrap = JSON.stringify({
     key: session.key,
     file: session.file,
     status: session.status,
     endedBy: session.endedBy || null,
-    chat: session.chat
-  }).replace(/</g, '\\u003c');
+    chat: session.chat,
+  }).replace(/</g, "\\u003c");
   const artifactSrc = `/artifact/${session.key}/`;
   return `<!DOCTYPE html>
 <html lang="en">
@@ -490,7 +490,7 @@ ${TOKENS_CSS}
 <article class="doc">
 ${bodyHtml}
 </article>
-${hasMermaid ? mermaidLoaderScript(mermaidUrl()) : ''}
+${hasMermaid ? mermaidLoaderScript(mermaidUrl()) : ""}
 <script src="${sdkSrc}"></script>
 </body>
 </html>`;
@@ -498,13 +498,17 @@ ${hasMermaid ? mermaidLoaderScript(mermaidUrl()) : ''}
 
 // Landing page listing sessions (GET /).
 function renderSessionListHtml(sessions) {
-  const rows = sessions.map(s => {
-    const status = s.status === 'ended' ? `ended by ${escapeHtml(s.endedBy || 'agent')}` : s.status;
-    const link = s.status === 'ended'
-      ? escapeHtml(path.basename(s.file))
-      : `<a href="/canvas/${escapeHtml(s.key)}">${escapeHtml(path.basename(s.file))}</a>`;
-    return `<tr><td>${link}</td><td class="mono">${escapeHtml(s.file)}</td><td><span class="badge ${escapeHtml(s.status)}">${status}</span></td></tr>`;
-  }).join('\n');
+  const rows = sessions
+    .map((s) => {
+      const status =
+        s.status === "ended" ? `ended by ${escapeHtml(s.endedBy || "agent")}` : s.status;
+      const link =
+        s.status === "ended"
+          ? escapeHtml(path.basename(s.file))
+          : `<a href="/canvas/${escapeHtml(s.key)}">${escapeHtml(path.basename(s.file))}</a>`;
+      return `<tr><td>${link}</td><td class="mono">${escapeHtml(s.file)}</td><td><span class="badge ${escapeHtml(s.status)}">${status}</span></td></tr>`;
+    })
+    .join("\n");
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -538,5 +542,5 @@ module.exports = {
   canvasClientJs,
   renderCanvasHtml,
   renderMarkdownArtifactHtml,
-  renderSessionListHtml
+  renderSessionListHtml,
 };

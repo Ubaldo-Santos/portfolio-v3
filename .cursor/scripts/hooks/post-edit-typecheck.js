@@ -79,9 +79,7 @@ process.stdin.on("end", () => {
             .slice(0, 10);
 
           if (relevantLines.length > 0) {
-            console.error(
-              "[Hook] TypeScript errors in " + path.basename(filePath) + ":",
-            );
+            console.error("[Hook] TypeScript errors in " + path.basename(filePath) + ":");
             relevantLines.forEach((line) => console.error(line));
           }
         }

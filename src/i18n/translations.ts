@@ -1,46 +1,5 @@
 export const translations = {
   es: {
-    meta: {
-      siteName: "Ubaldo Santos Patón",
-      author: "Ubaldo Santos Patón",
-      keywords:
-        "Ubaldo Santos, Ubaldo Santos Patón, full-stack engineer, TypeScript, PHP, Laravel, Vue, Wiris, Nubric, Barcelona, MathType, AI, Copilot, Cursor, OpenRouter, MCP",
-      home: {
-        title: "Ubaldo Santos Patón — Full-Stack Software Engineer",
-        description:
-          "Ingeniero full-stack con 6+ años en producto. En Wiris: Assessment (Nubric) e integraciones MathType (Google Workspace, Office, Moodle, editores WYSIWYG). Ex-Rotrafu (+50K servicios).",
-        ogDescription:
-          "Ingeniero full-stack con 6+ años en producto · TypeScript · PHP · Laravel · Vue · Portfolio, proyectos y CV.",
-      },
-      experience: {
-        title: "Experiencia — Ubaldo Santos Patón",
-        description:
-          "6+ años en producto: Wiris (Assessment & MathType Integrations), Rotrafu (+50K servicios, −35% load time), Prime IT, iThinkUPC.",
-        ogDescription: "Trayectoria en producto e ingeniería.",
-      },
-      projects: {
-        title: "Proyectos — Ubaldo Santos Patón",
-        description:
-          "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 y technical assessments en GitHub.",
-        ogDescription: "Producto real y proyectos de aprendizaje verificables.",
-      },
-      skills: {
-        title: "Skills & IA — Ubaldo Santos Patón",
-        description:
-          "Stack verificado: TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), arquitectura hexagonal, DevOps e IA aplicada.",
-        ogDescription: "Stack, prácticas e IA aplicada en producto.",
-      },
-      cv: {
-        title: "CV — Ubaldo Santos Patón",
-        description: "Curriculum imprimible y optimizado para parsers ATS de Ubaldo Santos Patón.",
-        ogDescription: "Pulsa imprimir y guarda como PDF.",
-      },
-      contact: {
-        title: "Contacto — Ubaldo Santos Patón",
-        description: "Contacta con Ubaldo Santos Patón: email, teléfono, LinkedIn y GitHub.",
-        ogDescription: "Hablemos.",
-      },
-    },
     nav: {
       home: "Inicio",
       experience: "Experiencia",
@@ -80,17 +39,13 @@ export const translations = {
       currentRole: "Actualmente",
       whatIDo: "Qué hago",
       reachOut: "Contacto",
-      atWiris:
-        "En Wiris: Assessment (Nubric) e integraciones MathType en Google Workspace, Office add-ins, Moodle y editores WYSIWYG.",
       selectedWork: "Trabajo seleccionado",
-      selectedWorkSub: "Roles donde he entregado producto con impacto medible.",
       stack: "Stack principal",
       based: "Barcelona",
       techRibbon: "Stack tecnológico",
     },
     experience: {
       title: "Experiencia",
-      subtitle: "6+ años construyendo producto escalable con impacto medible.",
       work: "Trabajo",
       trainee: "Prácticas y formación",
       present: "Actualidad",
@@ -99,13 +54,11 @@ export const translations = {
     },
     projects: {
       title: "Proyectos",
-      subtitle: "Producto en producción y technical assessments verificables.",
       active: "En curso",
       archived: "Archivado",
     },
     skills: {
       title: "Skills y educación",
-      subtitle: "Stack verificado, prácticas de ingeniería e idiomas.",
       languages: "Lenguajes",
       backend: "Backend",
       frontend: "Frontend",
@@ -116,29 +69,17 @@ export const translations = {
       education: "Educación",
       spokenLanguages: "Idiomas",
       primaryStack: "Stack principal",
-      aiCallout: {
-        kicker: "IA en mi día a día y en producto",
-        title: "Skills + IA",
-        body: "Uso IA como copiloto a diario (GitHub Copilot a nivel organización, Cursor CLI con reglas en el repo, OpenRouter para enrutar a varios modelos con fallback, MCP para conectar el modelo a datos reales). También la he integrado en producto, no solo en mi editor.",
-        tags: ["GitHub Copilot (org)", "Cursor CLI", "OpenRouter", "MCP", "Agent Skills"],
-      },
     },
     contact: {
       title: "Hablemos",
-      subtitle: "Cuéntame en qué estás trabajando.",
       email: "Email",
       phone: "Teléfono",
       location: "Ubicación",
       social: "Social",
       ctaEmail: "Enviar email",
-      availability: "Respondo en menos de 24 h en días laborables.",
-      preferred:
-        "Preferiblemente por email para conversaciones técnicas; LinkedIn para presentaciones.",
     },
     cv: {
       title: "Curriculum Vitae",
-      subtitle: "Versión optimizada para impresión y parsers ATS.",
-      printHint: "Pulsa imprimir y guarda como PDF.",
       profile: "Perfil",
       experience: "Experiencia profesional",
       education: "Educación",
@@ -169,46 +110,6 @@ export const translations = {
     },
   },
   ca: {
-    meta: {
-      siteName: "Ubaldo Santos Patón",
-      author: "Ubaldo Santos Patón",
-      keywords:
-        "Ubaldo Santos, Ubaldo Santos Patón, full-stack engineer, TypeScript, PHP, Laravel, Vue, Wiris, Nubric, Barcelona, MathType, IA, Copilot, Cursor, OpenRouter, MCP",
-      home: {
-        title: "Ubaldo Santos Patón — Full-Stack Software Engineer",
-        description:
-          "Enginyer full-stack amb més de 6 anys en producte. A Wiris: Assessment (Nubric) i integracions MathType (Google Workspace, Office, Moodle, editors WYSIWYG). Ex-Rotrafu (+50K serveis).",
-        ogDescription: "Portfolio, projectes i currículum.",
-      },
-      experience: {
-        title: "Experiència — Ubaldo Santos Patón",
-        description:
-          "Més de 6 anys en producte: Wiris (Assessment & MathType Integrations), Rotrafu (+50K serveis, −35% temps de càrrega), Prime IT, iThinkUPC.",
-        ogDescription: "Trajectòria en producte i enginyeria.",
-      },
-      projects: {
-        title: "Projectes — Ubaldo Santos Patón",
-        description:
-          "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 i technical assessments a GitHub.",
-        ogDescription: "Producte real i projectes d'aprenentatge verificables.",
-      },
-      skills: {
-        title: "Skills & IA — Ubaldo Santos Patón",
-        description:
-          "Stack verificat: TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), arquitectura hexagonal, DevOps i IA aplicada.",
-        ogDescription: "Stack, pràctiques i IA aplicada en producte.",
-      },
-      cv: {
-        title: "CV — Ubaldo Santos Patón",
-        description: "Currículum imprimible i optimitzat per a parsers ATS d'Ubaldo Santos Patón.",
-        ogDescription: "Prem imprimir i desa com a PDF.",
-      },
-      contact: {
-        title: "Contacte — Ubaldo Santos Patón",
-        description: "Contacta amb Ubaldo Santos Patón: correu, telèfon, LinkedIn i GitHub.",
-        ogDescription: "Parlem.",
-      },
-    },
     nav: {
       home: "Inici",
       experience: "Experiència",
@@ -248,17 +149,13 @@ export const translations = {
       currentRole: "Actualment",
       whatIDo: "Què faig",
       reachOut: "Contacte",
-      atWiris:
-        "A Wiris: Assessment (Nubric) i integracions MathType a Google Workspace, Office add-ins, Moodle i editors WYSIWYG.",
       selectedWork: "Treball seleccionat",
-      selectedWorkSub: "Rols on he lliurat producte amb impacte mesurable.",
       stack: "Stack principal",
       based: "Barcelona",
       techRibbon: "Stack tecnològic",
     },
     experience: {
       title: "Experiència",
-      subtitle: "Més de 6 anys construint producte escalable amb impacte mesurable.",
       work: "Feina",
       trainee: "Pràctiques i formació",
       present: "Actualitat",
@@ -267,13 +164,11 @@ export const translations = {
     },
     projects: {
       title: "Projectes",
-      subtitle: "Producte en producció i technical assessments verificables.",
       active: "En curs",
       archived: "Arxivat",
     },
     skills: {
       title: "Skills i educació",
-      subtitle: "Stack verificat, pràctiques d'enginyeria i idiomes.",
       languages: "Llenguatges",
       backend: "Backend",
       frontend: "Frontend",
@@ -284,29 +179,17 @@ export const translations = {
       education: "Educació",
       spokenLanguages: "Idiomes",
       primaryStack: "Stack principal",
-      aiCallout: {
-        kicker: "IA al meu dia a dia i al producte",
-        title: "Skills + IA",
-        body: "Faig servir IA com a copilot a diari (GitHub Copilot a nivell d'organització, Cursor CLI amb regles al repo, OpenRouter per enrutar a diversos models amb fallback, MCP per connectar el model a dades reals). També l'he integrada en producte, no només al meu editor.",
-        tags: ["GitHub Copilot (org)", "Cursor CLI", "OpenRouter", "MCP", "Agent Skills"],
-      },
     },
     contact: {
       title: "Parlem",
-      subtitle: "Explica'm en què estàs treballant.",
       email: "Correu",
       phone: "Telèfon",
       location: "Ubicació",
       social: "Xarxes",
       ctaEmail: "Enviar correu",
-      availability: "Responc en menys de 24 h en dies laborables.",
-      preferred:
-        "Preferiblement per correu per a converses tècniques; LinkedIn per a presentacions.",
     },
     cv: {
       title: "Currículum vitae",
-      subtitle: "Versió optimitzada per a impressió i parsers ATS.",
-      printHint: "Prem imprimir i desa com a PDF.",
       profile: "Perfil",
       experience: "Experiència professional",
       education: "Educació",
@@ -337,46 +220,6 @@ export const translations = {
     },
   },
   en: {
-    meta: {
-      siteName: "Ubaldo Santos Patón",
-      author: "Ubaldo Santos Patón",
-      keywords:
-        "Ubaldo Santos, Ubaldo Santos Patón, full-stack engineer, TypeScript, PHP, Laravel, Vue, Wiris, Nubric, Barcelona, MathType, AI, Copilot, Cursor, OpenRouter, MCP",
-      home: {
-        title: "Ubaldo Santos Patón — Full-Stack Software Engineer",
-        description:
-          "Full-stack engineer with 6+ years in product. At Wiris: Assessment (Nubric) and MathType integrations (Google Workspace, Office, Moodle, WYSIWYG editors). Ex-Rotrafu (50K+ services).",
-        ogDescription: "Portfolio, projects and résumé.",
-      },
-      experience: {
-        title: "Experience — Ubaldo Santos Patón",
-        description:
-          "6+ years in product: Wiris (Assessment & MathType Integrations), Rotrafu (50K+ services, −35% load time), Prime IT, iThinkUPC.",
-        ogDescription: "Trajectory in product and engineering.",
-      },
-      projects: {
-        title: "Projects — Ubaldo Santos Patón",
-        description:
-          "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 and verifiable GitHub technical assessments.",
-        ogDescription: "Production product and verifiable learning projects.",
-      },
-      skills: {
-        title: "Skills & AI — Ubaldo Santos Patón",
-        description:
-          "Verified stack: TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), hexagonal architecture, DevOps and applied AI.",
-        ogDescription: "Stack, practices and AI applied in product.",
-      },
-      cv: {
-        title: "CV — Ubaldo Santos Patón",
-        description: "Printable, ATS-friendly résumé of Ubaldo Santos Patón.",
-        ogDescription: "Hit print and save as PDF.",
-      },
-      contact: {
-        title: "Contact — Ubaldo Santos Patón",
-        description: "Contact Ubaldo Santos Patón: email, phone, LinkedIn and GitHub.",
-        ogDescription: "Let's talk.",
-      },
-    },
     nav: {
       home: "Home",
       experience: "Experience",
@@ -416,17 +259,13 @@ export const translations = {
       currentRole: "Currently",
       whatIDo: "What I do",
       reachOut: "Reach out",
-      atWiris:
-        "At Wiris: Assessment (Nubric) and MathType integrations across Google Workspace, Office add-ins, Moodle and WYSIWYG editors.",
       selectedWork: "Selected work",
-      selectedWorkSub: "Roles where I've shipped product with measurable impact.",
       stack: "Core stack",
       based: "Barcelona",
       techRibbon: "Tech stack",
     },
     experience: {
       title: "Experience",
-      subtitle: "6+ years building scalable product with measurable impact.",
       work: "Work",
       trainee: "Internships & training",
       present: "Present",
@@ -435,13 +274,11 @@ export const translations = {
     },
     projects: {
       title: "Projects",
-      subtitle: "Production product and verifiable technical assessments.",
       active: "Ongoing",
       archived: "Archived",
     },
     skills: {
       title: "Skills & education",
-      subtitle: "Verified stack, engineering practices and languages.",
       languages: "Languages",
       backend: "Backend",
       frontend: "Frontend",
@@ -452,28 +289,17 @@ export const translations = {
       education: "Education",
       spokenLanguages: "Spoken languages",
       primaryStack: "Primary stack",
-      aiCallout: {
-        kicker: "AI in my workflow and in product",
-        title: "Skills + AI",
-        body: "I use AI as a copilot daily (GitHub Copilot at the org level, Cursor CLI with rules versioned in the repo, OpenRouter to route between models with fallback, MCP to connect the model to real data). I've also shipped AI into product, not just my editor.",
-        tags: ["GitHub Copilot (org)", "Cursor CLI", "OpenRouter", "MCP", "Agent Skills"],
-      },
     },
     contact: {
       title: "Let's talk",
-      subtitle: "Tell me what you're working on.",
       email: "Email",
       phone: "Phone",
       location: "Location",
       social: "Social",
       ctaEmail: "Send email",
-      availability: "I reply within 24 h on business days.",
-      preferred: "Email is best for technical conversations; LinkedIn for intros.",
     },
     cv: {
       title: "Curriculum Vitae",
-      subtitle: "Optimized for print and ATS parsers.",
-      printHint: "Hit print and save as PDF.",
       profile: "Profile",
       experience: "Professional experience",
       education: "Education",
@@ -506,4 +332,3 @@ export const translations = {
 } as const;
 
 export type TranslationLang = keyof typeof translations;
-export type TranslationPage = keyof typeof translations.es.meta;

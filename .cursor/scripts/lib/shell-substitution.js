@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Extract executable command-substitution bodies from a shell line.
@@ -17,7 +17,7 @@
  * @returns {string[]}
  */
 function extractCommandSubstitutions(input) {
-  const source = String(input || '');
+  const source = String(input || "");
   const substitutions = [];
   let inSingle = false;
   let inDouble = false;
@@ -26,17 +26,17 @@ function extractCommandSubstitutions(input) {
     const ch = source[i];
     const prev = source[i - 1];
 
-    if (ch === '\\' && !inSingle) {
+    if (ch === "\\" && !inSingle) {
       i += 1;
       continue;
     }
 
-    if (ch === "'" && !inDouble && prev !== '\\') {
+    if (ch === "'" && !inDouble && prev !== "\\") {
       inSingle = !inSingle;
       continue;
     }
 
-    if (ch === '"' && !inSingle && prev !== '\\') {
+    if (ch === '"' && !inSingle && prev !== "\\") {
       inDouble = !inDouble;
       continue;
     }
@@ -45,12 +45,12 @@ function extractCommandSubstitutions(input) {
       continue;
     }
 
-    if (ch === '`') {
-      let body = '';
+    if (ch === "`") {
+      let body = "";
       i += 1;
       while (i < source.length) {
         const inner = source[i];
-        if (inner === '\\') {
+        if (inner === "\\") {
           body += inner;
           if (i + 1 < source.length) {
             body += source[i + 1];
@@ -58,7 +58,7 @@ function extractCommandSubstitutions(input) {
             continue;
           }
         }
-        if (inner === '`') {
+        if (inner === "`") {
           break;
         }
         body += inner;
@@ -71,16 +71,16 @@ function extractCommandSubstitutions(input) {
       continue;
     }
 
-    if (ch === '$' && source[i + 1] === '(') {
+    if (ch === "$" && source[i + 1] === "(") {
       let depth = 1;
-      let body = '';
+      let body = "";
       let bodyInSingle = false;
       let bodyInDouble = false;
       i += 2;
       while (i < source.length && depth > 0) {
         const inner = source[i];
         const innerPrev = source[i - 1];
-        if (inner === '\\' && !bodyInSingle) {
+        if (inner === "\\" && !bodyInSingle) {
           body += inner;
           if (i + 1 < source.length) {
             body += source[i + 1];
@@ -88,14 +88,14 @@ function extractCommandSubstitutions(input) {
             continue;
           }
         }
-        if (inner === "'" && !bodyInDouble && innerPrev !== '\\') {
+        if (inner === "'" && !bodyInDouble && innerPrev !== "\\") {
           bodyInSingle = !bodyInSingle;
-        } else if (inner === '"' && !bodyInSingle && innerPrev !== '\\') {
+        } else if (inner === '"' && !bodyInSingle && innerPrev !== "\\") {
           bodyInDouble = !bodyInDouble;
         } else if (!bodyInSingle && !bodyInDouble) {
-          if (inner === '(') {
+          if (inner === "(") {
             depth += 1;
-          } else if (inner === ')') {
+          } else if (inner === ")") {
             depth -= 1;
             if (depth === 0) {
               break;
@@ -133,7 +133,7 @@ function extractCommandSubstitutions(input) {
  * @returns {string[]}
  */
 function extractSubshellGroups(input) {
-  const source = String(input || '');
+  const source = String(input || "");
   const groups = [];
   let inSingle = false;
   let inDouble = false;
@@ -142,17 +142,17 @@ function extractSubshellGroups(input) {
     const ch = source[i];
     const prev = source[i - 1];
 
-    if (ch === '\\' && !inSingle) {
+    if (ch === "\\" && !inSingle) {
       i += 1;
       continue;
     }
 
-    if (ch === "'" && !inDouble && prev !== '\\') {
+    if (ch === "'" && !inDouble && prev !== "\\") {
       inSingle = !inSingle;
       continue;
     }
 
-    if (ch === '"' && !inSingle && prev !== '\\') {
+    if (ch === '"' && !inSingle && prev !== "\\") {
       inDouble = !inDouble;
       continue;
     }
@@ -161,7 +161,7 @@ function extractSubshellGroups(input) {
       continue;
     }
 
-    if (ch === '$' && source[i + 1] === '(') {
+    if (ch === "$" && source[i + 1] === "(") {
       let depth = 1;
       let skipInSingle = false;
       let skipInDouble = false;
@@ -169,17 +169,17 @@ function extractSubshellGroups(input) {
       while (i < source.length && depth > 0) {
         const inner = source[i];
         const innerPrev = source[i - 1];
-        if (inner === '\\' && !skipInSingle) {
+        if (inner === "\\" && !skipInSingle) {
           i += 2;
           continue;
         }
-        if (inner === "'" && !skipInDouble && innerPrev !== '\\') {
+        if (inner === "'" && !skipInDouble && innerPrev !== "\\") {
           skipInSingle = !skipInSingle;
-        } else if (inner === '"' && !skipInSingle && innerPrev !== '\\') {
+        } else if (inner === '"' && !skipInSingle && innerPrev !== "\\") {
           skipInDouble = !skipInDouble;
         } else if (!skipInSingle && !skipInDouble) {
-          if (inner === '(') depth += 1;
-          else if (inner === ')') depth -= 1;
+          if (inner === "(") depth += 1;
+          else if (inner === ")") depth -= 1;
         }
         i += 1;
       }
@@ -187,10 +187,10 @@ function extractSubshellGroups(input) {
       continue;
     }
 
-    if (ch === '`') {
+    if (ch === "`") {
       i += 1;
-      while (i < source.length && source[i] !== '`') {
-        if (source[i] === '\\' && i + 1 < source.length) {
+      while (i < source.length && source[i] !== "`") {
+        if (source[i] === "\\" && i + 1 < source.length) {
           i += 2;
           continue;
         }
@@ -199,16 +199,16 @@ function extractSubshellGroups(input) {
       continue;
     }
 
-    if (ch === '(') {
+    if (ch === "(") {
       let depth = 1;
-      let body = '';
+      let body = "";
       let bodyInSingle = false;
       let bodyInDouble = false;
       i += 1;
       while (i < source.length && depth > 0) {
         const inner = source[i];
         const innerPrev = source[i - 1];
-        if (inner === '\\' && !bodyInSingle) {
+        if (inner === "\\" && !bodyInSingle) {
           body += inner;
           if (i + 1 < source.length) {
             body += source[i + 1];
@@ -216,14 +216,14 @@ function extractSubshellGroups(input) {
             continue;
           }
         }
-        if (inner === "'" && !bodyInDouble && innerPrev !== '\\') {
+        if (inner === "'" && !bodyInDouble && innerPrev !== "\\") {
           bodyInSingle = !bodyInSingle;
-        } else if (inner === '"' && !bodyInSingle && innerPrev !== '\\') {
+        } else if (inner === '"' && !bodyInSingle && innerPrev !== "\\") {
           bodyInDouble = !bodyInDouble;
         } else if (!bodyInSingle && !bodyInDouble) {
-          if (inner === '(') {
+          if (inner === "(") {
             depth += 1;
-          } else if (inner === ')') {
+          } else if (inner === ")") {
             depth -= 1;
             if (depth === 0) {
               break;
@@ -265,7 +265,7 @@ function extractSubshellGroups(input) {
  * @returns {string[]}
  */
 function extractBraceGroups(input) {
-  const source = String(input || '');
+  const source = String(input || "");
   const groups = [];
   let inSingle = false;
   let inDouble = false;
@@ -274,17 +274,17 @@ function extractBraceGroups(input) {
     const ch = source[i];
     const prev = source[i - 1];
 
-    if (ch === '\\' && !inSingle) {
+    if (ch === "\\" && !inSingle) {
       i += 1;
       continue;
     }
 
-    if (ch === "'" && !inDouble && prev !== '\\') {
+    if (ch === "'" && !inDouble && prev !== "\\") {
       inSingle = !inSingle;
       continue;
     }
 
-    if (ch === '"' && !inSingle && prev !== '\\') {
+    if (ch === '"' && !inSingle && prev !== "\\") {
       inDouble = !inDouble;
       continue;
     }
@@ -293,7 +293,7 @@ function extractBraceGroups(input) {
       continue;
     }
 
-    if (ch === '$' && source[i + 1] === '(') {
+    if (ch === "$" && source[i + 1] === "(") {
       let depth = 1;
       let skipInSingle = false;
       let skipInDouble = false;
@@ -301,17 +301,17 @@ function extractBraceGroups(input) {
       while (i < source.length && depth > 0) {
         const inner = source[i];
         const innerPrev = source[i - 1];
-        if (inner === '\\' && !skipInSingle) {
+        if (inner === "\\" && !skipInSingle) {
           i += 2;
           continue;
         }
-        if (inner === "'" && !skipInDouble && innerPrev !== '\\') {
+        if (inner === "'" && !skipInDouble && innerPrev !== "\\") {
           skipInSingle = !skipInSingle;
-        } else if (inner === '"' && !skipInSingle && innerPrev !== '\\') {
+        } else if (inner === '"' && !skipInSingle && innerPrev !== "\\") {
           skipInDouble = !skipInDouble;
         } else if (!skipInSingle && !skipInDouble) {
-          if (inner === '(') depth += 1;
-          else if (inner === ')') depth -= 1;
+          if (inner === "(") depth += 1;
+          else if (inner === ")") depth -= 1;
         }
         i += 1;
       }
@@ -319,10 +319,10 @@ function extractBraceGroups(input) {
       continue;
     }
 
-    if (ch === '`') {
+    if (ch === "`") {
       i += 1;
-      while (i < source.length && source[i] !== '`') {
-        if (source[i] === '\\' && i + 1 < source.length) {
+      while (i < source.length && source[i] !== "`") {
+        if (source[i] === "\\" && i + 1 < source.length) {
           i += 2;
           continue;
         }
@@ -331,7 +331,7 @@ function extractBraceGroups(input) {
       continue;
     }
 
-    if (ch === '(') {
+    if (ch === "(") {
       let depth = 1;
       let skipInSingle = false;
       let skipInDouble = false;
@@ -339,17 +339,17 @@ function extractBraceGroups(input) {
       while (i < source.length && depth > 0) {
         const inner = source[i];
         const innerPrev = source[i - 1];
-        if (inner === '\\' && !skipInSingle) {
+        if (inner === "\\" && !skipInSingle) {
           i += 2;
           continue;
         }
-        if (inner === "'" && !skipInDouble && innerPrev !== '\\') {
+        if (inner === "'" && !skipInDouble && innerPrev !== "\\") {
           skipInSingle = !skipInSingle;
-        } else if (inner === '"' && !skipInSingle && innerPrev !== '\\') {
+        } else if (inner === '"' && !skipInSingle && innerPrev !== "\\") {
           skipInDouble = !skipInDouble;
         } else if (!skipInSingle && !skipInDouble) {
-          if (inner === '(') depth += 1;
-          else if (inner === ')') depth -= 1;
+          if (inner === "(") depth += 1;
+          else if (inner === ")") depth -= 1;
         }
         i += 1;
       }
@@ -357,19 +357,19 @@ function extractBraceGroups(input) {
       continue;
     }
 
-    if (ch === '{' && /\s/.test(source[i + 1] || '')) {
+    if (ch === "{" && /\s/.test(source[i + 1] || "")) {
       const prevIsBoundary = i === 0 || /[\s;|&(]/.test(prev);
       if (!prevIsBoundary) continue;
 
       let depth = 1;
-      let body = '';
+      let body = "";
       let bodyInSingle = false;
       let bodyInDouble = false;
       i += 1;
       while (i < source.length && depth > 0) {
         const inner = source[i];
         const innerPrev = source[i - 1];
-        if (inner === '\\' && !bodyInSingle) {
+        if (inner === "\\" && !bodyInSingle) {
           body += inner;
           if (i + 1 < source.length) {
             body += source[i + 1];
@@ -377,13 +377,13 @@ function extractBraceGroups(input) {
             continue;
           }
         }
-        if (inner === "'" && !bodyInDouble && innerPrev !== '\\') {
+        if (inner === "'" && !bodyInDouble && innerPrev !== "\\") {
           bodyInSingle = !bodyInSingle;
           body += inner;
           i += 1;
           continue;
         }
-        if (inner === '"' && !bodyInSingle && innerPrev !== '\\') {
+        if (inner === '"' && !bodyInSingle && innerPrev !== "\\") {
           bodyInDouble = !bodyInDouble;
           body += inner;
           i += 1;
@@ -396,7 +396,7 @@ function extractBraceGroups(input) {
         }
         // Skip $(...) spans — a quoted `}` or `}`-as-text inside a
         // substitution body must not close the enclosing brace group.
-        if (inner === '$' && source[i + 1] === '(') {
+        if (inner === "$" && source[i + 1] === "(") {
           body += inner + source[i + 1];
           let subDepth = 1;
           let subInSingle = false;
@@ -406,27 +406,27 @@ function extractBraceGroups(input) {
             const c = source[i];
             const p = source[i - 1];
             body += c;
-            if (c === '\\' && !subInSingle && i + 1 < source.length) {
+            if (c === "\\" && !subInSingle && i + 1 < source.length) {
               body += source[i + 1];
               i += 2;
               continue;
             }
-            if (c === "'" && !subInDouble && p !== '\\') subInSingle = !subInSingle;
-            else if (c === '"' && !subInSingle && p !== '\\') subInDouble = !subInDouble;
+            if (c === "'" && !subInDouble && p !== "\\") subInSingle = !subInSingle;
+            else if (c === '"' && !subInSingle && p !== "\\") subInDouble = !subInDouble;
             else if (!subInSingle && !subInDouble) {
-              if (c === '(') subDepth += 1;
-              else if (c === ')') subDepth -= 1;
+              if (c === "(") subDepth += 1;
+              else if (c === ")") subDepth -= 1;
             }
             i += 1;
           }
           continue;
         }
         // Skip backtick spans for the same reason.
-        if (inner === '`') {
+        if (inner === "`") {
           body += inner;
           i += 1;
-          while (i < source.length && source[i] !== '`') {
-            if (source[i] === '\\' && i + 1 < source.length) {
+          while (i < source.length && source[i] !== "`") {
+            if (source[i] === "\\" && i + 1 < source.length) {
               body += source[i] + source[i + 1];
               i += 2;
               continue;
@@ -441,7 +441,7 @@ function extractBraceGroups(input) {
           continue;
         }
         // Skip plain (...) subshell spans for the same reason.
-        if (inner === '(') {
+        if (inner === "(") {
           body += inner;
           let subDepth = 1;
           let subInSingle = false;
@@ -451,28 +451,28 @@ function extractBraceGroups(input) {
             const c = source[i];
             const p = source[i - 1];
             body += c;
-            if (c === '\\' && !subInSingle && i + 1 < source.length) {
+            if (c === "\\" && !subInSingle && i + 1 < source.length) {
               body += source[i + 1];
               i += 2;
               continue;
             }
-            if (c === "'" && !subInDouble && p !== '\\') subInSingle = !subInSingle;
-            else if (c === '"' && !subInSingle && p !== '\\') subInDouble = !subInDouble;
+            if (c === "'" && !subInDouble && p !== "\\") subInSingle = !subInSingle;
+            else if (c === '"' && !subInSingle && p !== "\\") subInDouble = !subInDouble;
             else if (!subInSingle && !subInDouble) {
-              if (c === '(') subDepth += 1;
-              else if (c === ')') subDepth -= 1;
+              if (c === "(") subDepth += 1;
+              else if (c === ")") subDepth -= 1;
             }
             i += 1;
           }
           continue;
         }
-        if (inner === '{' && /\s/.test(source[i + 1] || '')) {
+        if (inner === "{" && /\s/.test(source[i + 1] || "")) {
           // Match the outer-scan boundary rule for nested `{` so
           // tokens like `foo{` (no boundary, but followed by space
           // via `foo{ bar`) cannot bump nested depth.
           const nestedPrevIsBoundary = /[\s;|&(]/.test(innerPrev);
           if (nestedPrevIsBoundary) depth += 1;
-        } else if (inner === '}' && (innerPrev === ';' || /\s/.test(innerPrev))) {
+        } else if (inner === "}" && (innerPrev === ";" || /\s/.test(innerPrev))) {
           depth -= 1;
           if (depth === 0) {
             break;

@@ -6,44 +6,40 @@
  * ~/.claude/metrics/tool-usage.jsonl for ECC2 metric sync.
  */
 
-'use strict';
+"use strict";
 
-const crypto = require('crypto');
-const path = require('path');
-const { spawnSync } = require('child_process');
-const {
-  appendFile,
-  getClaudeDir,
-  stripAnsi,
-} = require('../lib/utils');
+const crypto = require("crypto");
+const path = require("path");
+const { spawnSync } = require("child_process");
+const { appendFile, getClaudeDir, stripAnsi } = require("../lib/utils");
 
 const MAX_STDIN = 1024 * 1024;
-const METRICS_FILE_NAME = 'tool-usage.jsonl';
+const METRICS_FILE_NAME = "tool-usage.jsonl";
 const FILE_PATH_KEYS = new Set([
-  'file_path',
-  'file_paths',
-  'source_path',
-  'destination_path',
-  'old_file_path',
-  'new_file_path',
+  "file_path",
+  "file_paths",
+  "source_path",
+  "destination_path",
+  "old_file_path",
+  "new_file_path",
 ]);
 
 function redactSecrets(value) {
-  return String(value || '')
-    .replace(/\n/g, ' ')
-    .replace(/--token[= ][^ ]*/g, '--token=<REDACTED>')
-    .replace(/Authorization:[: ]*[^ ]*[: ]*[^ ]*/gi, 'Authorization:<REDACTED>')
-    .replace(/\bAKIA[A-Z0-9]{16}\b/g, '<REDACTED>')
-    .replace(/\bASIA[A-Z0-9]{16}\b/g, '<REDACTED>')
-    .replace(/password[= ][^ ]*/gi, 'password=<REDACTED>')
-    .replace(/\bghp_[A-Za-z0-9_]+\b/g, '<REDACTED>')
-    .replace(/\bgho_[A-Za-z0-9_]+\b/g, '<REDACTED>')
-    .replace(/\bghs_[A-Za-z0-9_]+\b/g, '<REDACTED>')
-    .replace(/\bgithub_pat_[A-Za-z0-9_]+\b/g, '<REDACTED>');
+  return String(value || "")
+    .replace(/\n/g, " ")
+    .replace(/--token[= ][^ ]*/g, "--token=<REDACTED>")
+    .replace(/Authorization:[: ]*[^ ]*[: ]*[^ ]*/gi, "Authorization:<REDACTED>")
+    .replace(/\bAKIA[A-Z0-9]{16}\b/g, "<REDACTED>")
+    .replace(/\bASIA[A-Z0-9]{16}\b/g, "<REDACTED>")
+    .replace(/password[= ][^ ]*/gi, "password=<REDACTED>")
+    .replace(/\bghp_[A-Za-z0-9_]+\b/g, "<REDACTED>")
+    .replace(/\bgho_[A-Za-z0-9_]+\b/g, "<REDACTED>")
+    .replace(/\bghs_[A-Za-z0-9_]+\b/g, "<REDACTED>")
+    .replace(/\bgithub_pat_[A-Za-z0-9_]+\b/g, "<REDACTED>");
 }
 
 function truncateSummary(value, maxLength = 220) {
-  const normalized = stripAnsi(redactSecrets(value)).trim().replace(/\s+/g, ' ');
+  const normalized = stripAnsi(redactSecrets(value)).trim().replace(/\s+/g, " ");
   if (normalized.length <= maxLength) {
     return normalized;
   }
@@ -52,26 +48,26 @@ function truncateSummary(value, maxLength = 220) {
 
 function sanitizeParamValue(value, depth = 0) {
   if (depth >= 4) {
-    return '[Truncated]';
+    return "[Truncated]";
   }
 
   if (value === null || value === undefined) {
     return value;
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return truncateSummary(value, 160);
   }
 
-  if (typeof value === 'number' || typeof value === 'boolean') {
+  if (typeof value === "number" || typeof value === "boolean") {
     return value;
   }
 
   if (Array.isArray(value)) {
-    return value.slice(0, 8).map(entry => sanitizeParamValue(entry, depth + 1));
+    return value.slice(0, 8).map((entry) => sanitizeParamValue(entry, depth + 1));
   }
 
-  if (typeof value === 'object') {
+  if (typeof value === "object") {
     const output = {};
     for (const [key, nested] of Object.entries(value).slice(0, 20)) {
       output[key] = sanitizeParamValue(nested, depth + 1);
@@ -83,19 +79,19 @@ function sanitizeParamValue(value, depth = 0) {
 }
 
 function sanitizeInputParams(toolInput) {
-  if (!toolInput || typeof toolInput !== 'object' || Array.isArray(toolInput)) {
-    return '{}';
+  if (!toolInput || typeof toolInput !== "object" || Array.isArray(toolInput)) {
+    return "{}";
   }
 
   try {
     return JSON.stringify(sanitizeParamValue(toolInput));
   } catch {
-    return '{}';
+    return "{}";
   }
 }
 
 function pushPathCandidate(paths, value) {
-  const candidate = String(value || '').trim();
+  const candidate = String(value || "").trim();
   if (!candidate) {
     return;
   }
@@ -108,25 +104,26 @@ function pushPathCandidate(paths, value) {
 }
 
 function pushFileEvent(events, value, action, diffPreview, patchPreview) {
-  const candidate = String(value || '').trim();
+  const candidate = String(value || "").trim();
   if (!candidate) {
     return;
   }
   if (/^(https?:\/\/|app:\/\/|plugin:\/\/|mcp:\/\/)/i.test(candidate)) {
     return;
   }
-  const normalizedDiffPreview = typeof diffPreview === 'string' && diffPreview.trim()
-    ? diffPreview.trim()
-    : undefined;
-  const normalizedPatchPreview = typeof patchPreview === 'string' && patchPreview.trim()
-    ? patchPreview.trim()
-    : undefined;
-  if (!events.some(event =>
-    event.path === candidate
-      && event.action === action
-      && (event.diff_preview || undefined) === normalizedDiffPreview
-      && (event.patch_preview || undefined) === normalizedPatchPreview
-  )) {
+  const normalizedDiffPreview =
+    typeof diffPreview === "string" && diffPreview.trim() ? diffPreview.trim() : undefined;
+  const normalizedPatchPreview =
+    typeof patchPreview === "string" && patchPreview.trim() ? patchPreview.trim() : undefined;
+  if (
+    !events.some(
+      (event) =>
+        event.path === candidate &&
+        event.action === action &&
+        (event.diff_preview || undefined) === normalizedDiffPreview &&
+        (event.patch_preview || undefined) === normalizedPatchPreview,
+    )
+  ) {
     const event = { path: candidate, action };
     if (normalizedDiffPreview) {
       event.diff_preview = normalizedDiffPreview;
@@ -139,23 +136,25 @@ function pushFileEvent(events, value, action, diffPreview, patchPreview) {
 }
 
 function sanitizeDiffText(value, maxLength = 96) {
-  if (typeof value !== 'string' || !value.trim()) {
-    return '';
+  if (typeof value !== "string" || !value.trim()) {
+    return "";
   }
   return truncateSummary(value, maxLength);
 }
 
 function sanitizePatchLines(value, maxLines = 4, maxLineLength = 120) {
-  if (typeof value !== 'string' || !value.trim()) {
+  if (typeof value !== "string" || !value.trim()) {
     return [];
   }
 
   return stripAnsi(redactSecrets(value))
     .split(/\r?\n/)
-    .map(line => line.trim())
+    .map((line) => line.trim())
     .filter(Boolean)
     .slice(0, maxLines)
-    .map(line => line.length <= maxLineLength ? line : `${line.slice(0, maxLineLength - 3)}...`);
+    .map((line) =>
+      line.length <= maxLineLength ? line : `${line.slice(0, maxLineLength - 3)}...`,
+    );
 }
 
 function buildReplacementPreview(oldValue, newValue) {
@@ -188,14 +187,14 @@ function buildPatchPreviewFromReplacement(oldValue, newValue) {
     return undefined;
   }
 
-  const lines = ['@@'];
+  const lines = ["@@"];
   for (const line of beforeLines) {
     lines.push(`- ${line}`);
   }
   for (const line of afterLines) {
     lines.push(`+ ${line}`);
   }
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function buildPatchPreviewFromContent(content, prefix) {
@@ -203,27 +202,27 @@ function buildPatchPreviewFromContent(content, prefix) {
   if (lines.length === 0) {
     return undefined;
   }
-  return lines.map(line => `${prefix} ${line}`).join('\n');
+  return lines.map((line) => `${prefix} ${line}`).join("\n");
 }
 
 function buildDiffPreviewFromPatchPreview(patchPreview) {
-  if (typeof patchPreview !== 'string' || !patchPreview.trim()) {
+  if (typeof patchPreview !== "string" || !patchPreview.trim()) {
     return undefined;
   }
 
   const lines = patchPreview
     .split(/\r?\n/)
-    .map(line => line.trim())
+    .map((line) => line.trim())
     .filter(Boolean);
-  const removed = lines.find(line => line.startsWith('- ') || line.startsWith('-'));
-  const added = lines.find(line => line.startsWith('+ ') || line.startsWith('+'));
+  const removed = lines.find((line) => line.startsWith("- ") || line.startsWith("-"));
+  const added = lines.find((line) => line.startsWith("+ ") || line.startsWith("+"));
 
   if (!removed && !added) {
     return undefined;
   }
 
-  const before = removed ? removed.replace(/^- ?/, '') : '';
-  const after = added ? added.replace(/^\+ ?/, '') : '';
+  const before = removed ? removed.replace(/^- ?/, "") : "";
+  const after = added ? added.replace(/^\+ ?/, "") : "";
   if (before && after) {
     return `${before} -> ${after}`;
   }
@@ -234,31 +233,33 @@ function buildDiffPreviewFromPatchPreview(patchPreview) {
 }
 
 function inferDefaultFileAction(toolName) {
-  const normalized = String(toolName || '').trim().toLowerCase();
-  if (normalized.includes('read')) {
-    return 'read';
+  const normalized = String(toolName || "")
+    .trim()
+    .toLowerCase();
+  if (normalized.includes("read")) {
+    return "read";
   }
-  if (normalized.includes('write')) {
-    return 'create';
+  if (normalized.includes("write")) {
+    return "create";
   }
-  if (normalized.includes('edit')) {
-    return 'modify';
+  if (normalized.includes("edit")) {
+    return "modify";
   }
-  if (normalized.includes('delete') || normalized.includes('remove')) {
-    return 'delete';
+  if (normalized.includes("delete") || normalized.includes("remove")) {
+    return "delete";
   }
-  if (normalized.includes('move') || normalized.includes('rename')) {
-    return 'move';
+  if (normalized.includes("move") || normalized.includes("rename")) {
+    return "move";
   }
-  return 'touch';
+  return "touch";
 }
 
 function actionForFileKey(toolName, key) {
-  if (key === 'source_path' || key === 'old_file_path') {
-    return 'move';
+  if (key === "source_path" || key === "old_file_path") {
+    return "move";
   }
-  if (key === 'destination_path' || key === 'new_file_path') {
-    return 'move';
+  if (key === "destination_path" || key === "new_file_path") {
+    return "move";
   }
   return inferDefaultFileAction(toolName);
 }
@@ -275,12 +276,12 @@ function collectFilePaths(value, paths) {
     return;
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     pushPathCandidate(paths, value);
     return;
   }
 
-  if (typeof value !== 'object') {
+  if (typeof value !== "object") {
     return;
   }
 
@@ -290,7 +291,7 @@ function collectFilePaths(value, paths) {
       continue;
     }
 
-    if (nested && (Array.isArray(nested) || typeof nested === 'object')) {
+    if (nested && (Array.isArray(nested) || typeof nested === "object")) {
       collectFilePaths(nested, paths);
     }
   }
@@ -298,7 +299,7 @@ function collectFilePaths(value, paths) {
 
 function extractFilePaths(toolInput) {
   const paths = [];
-  if (!toolInput || typeof toolInput !== 'object') {
+  if (!toolInput || typeof toolInput !== "object") {
     return paths;
   }
   collectFilePaths(toolInput, paths);
@@ -306,15 +307,15 @@ function extractFilePaths(toolInput) {
 }
 
 function fileEventDiffPreview(toolName, value, action) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
     return undefined;
   }
 
-  if (typeof value.old_string === 'string' || typeof value.new_string === 'string') {
+  if (typeof value.old_string === "string" || typeof value.new_string === "string") {
     return buildReplacementPreview(value.old_string, value.new_string);
   }
 
-  if (action === 'create') {
+  if (action === "create") {
     return buildCreationPreview(value.content || value.file_text || value.text);
   }
 
@@ -322,29 +323,29 @@ function fileEventDiffPreview(toolName, value, action) {
 }
 
 function fileEventPatchPreview(value, action) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
     return undefined;
   }
 
-  if (typeof value.old_string === 'string' || typeof value.new_string === 'string') {
+  if (typeof value.old_string === "string" || typeof value.new_string === "string") {
     return buildPatchPreviewFromReplacement(value.old_string, value.new_string);
   }
 
-  if (action === 'create') {
-    return buildPatchPreviewFromContent(value.content || value.file_text || value.text, '+');
+  if (action === "create") {
+    return buildPatchPreviewFromContent(value.content || value.file_text || value.text, "+");
   }
 
-  if (action === 'delete') {
-    return buildPatchPreviewFromContent(value.content || value.old_string || value.file_text, '-');
+  if (action === "delete") {
+    return buildPatchPreviewFromContent(value.content || value.old_string || value.file_text, "-");
   }
 
   return undefined;
 }
 
 function runGit(args, cwd) {
-  const result = spawnSync('git', args, {
+  const result = spawnSync("git", args, {
     cwd,
-    encoding: 'utf8',
+    encoding: "utf8",
     timeout: 2500,
   });
 
@@ -352,11 +353,11 @@ function runGit(args, cwd) {
     return null;
   }
 
-  return String(result.stdout || '').trim();
+  return String(result.stdout || "").trim();
 }
 
 function gitRepoRoot(cwd) {
-  return runGit(['rev-parse', '--show-toplevel'], cwd);
+  return runGit(["rev-parse", "--show-toplevel"], cwd);
 }
 
 const MAX_RELEVANT_PATCH_LINES = 6;
@@ -364,8 +365,8 @@ const MAX_RELEVANT_PATCH_LINES = 6;
 function candidateGitPaths(repoRoot, filePath) {
   const resolvedRepoRoot = path.resolve(repoRoot);
   const candidates = [];
-  const pushCandidate = value => {
-    const candidate = String(value || '').trim();
+  const pushCandidate = (value) => {
+    const candidate = String(value || "").trim();
     if (!candidate || candidates.includes(candidate)) {
       return;
     }
@@ -374,21 +375,18 @@ function candidateGitPaths(repoRoot, filePath) {
 
   const absoluteCandidates = path.isAbsolute(filePath)
     ? [path.resolve(filePath)]
-    : [
-        path.resolve(resolvedRepoRoot, filePath),
-        path.resolve(process.cwd(), filePath),
-      ];
+    : [path.resolve(resolvedRepoRoot, filePath), path.resolve(process.cwd(), filePath)];
 
   for (const absolute of absoluteCandidates) {
     const relative = path.relative(resolvedRepoRoot, absolute);
-    if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
+    if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
       continue;
     }
 
     pushCandidate(relative);
-    pushCandidate(relative.split(path.sep).join('/'));
+    pushCandidate(relative.split(path.sep).join("/"));
     pushCandidate(absolute);
-    pushCandidate(absolute.split(path.sep).join('/'));
+    pushCandidate(absolute.split(path.sep).join("/"));
   }
 
   return candidates;
@@ -397,8 +395,8 @@ function candidateGitPaths(repoRoot, filePath) {
 function patchPreviewFromGitDiff(repoRoot, pathCandidates) {
   for (const candidate of pathCandidates) {
     const patch = runGit(
-      ['diff', '--no-ext-diff', '--no-color', '--unified=1', '--', candidate],
-      repoRoot
+      ["diff", "--no-ext-diff", "--no-color", "--unified=1", "--", candidate],
+      repoRoot,
     );
     if (!patch) {
       continue;
@@ -406,15 +404,16 @@ function patchPreviewFromGitDiff(repoRoot, pathCandidates) {
 
     const relevant = patch
       .split(/\r?\n/)
-      .filter(line =>
-        line.startsWith('@@')
-          || (line.startsWith('+') && !line.startsWith('+++'))
-          || (line.startsWith('-') && !line.startsWith('---'))
+      .filter(
+        (line) =>
+          line.startsWith("@@") ||
+          (line.startsWith("+") && !line.startsWith("+++")) ||
+          (line.startsWith("-") && !line.startsWith("---")),
       )
       .slice(0, MAX_RELEVANT_PATCH_LINES);
 
     if (relevant.length > 0) {
-      return relevant.join('\n');
+      return relevant.join("\n");
     }
   }
 
@@ -422,13 +421,13 @@ function patchPreviewFromGitDiff(repoRoot, pathCandidates) {
 }
 
 function trackedInGit(repoRoot, pathCandidates) {
-  return pathCandidates.some(candidate =>
-    runGit(['ls-files', '--error-unmatch', '--', candidate], repoRoot) !== null
+  return pathCandidates.some(
+    (candidate) => runGit(["ls-files", "--error-unmatch", "--", candidate], repoRoot) !== null,
   );
 }
 
 function enrichFileEventFromWorkingTree(toolName, event) {
-  if (!event || typeof event !== 'object' || !event.path) {
+  if (!event || typeof event !== "object" || !event.path) {
     return event;
   }
 
@@ -442,15 +441,17 @@ function enrichFileEventFromWorkingTree(toolName, event) {
     return event;
   }
 
-  const tool = String(toolName || '').trim().toLowerCase();
+  const tool = String(toolName || "")
+    .trim()
+    .toLowerCase();
   const tracked = trackedInGit(repoRoot, pathCandidates);
   const patchPreview = patchPreviewFromGitDiff(repoRoot, pathCandidates) || event.patch_preview;
   const diffPreview = buildDiffPreviewFromPatchPreview(patchPreview) || event.diff_preview;
 
-  if (tool.includes('write')) {
+  if (tool.includes("write")) {
     return {
       ...event,
-      action: tracked ? 'modify' : event.action,
+      action: tracked ? "modify" : event.action,
       diff_preview: diffPreview,
       patch_preview: patchPreview,
     };
@@ -479,7 +480,7 @@ function collectFileEvents(toolName, value, events, key = null, parentValue = nu
     return;
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     if (key && FILE_PATH_KEYS.has(key)) {
       const action = actionForFileKey(toolName, key);
       pushFileEvent(
@@ -487,13 +488,13 @@ function collectFileEvents(toolName, value, events, key = null, parentValue = nu
         value,
         action,
         fileEventDiffPreview(toolName, parentValue, action),
-        fileEventPatchPreview(parentValue, action)
+        fileEventPatchPreview(parentValue, action),
       );
     }
     return;
   }
 
-  if (typeof value !== 'object') {
+  if (typeof value !== "object") {
     return;
   }
 
@@ -503,7 +504,7 @@ function collectFileEvents(toolName, value, events, key = null, parentValue = nu
       continue;
     }
 
-    if (nested && (Array.isArray(nested) || typeof nested === 'object')) {
+    if (nested && (Array.isArray(nested) || typeof nested === "object")) {
       collectFileEvents(toolName, nested, events, null, nested);
     }
   }
@@ -511,7 +512,7 @@ function collectFileEvents(toolName, value, events, key = null, parentValue = nu
 
 function extractFileEvents(toolName, toolInput) {
   const events = [];
-  if (!toolInput || typeof toolInput !== 'object') {
+  if (!toolInput || typeof toolInput !== "object") {
     return events;
   }
   collectFileEvents(toolName, toolInput, events);
@@ -519,21 +520,21 @@ function extractFileEvents(toolName, toolInput) {
 }
 
 function summarizeInput(toolName, toolInput, filePaths) {
-  if (toolName === 'Bash') {
-    return truncateSummary(toolInput?.command || 'bash');
+  if (toolName === "Bash") {
+    return truncateSummary(toolInput?.command || "bash");
   }
 
   if (filePaths.length > 0) {
-    return truncateSummary(`${toolName} ${filePaths.join(', ')}`);
+    return truncateSummary(`${toolName} ${filePaths.join(", ")}`);
   }
 
-  if (toolInput && typeof toolInput === 'object') {
+  if (toolInput && typeof toolInput === "object") {
     const shallow = {};
     for (const [key, value] of Object.entries(toolInput)) {
       if (value === null || value === undefined) {
         continue;
       }
-      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
         shallow[key] = value;
       }
     }
@@ -546,14 +547,14 @@ function summarizeInput(toolName, toolInput, filePaths) {
 
 function summarizeOutput(toolOutput) {
   if (toolOutput === null || toolOutput === undefined) {
-    return '';
+    return "";
   }
 
-  if (typeof toolOutput === 'string') {
+  if (typeof toolOutput === "string") {
     return truncateSummary(toolOutput);
   }
 
-  if (typeof toolOutput === 'object' && typeof toolOutput.output === 'string') {
+  if (typeof toolOutput === "object" && typeof toolOutput.output === "string") {
     return truncateSummary(toolOutput.output);
   }
 
@@ -561,27 +562,28 @@ function summarizeOutput(toolOutput) {
 }
 
 function buildActivityRow(input, env = process.env) {
-  const hookEvent = String(env.CLAUDE_HOOK_EVENT_NAME || '').trim();
-  if (hookEvent && hookEvent !== 'PostToolUse') {
+  const hookEvent = String(env.CLAUDE_HOOK_EVENT_NAME || "").trim();
+  if (hookEvent && hookEvent !== "PostToolUse") {
     return null;
   }
 
-  const toolName = String(input?.tool_name || '').trim();
-  const sessionId = String(env.ECC_SESSION_ID || env.CLAUDE_SESSION_ID || '').trim();
+  const toolName = String(input?.tool_name || "").trim();
+  const sessionId = String(env.ECC_SESSION_ID || env.CLAUDE_SESSION_ID || "").trim();
   if (!toolName || !sessionId) {
     return null;
   }
 
   const toolInput = input?.tool_input || {};
-  const fileEvents = extractFileEvents(toolName, toolInput).map(event =>
-    enrichFileEventFromWorkingTree(toolName, event)
+  const fileEvents = extractFileEvents(toolName, toolInput).map((event) =>
+    enrichFileEventFromWorkingTree(toolName, event),
   );
-  const filePaths = fileEvents.length > 0
-    ? [...new Set(fileEvents.map(event => event.path))]
-    : extractFilePaths(toolInput);
+  const filePaths =
+    fileEvents.length > 0
+      ? [...new Set(fileEvents.map((event) => event.path))]
+      : extractFilePaths(toolInput);
 
   return {
-    id: `tool-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`,
+    id: `tool-${Date.now()}-${crypto.randomBytes(6).toString("hex")}`,
     timestamp: new Date().toISOString(),
     session_id: sessionId,
     tool_name: toolName,
@@ -600,8 +602,8 @@ function run(rawInput) {
     const row = buildActivityRow(input);
     if (row) {
       appendFile(
-        path.join(getClaudeDir(), 'metrics', METRICS_FILE_NAME),
-        `${JSON.stringify(row)}\n`
+        path.join(getClaudeDir(), "metrics", METRICS_FILE_NAME),
+        `${JSON.stringify(row)}\n`,
       );
     }
   } catch {
@@ -612,15 +614,15 @@ function run(rawInput) {
 }
 
 function main() {
-  let raw = '';
-  process.stdin.setEncoding('utf8');
-  process.stdin.on('data', chunk => {
+  let raw = "";
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => {
     if (raw.length < MAX_STDIN) {
       const remaining = MAX_STDIN - raw.length;
       raw += chunk.substring(0, remaining);
     }
   });
-  process.stdin.on('end', () => {
+  process.stdin.on("end", () => {
     process.stdout.write(run(raw));
   });
 }

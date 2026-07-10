@@ -3,25 +3,42 @@
  * Works on Windows, macOS, and Linux
  */
 
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const crypto = require('crypto');
-const { execSync, spawnSync } = require('child_process');
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
+const crypto = require("crypto");
+const { execSync, spawnSync } = require("child_process");
 
 // Platform detection
-const isWindows = process.platform === 'win32';
-const isMacOS = process.platform === 'darwin';
-const isLinux = process.platform === 'linux';
-const SESSION_DATA_DIR_NAME = 'session-data';
-const LEGACY_SESSIONS_DIR_NAME = 'sessions';
-const {
-  resolveAgentDataHome,
-} = require('./agent-data-home');
+const isWindows = process.platform === "win32";
+const isMacOS = process.platform === "darwin";
+const isLinux = process.platform === "linux";
+const SESSION_DATA_DIR_NAME = "session-data";
+const LEGACY_SESSIONS_DIR_NAME = "sessions";
+const { resolveAgentDataHome } = require("./agent-data-home");
 const WINDOWS_RESERVED_SESSION_IDS = new Set([
-  'CON', 'PRN', 'AUX', 'NUL',
-  'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
-  'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9'
+  "CON",
+  "PRN",
+  "AUX",
+  "NUL",
+  "COM1",
+  "COM2",
+  "COM3",
+  "COM4",
+  "COM5",
+  "COM6",
+  "COM7",
+  "COM8",
+  "COM9",
+  "LPT1",
+  "LPT2",
+  "LPT3",
+  "LPT4",
+  "LPT5",
+  "LPT6",
+  "LPT7",
+  "LPT8",
+  "LPT9",
 ]);
 
 /**
@@ -49,7 +66,6 @@ function getClaudeDir() {
   return getAgentDataHome();
 }
 
-
 /**
  * Get the sessions directory
  */
@@ -75,7 +91,7 @@ function getSessionSearchDirs() {
  * Get the learned skills directory
  */
 function getLearnedSkillsDir() {
-  return path.join(getClaudeDir(), 'skills', 'learned');
+  return path.join(getClaudeDir(), "skills", "learned");
 }
 
 /**
@@ -98,7 +114,7 @@ function ensureDir(dirPath) {
     }
   } catch (err) {
     // EEXIST is fine (race condition with another process creating it)
-    if (err.code !== 'EEXIST') {
+    if (err.code !== "EEXIST") {
       throw new Error(`Failed to create directory '${dirPath}': ${err.message}`);
     }
   }
@@ -111,8 +127,8 @@ function ensureDir(dirPath) {
 function getDateString() {
   const now = new Date();
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -121,8 +137,8 @@ function getDateString() {
  */
 function getTimeString() {
   const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;
 }
 
@@ -130,7 +146,7 @@ function getTimeString() {
  * Get the git repository name
  */
 function getGitRepoName() {
-  const result = runCommand('git rev-parse --show-toplevel');
+  const result = runCommand("git rev-parse --show-toplevel");
   if (!result.success) return null;
   return path.basename(result.output);
 }
@@ -155,17 +171,17 @@ function getProjectName() {
  * ASCII part and gain a short hash suffix for disambiguation.
  */
 function sanitizeSessionId(raw) {
-  if (!raw || typeof raw !== 'string') return null;
+  if (!raw || typeof raw !== "string") return null;
 
-  const hasNonAscii = Array.from(raw).some(char => char.codePointAt(0) > 0x7f);
-  const normalized = raw.replace(/^\.+/, '');
+  const hasNonAscii = Array.from(raw).some((char) => char.codePointAt(0) > 0x7f);
+  const normalized = raw.replace(/^\.+/, "");
   const sanitized = normalized
-    .replace(/[^a-zA-Z0-9_-]/g, '-')
-    .replace(/-{2,}/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/[^a-zA-Z0-9_-]/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "");
 
   if (sanitized.length > 0) {
-    const suffix = crypto.createHash('sha256').update(normalized).digest('hex').slice(0, 6);
+    const suffix = crypto.createHash("sha256").update(normalized).digest("hex").slice(0, 6);
     if (WINDOWS_RESERVED_SESSION_IDS.has(sanitized.toUpperCase())) {
       return `${sanitized}-${suffix}`;
     }
@@ -173,23 +189,23 @@ function sanitizeSessionId(raw) {
     return `${sanitized}-${suffix}`;
   }
 
-  const meaningful = normalized.replace(/[\s\p{P}]/gu, '');
+  const meaningful = normalized.replace(/[\s\p{P}]/gu, "");
   if (meaningful.length === 0) return null;
 
-  return crypto.createHash('sha256').update(normalized).digest('hex').slice(0, 8);
+  return crypto.createHash("sha256").update(normalized).digest("hex").slice(0, 8);
 }
 
 /**
  * Get short session ID from CLAUDE_SESSION_ID environment variable
  * Returns last 8 characters, falls back to a sanitized project name then 'default'.
  */
-function getSessionIdShort(fallback = 'default') {
+function getSessionIdShort(fallback = "default") {
   const sessionId = process.env.CLAUDE_SESSION_ID;
   if (sessionId && sessionId.length > 0) {
     const sanitized = sanitizeSessionId(sessionId.slice(-8));
     if (sanitized) return sanitized;
   }
-  return sanitizeSessionId(getProjectName()) || sanitizeSessionId(fallback) || 'default';
+  return sanitizeSessionId(getProjectName()) || sanitizeSessionId(fallback) || "default";
 }
 
 /**
@@ -198,11 +214,11 @@ function getSessionIdShort(fallback = 'default') {
 function getDateTimeString() {
   const now = new Date();
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
@@ -213,8 +229,8 @@ function getDateTimeString() {
  * @param {object} options - Options { maxAge: days, recursive: boolean }
  */
 function findFiles(dir, pattern, options = {}) {
-  if (!dir || typeof dir !== 'string') return [];
-  if (!pattern || typeof pattern !== 'string') return [];
+  if (!dir || typeof dir !== "string") return [];
+  if (!pattern || typeof pattern !== "string") return [];
 
   const { maxAge = null, recursive = false } = options;
   const results = [];
@@ -226,9 +242,9 @@ function findFiles(dir, pattern, options = {}) {
   // Escape all regex special characters, then convert glob wildcards.
   // Order matters: escape specials first, then convert * and ? to regex equivalents.
   const regexPattern = pattern
-    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-    .replace(/\*/g, '.*')
-    .replace(/\?/g, '.');
+    .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+    .replace(/\*/g, ".*")
+    .replace(/\?/g, ".");
   const regex = new RegExp(`^${regexPattern}$`);
 
   function searchDir(currentDir) {
@@ -282,16 +298,16 @@ async function readStdinJson(options = {}) {
   const { timeoutMs = 5000, maxSize = 1024 * 1024 } = options;
 
   return new Promise((resolve) => {
-    let data = '';
+    let data = "";
     let settled = false;
 
     const timer = setTimeout(() => {
       if (!settled) {
         settled = true;
         // Clean up stdin listeners so the event loop can exit
-        process.stdin.removeAllListeners('data');
-        process.stdin.removeAllListeners('end');
-        process.stdin.removeAllListeners('error');
+        process.stdin.removeAllListeners("data");
+        process.stdin.removeAllListeners("end");
+        process.stdin.removeAllListeners("error");
         if (process.stdin.unref) process.stdin.unref();
         // Resolve with whatever we have so far rather than hanging
         try {
@@ -302,14 +318,14 @@ async function readStdinJson(options = {}) {
       }
     }, timeoutMs);
 
-    process.stdin.setEncoding('utf8');
-    process.stdin.on('data', chunk => {
+    process.stdin.setEncoding("utf8");
+    process.stdin.on("data", (chunk) => {
       if (data.length < maxSize) {
         data += chunk;
       }
     });
 
-    process.stdin.on('end', () => {
+    process.stdin.on("end", () => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
@@ -322,7 +338,7 @@ async function readStdinJson(options = {}) {
       }
     });
 
-    process.stdin.on('error', () => {
+    process.stdin.on("error", () => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
@@ -343,7 +359,7 @@ function log(message) {
  * Output to stdout (returned to Claude)
  */
 function output(data) {
-  if (typeof data === 'object') {
+  if (typeof data === "object") {
     console.log(JSON.stringify(data));
   } else {
     console.log(data);
@@ -355,7 +371,7 @@ function output(data) {
  */
 function readFile(filePath) {
   try {
-    return fs.readFileSync(filePath, 'utf8');
+    return fs.readFileSync(filePath, "utf8");
   } catch {
     return null;
   }
@@ -366,7 +382,7 @@ function readFile(filePath) {
  */
 function writeFile(filePath, content) {
   ensureDir(path.dirname(filePath));
-  fs.writeFileSync(filePath, content, 'utf8');
+  fs.writeFileSync(filePath, content, "utf8");
 }
 
 /**
@@ -374,7 +390,7 @@ function writeFile(filePath, content) {
  */
 function appendFile(filePath, content) {
   ensureDir(path.dirname(filePath));
-  fs.appendFileSync(filePath, content, 'utf8');
+  fs.appendFileSync(filePath, content, "utf8");
 }
 
 /**
@@ -390,10 +406,10 @@ function commandExists(cmd) {
   try {
     if (isWindows) {
       // Use spawnSync to avoid shell interpolation
-      const result = spawnSync('where', [cmd], { stdio: 'pipe' });
+      const result = spawnSync("where", [cmd], { stdio: "pipe" });
       return result.status === 0;
     } else {
-      const result = spawnSync('which', [cmd], { stdio: 'pipe' });
+      const result = spawnSync("which", [cmd], { stdio: "pipe" });
       return result.status === 0;
     }
   } catch {
@@ -413,24 +429,24 @@ function commandExists(cmd) {
  */
 function runCommand(cmd, options = {}) {
   // Allowlist: only permit known-safe command prefixes
-  const allowedPrefixes = ['git ', 'node ', 'npx ', 'which ', 'where '];
-  if (!allowedPrefixes.some(prefix => cmd.startsWith(prefix))) {
-    return { success: false, output: 'runCommand blocked: unrecognized command prefix' };
+  const allowedPrefixes = ["git ", "node ", "npx ", "which ", "where "];
+  if (!allowedPrefixes.some((prefix) => cmd.startsWith(prefix))) {
+    return { success: false, output: "runCommand blocked: unrecognized command prefix" };
   }
 
   // Reject shell metacharacters. $() and backticks are evaluated inside
   // double quotes, so block $ and ` anywhere in cmd. Other operators
   // (;|&) are literal inside quotes, so only check unquoted portions.
-  const unquoted = cmd.replace(/"[^"]*"/g, '').replace(/'[^']*'/g, '');
+  const unquoted = cmd.replace(/"[^"]*"/g, "").replace(/'[^']*'/g, "");
   if (/[;|&\n]/.test(unquoted) || /[`$]/.test(cmd)) {
-    return { success: false, output: 'runCommand blocked: shell metacharacters not allowed' };
+    return { success: false, output: "runCommand blocked: shell metacharacters not allowed" };
   }
 
   try {
     const result = execSync(cmd, {
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-      ...options
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"],
+      ...options,
     });
     return { success: true, output: result.trim() };
   } catch (err) {
@@ -442,7 +458,7 @@ function runCommand(cmd, options = {}) {
  * Check if current directory is a git repository
  */
 function isGitRepo() {
-  return runCommand('git rev-parse --git-dir').success;
+  return runCommand("git rev-parse --git-dir").success;
 }
 
 /**
@@ -454,16 +470,16 @@ function isGitRepo() {
 function getGitModifiedFiles(patterns = []) {
   if (!isGitRepo()) return [];
 
-  const result = runCommand('git diff --name-only HEAD');
+  const result = runCommand("git diff --name-only HEAD");
   if (!result.success) return [];
 
-  let files = result.output.split('\n').filter(Boolean);
+  let files = result.output.split("\n").filter(Boolean);
 
   if (patterns.length > 0) {
     // Pre-compile patterns, skipping invalid ones
     const compiled = [];
     for (const pattern of patterns) {
-      if (typeof pattern !== 'string' || pattern.length === 0) continue;
+      if (typeof pattern !== "string" || pattern.length === 0) continue;
       try {
         compiled.push(new RegExp(pattern));
       } catch {
@@ -471,7 +487,7 @@ function getGitModifiedFiles(patterns = []) {
       }
     }
     if (compiled.length > 0) {
-      files = files.filter(file => compiled.some(regex => regex.test(file)));
+      files = files.filter((file) => compiled.some((regex) => regex.test(file)));
     }
   }
 
@@ -495,7 +511,7 @@ function replaceInFile(filePath, search, replace, options = {}) {
 
   try {
     let newContent;
-    if (options.all && typeof search === 'string') {
+    if (options.all && typeof search === "string") {
       newContent = content.replaceAll(search, replace);
     } else {
       newContent = content.replace(search, replace);
@@ -524,9 +540,12 @@ function countInFile(filePath, pattern) {
   try {
     if (pattern instanceof RegExp) {
       // Always create new RegExp to avoid shared lastIndex state; ensure global flag
-      regex = new RegExp(pattern.source, pattern.flags.includes('g') ? pattern.flags : pattern.flags + 'g');
-    } else if (typeof pattern === 'string') {
-      regex = new RegExp(pattern, 'g');
+      regex = new RegExp(
+        pattern.source,
+        pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g",
+      );
+    } else if (typeof pattern === "string") {
+      regex = new RegExp(pattern, "g");
     } else {
       return 0;
     }
@@ -550,9 +569,9 @@ function countInFile(filePath, pattern) {
  * @returns {string} Cleaned string with all escape sequences removed
  */
 function stripAnsi(str) {
-  if (typeof str !== 'string') return '';
+  if (typeof str !== "string") return "";
   // eslint-disable-next-line no-control-regex
-  return str.replace(/\x1b(?:\[[0-9;?]*[A-Za-z]|\][^\x07\x1b]*(?:\x07|\x1b\\)|\([A-Z]|[A-Z])/g, '');
+  return str.replace(/\x1b(?:\[[0-9;?]*[A-Za-z]|\][^\x07\x1b]*(?:\x07|\x1b\\)|\([A-Z]|[A-Z])/g, "");
 }
 
 /**
@@ -568,7 +587,7 @@ function grepFile(filePath, pattern) {
       // Always create a new RegExp without the 'g' flag to prevent lastIndex
       // state issues when using .test() in a loop (g flag makes .test() stateful,
       // causing alternating match/miss on consecutive matching lines)
-      const flags = pattern.flags.replace('g', '');
+      const flags = pattern.flags.replace("g", "");
       regex = new RegExp(pattern.source, flags);
     } else {
       regex = new RegExp(pattern);
@@ -576,7 +595,7 @@ function grepFile(filePath, pattern) {
   } catch {
     return []; // Invalid regex pattern
   }
-  const lines = content.split('\n');
+  const lines = content.split("\n");
   const results = [];
 
   lines.forEach((line, index) => {
@@ -637,5 +656,5 @@ module.exports = {
   commandExists,
   runCommand,
   isGitRepo,
-  getGitModifiedFiles
+  getGitModifiedFiles,
 };

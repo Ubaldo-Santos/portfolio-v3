@@ -11,14 +11,21 @@
  * exit 0: success  exit 1: error
  */
 
-import { readFileSync, existsSync, renameSync } from 'fs';
-import { resolve } from 'path';
-import { readProjects, writeProjects, saveContext, today, shortId, CONTEXTS_DIR } from './shared.mjs';
+import { readFileSync, existsSync, renameSync } from "fs";
+import { resolve } from "path";
+import {
+  readProjects,
+  writeProjects,
+  saveContext,
+  today,
+  shortId,
+  CONTEXTS_DIR,
+} from "./shared.mjs";
 
-const isDryRun = process.argv.includes('--dry-run');
+const isDryRun = process.argv.includes("--dry-run");
 
 if (isDryRun) {
-  console.log('ck migrate — DRY RUN (no files will be written)\n');
+  console.log("ck migrate — DRY RUN (no files will be written)\n");
 }
 
 // ── v1 markdown parsers ───────────────────────────────────────────────────────
@@ -31,20 +38,24 @@ function extractSection(md, heading) {
 
 function parseBullets(text) {
   if (!text) return [];
-  return text.split('\n')
-    .filter(l => /^[-*\d]\s/.test(l.trim()))
-    .map(l => l.replace(/^[-*\d]+\.?\s+/, '').trim())
+  return text
+    .split("\n")
+    .filter((l) => /^[-*\d]\s/.test(l.trim()))
+    .map((l) => l.replace(/^[-*\d]+\.?\s+/, "").trim())
     .filter(Boolean);
 }
 
 function parseDecisionsTable(text) {
   if (!text) return [];
   const rows = [];
-  for (const line of text.split('\n')) {
-    if (!line.startsWith('|') || line.match(/^[|\s-]+$/)) continue;
-    const cols = line.split('|').map(c => c.trim()).filter((c, i) => i > 0 && i < 4);
-    if (cols.length >= 1 && !cols[0].startsWith('Decision') && !cols[0].startsWith('_')) {
-      rows.push({ what: cols[0] || '', why: cols[1] || '', date: cols[2] || '' });
+  for (const line of text.split("\n")) {
+    if (!line.startsWith("|") || line.match(/^[|\s-]+$/)) continue;
+    const cols = line
+      .split("|")
+      .map((c) => c.trim())
+      .filter((c, i) => i > 0 && i < 4);
+    if (cols.length >= 1 && !cols[0].startsWith("Decision") && !cols[0].startsWith("_")) {
+      rows.push({ what: cols[0] || "", why: cols[1] || "", date: cols[2] || "" });
     }
   }
   return rows;
@@ -63,20 +74,22 @@ function parseLeftOff(text) {
   const sessionBlocks = text.split(/(?=Session \d+)/);
   if (sessionBlocks.length > 1) {
     return sessionBlocks
-      .filter(b => b.trim())
-      .map(block => {
+      .filter((b) => b.trim())
+      .map((block) => {
         const dateMatch = block.match(/\((\d{4}-\d{2}-\d{2})\)/);
         const bullets = parseBullets(block);
         return {
           date: dateMatch?.[1] || null,
-          leftOff: bullets.length ? bullets.join('\n') : block.replace(/^Session \d+.*\n/, '').trim(),
+          leftOff: bullets.length
+            ? bullets.join("\n")
+            : block.replace(/^Session \d+.*\n/, "").trim(),
         };
       });
   }
 
   // Simple format
   const bullets = parseBullets(text);
-  return [{ leftOff: bullets.length ? bullets.join('\n') : text.trim() }];
+  return [{ leftOff: bullets.length ? bullets.join("\n") : text.trim() }];
 }
 
 // ── Main migration ─────────────────────────────────────────────────────────────
@@ -89,61 +102,71 @@ let errors = 0;
 for (const [projectPath, info] of Object.entries(projects)) {
   const contextDir = info.contextDir;
   const contextDirPath = resolve(CONTEXTS_DIR, contextDir);
-  const contextJsonPath = resolve(contextDirPath, 'context.json');
-  const contextMdPath   = resolve(contextDirPath, 'CONTEXT.md');
-  const metaPath        = resolve(contextDirPath, 'meta.json');
+  const contextJsonPath = resolve(contextDirPath, "context.json");
+  const contextMdPath = resolve(contextDirPath, "CONTEXT.md");
+  const metaPath = resolve(contextDirPath, "meta.json");
 
   // Already v2
   if (existsSync(contextJsonPath)) {
     try {
-      const existing = JSON.parse(readFileSync(contextJsonPath, 'utf8'));
+      const existing = JSON.parse(readFileSync(contextJsonPath, "utf8"));
       if (existing.version === 2) {
         console.log(`  ✓ ${contextDir} — already v2, skipping`);
         skipped++;
         continue;
       }
-    } catch { /* fall through to migrate */ }
+    } catch {
+      /* fall through to migrate */
+    }
   }
 
   console.log(`\n  → Migrating: ${contextDir}`);
 
   try {
     // Read v1 files
-    const contextMd = existsSync(contextMdPath) ? readFileSync(contextMdPath, 'utf8') : '';
+    const contextMd = existsSync(contextMdPath) ? readFileSync(contextMdPath, "utf8") : "";
     let meta = {};
     if (existsSync(metaPath)) {
       try {
-        meta = JSON.parse(readFileSync(metaPath, 'utf8'));
+        meta = JSON.parse(readFileSync(metaPath, "utf8"));
       } catch (e) {
-        console.warn(`  ! ${contextDir}: invalid meta.json, continuing with defaults (${e.message})`);
+        console.warn(
+          `  ! ${contextDir}: invalid meta.json, continuing with defaults (${e.message})`,
+        );
       }
     }
 
     // Extract fields from CONTEXT.md
-    const description   = extractSection(contextMd, 'What This Is') || extractSection(contextMd, 'About') || null;
-    const stackRaw      = extractSection(contextMd, 'Tech Stack') || '';
-    const stack         = stackRaw.split(/[,\n]/).map(s => s.replace(/^[-*]\s+/, '').trim()).filter(Boolean);
-    const goal          = (extractSection(contextMd, 'Current Goal') || '').split('\n')[0].trim() || null;
-    const constraintRaw = extractSection(contextMd, 'Do Not Do') || '';
-    const constraints   = parseBullets(constraintRaw);
-    const decisionsRaw  = extractSection(contextMd, 'Decisions Made') || '';
-    const decisions     = parseDecisionsTable(decisionsRaw);
-    const nextStepsRaw  = extractSection(contextMd, 'Next Steps') || '';
-    const nextSteps     = parseBullets(nextStepsRaw);
-    const blockersRaw   = extractSection(contextMd, 'Blockers') || '';
-    const blockers      = parseBullets(blockersRaw).filter(b => b.toLowerCase() !== 'none');
-    const leftOffRaw    = extractSection(contextMd, 'Where I Left Off') || '';
+    const description =
+      extractSection(contextMd, "What This Is") || extractSection(contextMd, "About") || null;
+    const stackRaw = extractSection(contextMd, "Tech Stack") || "";
+    const stack = stackRaw
+      .split(/[,\n]/)
+      .map((s) => s.replace(/^[-*]\s+/, "").trim())
+      .filter(Boolean);
+    const goal = (extractSection(contextMd, "Current Goal") || "").split("\n")[0].trim() || null;
+    const constraintRaw = extractSection(contextMd, "Do Not Do") || "";
+    const constraints = parseBullets(constraintRaw);
+    const decisionsRaw = extractSection(contextMd, "Decisions Made") || "";
+    const decisions = parseDecisionsTable(decisionsRaw);
+    const nextStepsRaw = extractSection(contextMd, "Next Steps") || "";
+    const nextSteps = parseBullets(nextStepsRaw);
+    const blockersRaw = extractSection(contextMd, "Blockers") || "";
+    const blockers = parseBullets(blockersRaw).filter((b) => b.toLowerCase() !== "none");
+    const leftOffRaw = extractSection(contextMd, "Where I Left Off") || "";
     const leftOffParsed = parseLeftOff(leftOffRaw);
 
     // Build sessions from parsed left-off blocks (may be multiple)
     const sessions = leftOffParsed.map((lo, idx) => ({
-      id: idx === leftOffParsed.length - 1 && meta.lastSessionId
-        ? meta.lastSessionId.slice(0, 8)
-        : shortId(),
+      id:
+        idx === leftOffParsed.length - 1 && meta.lastSessionId
+          ? meta.lastSessionId.slice(0, 8)
+          : shortId(),
       date: lo.date || meta.lastUpdated || today(),
-      summary: idx === leftOffParsed.length - 1
-        ? (meta.lastSessionSummary || 'Migrated from v1')
-        : `Session ${idx + 1} (migrated)`,
+      summary:
+        idx === leftOffParsed.length - 1
+          ? meta.lastSessionSummary || "Migrated from v1"
+          : `Session ${idx + 1} (migrated)`,
       leftOff: lo.leftOff,
       nextSteps: idx === leftOffParsed.length - 1 ? nextSteps : [],
       decisions: idx === leftOffParsed.length - 1 ? decisions : [],
@@ -164,9 +187,9 @@ for (const [projectPath, info] of Object.entries(projects)) {
     };
 
     if (isDryRun) {
-      console.log(`    description: ${description?.slice(0, 60) || '(none)'}`);
-      console.log(`    stack:       ${stack.join(', ') || '(none)'}`);
-      console.log(`    goal:        ${goal?.slice(0, 60) || '(none)'}`);
+      console.log(`    description: ${description?.slice(0, 60) || "(none)"}`);
+      console.log(`    stack:       ${stack.join(", ") || "(none)"}`);
+      console.log(`    goal:        ${goal?.slice(0, 60) || "(none)"}`);
       console.log(`    sessions:    ${sessions.length}`);
       console.log(`    decisions:   ${decisions.length}`);
       console.log(`    nextSteps:   ${nextSteps.length}`);
@@ -176,7 +199,7 @@ for (const [projectPath, info] of Object.entries(projects)) {
 
     // Backup meta.json
     if (existsSync(metaPath)) {
-      renameSync(metaPath, resolve(contextDirPath, 'meta.json.v1-backup'));
+      renameSync(metaPath, resolve(contextDirPath, "meta.json.v1-backup"));
     }
 
     // Write context.json + regenerated CONTEXT.md
@@ -198,5 +221,5 @@ if (!isDryRun && migrated > 0) {
 }
 
 console.log(`\nck migrate: ${migrated} migrated, ${skipped} already v2, ${errors} errors`);
-if (isDryRun) console.log('Run without --dry-run to apply.');
+if (isDryRun) console.log("Run without --dry-run to apply.");
 if (errors > 0) process.exit(1);

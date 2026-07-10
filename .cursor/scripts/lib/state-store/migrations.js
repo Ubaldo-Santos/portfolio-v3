@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const INITIAL_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -136,12 +136,12 @@ CREATE INDEX IF NOT EXISTS idx_work_items_session_id_updated_at
 const MIGRATIONS = [
   {
     version: 1,
-    name: '001_initial_state_store',
+    name: "001_initial_state_store",
     sql: INITIAL_SCHEMA_SQL,
   },
   {
     version: 2,
-    name: '002_work_items',
+    name: "002_work_items",
     sql: WORK_ITEMS_SQL,
   },
 ];
@@ -159,13 +159,15 @@ function ensureMigrationTable(db) {
 function getAppliedMigrations(db) {
   ensureMigrationTable(db);
   return db
-    .prepare(`
+    .prepare(
+      `
       SELECT version, name, applied_at
       FROM schema_migrations
       ORDER BY version ASC
-    `)
+    `,
+    )
     .all()
-    .map(row => ({
+    .map((row) => ({
       version: row.version,
       name: row.name,
       appliedAt: row.applied_at,
@@ -176,7 +178,10 @@ function applyMigrations(db) {
   ensureMigrationTable(db);
 
   const appliedVersions = new Set(
-    db.prepare('SELECT version FROM schema_migrations').all().map(row => row.version)
+    db
+      .prepare("SELECT version FROM schema_migrations")
+      .all()
+      .map((row) => row.version),
   );
   const insertMigration = db.prepare(`
     INSERT INTO schema_migrations (version, name, applied_at)

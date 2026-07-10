@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowUpRight } from "lucide-react";
 import { cv } from "@/data/cv";
-import { currentLang, formatPeriod, workAnchorId } from "@/lib/format";
+import { currentLang, formatPeriod, taglineLead, workAnchorId } from "@/lib/format";
+import { cvHomeSelectedWorkSub } from "@/lib/cv-copy";
 import { routeHead } from "@/lib/seo";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { PrimaryStack } from "@/components/primary-stack";
@@ -42,9 +43,9 @@ function Home() {
             {/* Name block — centered vertically */}
             <div className="flex min-h-0 flex-1 flex-col justify-center py-6 sm:py-8">
               <p className="font-display text-[clamp(2.75rem,12vw,10rem)] leading-[0.86] tracking-tight">
-                <span className="block">Ubaldo</span>
+                <span className="block">{cv.basics.givenName}</span>
                 <span className="font-display-italic block text-muted-foreground">
-                  Santos Patón
+                  {cv.basics.familyName}
                 </span>
               </p>
 
@@ -56,7 +57,7 @@ function Home() {
                 <div className="sm:col-span-5">
                   <SectionIndex index="01" label={t("home.whatIDo")} />
                   <p className="font-display mt-3 text-sm leading-relaxed text-balance sm:mt-4 sm:text-base">
-                    <span className="text-foreground">{cv.basics.tagline.lead[lang]}</span>{" "}
+                    <span className="text-foreground">{taglineLead(lang)}</span>{" "}
                     <span className="text-muted-foreground">{cv.basics.tagline.detail[lang]}</span>
                   </p>
                 </div>
@@ -117,7 +118,7 @@ function Home() {
               <div>
                 <SectionIndex index="04" />
                 <h2 className="mt-3 font-display text-5xl sm:text-6xl">{t("home.selectedWork")}</h2>
-                <p className="mt-2 max-w-md text-muted-foreground">{t("home.selectedWorkSub")}</p>
+                <p className="mt-2 max-w-md text-muted-foreground">{cvHomeSelectedWorkSub(lang)}</p>
               </div>
               <Link
                 to="/projects"
