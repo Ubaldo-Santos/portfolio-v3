@@ -16,6 +16,7 @@ Sitio estático de **Ubaldo Santos Patón** (Full-Stack, Barcelona). URL: `https
 - **i18next** + **react-i18next** — idiomas ES / CA / EN
 - **Motion** (`motion/react`), **lucide-react**, **shadcn/ui** (`components.json`, alias `@/`)
 - Template Lovable: `@lovable.dev/vite-tanstack-config` — **no añadir plugins Vite manualmente**
+- **Vercel Analytics** (`@vercel/analytics`) — navegaciones vía router
 
 ## Rutas
 
@@ -27,16 +28,18 @@ Sitio estático de **Ubaldo Santos Patón** (Full-Stack, Barcelona). URL: `https
 | `/skills` | `skills.tsx` | Skills, idiomas, educación |
 | `/contact` | `contact.tsx` | mailto, teléfono, LinkedIn, GitHub |
 | `/cv` | `cv.tsx` | CV imprimible ATS-friendly (1 columna) |
+| `/og/$size` | `og.$size.tsx` | Render OG card (noindex) |
 
 Layout raíz: `__root.tsx` (Header, Footer, CustomCursor, EasterEgg, i18n, Toaster).
 
 ## Datos y contenido
 
 - **Fuente única de verdad**: `src/data/cv.ts` — experiencia, proyectos, educación, skills
-- Strings UI: `src/i18n/locales/{es,ca,en}.json`
+- **Strings UI**: `src/i18n/translations.ts` (monolítico ES/CA/EN — no hay JSON por locale)
 - Helper `pick()` y tipos `LocalizedString` / `LocalizedList` en `cv.ts`
 - `currentLang()` y `formatPeriod()` en `src/lib/format.ts`
 - Idioma SSR siempre `es`; cliente resuelve en `I18nProvider` (evita hydration mismatch)
+- Breadcrumbs SEO: `seoBreadcrumbs()` en `src/lib/seo.ts` (también ES default)
 
 ## Diseño visual
 
@@ -45,7 +48,7 @@ Estilo **editorial-técnico**: Fraunces (display) + Inter (body) + JetBrains Mon
 ## CV / PDF
 
 - Vista `/cv` con `#cv-article`, estilos `@media print` en `styles.css`
-- Descarga: `downloadCv()` en `src/lib/download-cv.ts` usa **html2pdf.js** (no `window.print()`)
+- Descarga: botón imprimir en `cv.tsx` usa **`window.print()`** (no html2pdf)
 - Secciones: Contacto → Resumen → Experiencia → Educación → Skills → Idiomas → Proyectos
 
 ## Experiencia profesional clave (cv.ts)
@@ -57,16 +60,23 @@ Estilo **editorial-técnico**: Fraunces (display) + Inter (body) + JetBrains Mon
 ## Convenciones de código
 
 - Alias `@/` → `src/`
-- Componentes UI en `src/components/ui/` (shadcn)
-- Rutas con `head()` para SEO (title, og:*, canonical)
+- Componentes UI en `src/components/ui/` (shadcn — mayoría sin usar, scaffold Lovable)
+- Rutas con `head()` para SEO (title, og:*, canonical) vía `routeHead()`
 - Clase `no-print` oculta chrome al imprimir
 - Cambios mínimos; reutilizar patrones existentes (Reveal, font-mono labels, max-w-6xl)
 - Sin backend real — contacto vía `mailto:` / enlaces externos
 - SSR errors: `src/server.ts` + `src/start.ts` middleware
 
+## Documentación para IA
+
+- **`docs/AI-CONTEXT.md`** — codemap, recetas de cambio, anti-patterns (leer primero)
+- **`docs/AUDIT.md`** — auditoría de producción
+- **`AGENTS.md`** — entry point cross-harness
+- **`public/llms.txt`** — resumen machine-readable
+
 ## Fuera de alcance
 
-Blog/MDX, analytics, formulario de contacto con backend, README (aún no existe).
+Blog/MDX, formulario de contacto con backend, README raíz (aún no existe).
 
 ## Harness ECC (Cursor)
 
