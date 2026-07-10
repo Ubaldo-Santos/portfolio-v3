@@ -32,7 +32,7 @@ export const linkedIn = {
     jobBlock(
       "WIRIS",
       "Ingeniero de Software · Assessment",
-      "abr 2025 – Actualidad",
+      "abr 2026 – Actualidad",
       cv.work[0].summary[lang],
       cv.work[0].highlights[lang],
       cv.work[0].technologies,
@@ -40,7 +40,7 @@ export const linkedIn = {
     jobBlock(
       "WIRIS",
       "Ingeniero de Software · MathType Integrations",
-      "mar 2024 – abr 2025",
+      "mar 2024 – abr 2026",
       cv.work[1].summary[lang],
       cv.work[1].highlights[lang],
       cv.work[1].technologies,
@@ -116,7 +116,7 @@ export const infoJobs = {
   ],
   experience: linkedIn.experience,
   fixes: [
-    "Dividir Wiris en Assessment (actual) + Integraciones (hasta abr 2025)",
+    "Dividir Wiris en Assessment (actual) + Integraciones (hasta abr 2026)",
     "Corregir estudios: ASIR 2018–2020 y DAW 2020–2021 (no solapados)",
     "Renombrar CFGS Superior erróneo: es ASIR, no SMR",
     "Eliminar texto duplicado en Wiris Integraciones",
