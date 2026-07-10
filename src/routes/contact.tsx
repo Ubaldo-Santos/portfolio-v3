@@ -4,20 +4,14 @@ import { Mail, Phone, MapPin, Printer, ArrowUpRight, Copy, Check } from "lucide-
 import { useState, type ReactNode } from "react";
 import { cv } from "@/data/cv";
 import { currentLang } from "@/lib/format";
-import { routeHead } from "@/lib/seo";
+import { routeHead, seoBreadcrumbs } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/reveal";
 import { PageHeader, PageShell, pageLeadClass } from "@/components/page-shell";
 import { MotionPage } from "@/components/page-transition";
 
 export const Route = createFileRoute("/contact")({
-  head: () =>
-    routeHead("contact", "/contact", {
-      breadcrumbs: [
-        { name: "Inicio", path: "/" },
-        { name: "Contacto", path: "/contact" },
-      ],
-    }),
+  head: () => routeHead("contact", "/contact", { breadcrumbs: seoBreadcrumbs("contact") }),
   component: ContactPage,
 });
 

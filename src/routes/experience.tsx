@@ -2,20 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { cv, type WorkItem } from "@/data/cv";
 import { currentLang, formatPeriod, workAnchorId } from "@/lib/format";
-import { routeHead } from "@/lib/seo";
+import { routeHead, seoBreadcrumbs } from "@/lib/seo";
 import { RevealGroup, RevealItem } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
 import { MotionPage } from "@/components/page-transition";
 import { MapPin, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/experience")({
-  head: () =>
-    routeHead("experience", "/experience", {
-      breadcrumbs: [
-        { name: "Inicio", path: "/" },
-        { name: "Experiencia", path: "/experience" },
-      ],
-    }),
+  head: () => routeHead("experience", "/experience", { breadcrumbs: seoBreadcrumbs("experience") }),
   component: ExperiencePage,
 });
 

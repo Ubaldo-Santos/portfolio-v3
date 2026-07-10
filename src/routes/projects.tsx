@@ -3,19 +3,13 @@ import { useTranslation } from "react-i18next";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
-import { routeHead } from "@/lib/seo";
+import { routeHead, seoBreadcrumbs } from "@/lib/seo";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { PageHeader, PageShell } from "@/components/page-shell";
 import { MotionPage } from "@/components/page-transition";
 
 export const Route = createFileRoute("/projects")({
-  head: () =>
-    routeHead("projects", "/projects", {
-      breadcrumbs: [
-        { name: "Inicio", path: "/" },
-        { name: "Proyectos", path: "/projects" },
-      ],
-    }),
+  head: () => routeHead("projects", "/projects", { breadcrumbs: seoBreadcrumbs("projects") }),
   component: ProjectsPage,
 });
 

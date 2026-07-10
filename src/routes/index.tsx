@@ -55,8 +55,9 @@ function Home() {
               <div className="grid gap-x-10 gap-y-10 pt-8 sm:grid-cols-12 sm:gap-y-12 sm:pt-10">
                 <div className="sm:col-span-5">
                   <SectionIndex index="01" label={t("home.whatIDo")} />
-                  <p className="mt-3 text-sm leading-relaxed text-balance sm:mt-4 sm:text-base">
-                    {cv.basics.tagline[lang]}
+                  <p className="font-display mt-3 text-sm leading-relaxed text-balance sm:mt-4 sm:text-base">
+                    <span className="text-foreground">{cv.basics.tagline.lead[lang]}</span>{" "}
+                    <span className="text-muted-foreground">{cv.basics.tagline.detail[lang]}</span>
                   </p>
                 </div>
 

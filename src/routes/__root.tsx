@@ -3,6 +3,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -12,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { cv } from "@/data/cv";
-import { BRAND_MARK_URL } from "@/lib/seo";
+import { BRAND_MARK_URL, OG_IMAGE_URL } from "@/lib/seo";
 import { translations } from "@/i18n/translations";
 import { I18nProvider } from "@/components/i18n-provider";
 import { Header } from "@/components/header";
@@ -25,18 +26,18 @@ import { VercelAnalytics } from "@/components/vercel-analytics";
 import { BOOTSTRAP_SCRIPT } from "@/lib/bootstrap-script";
 
 function NotFoundComponent() {
-  const copy = translations.es.errors;
+  const { t } = useTranslation();
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="font-display text-8xl text-foreground">404</h1>
-        <p className="mt-4 text-muted-foreground">{copy.notFound}</p>
+        <p className="mt-4 text-muted-foreground">{t("errors.notFound")}</p>
         <Link
           to="/"
           className="mt-6 inline-flex rounded-full bg-foreground px-4 py-2 text-sm text-background"
         >
-          {copy.goHome}
+          {t("errors.goHome")}
         </Link>
       </div>
     </div>
@@ -45,14 +46,14 @@ function NotFoundComponent() {
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
-  const copy = translations.es.errors;
+  const { t } = useTranslation();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
   return (
     <div className="flex min-h-[60vh] items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="font-display text-3xl">{copy.generic}</h1>
+        <h1 className="font-display text-3xl">{t("errors.generic")}</h1>
         <button
           onClick={() => {
             router.invalidate();
@@ -60,7 +61,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           }}
           className="mt-6 rounded-full bg-foreground px-4 py-2 text-sm text-background"
         >
-          {copy.tryAgain}
+          {t("errors.tryAgain")}
         </button>
       </div>
     </div>
@@ -91,11 +92,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:locale", content: "es_ES" },
       { property: "og:locale:alternate", content: "ca_ES" },
       { property: "og:locale:alternate", content: "en_US" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:creator", content: "@ubaldosantos" },
-      { name: "twitter:image", content: BRAND_MARK_URL },
-      { property: "og:image", content: BRAND_MARK_URL },
-      { property: "og:image:type", content: "image/svg+xml" },
+      { name: "twitter:image", content: OG_IMAGE_URL },
+      { property: "og:image", content: OG_IMAGE_URL },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
       { property: "og:image:alt", content: translations.es.meta.siteName },
     ],
     links: [
@@ -118,7 +121,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           email: cv.basics.email,
           telephone: cv.basics.phone,
           url: cv.basics.url,
-          image: BRAND_MARK_URL,
+          image: OG_IMAGE_URL,
           worksFor: { "@type": "Organization", name: cv.work[0].name, url: cv.work[0].url },
           address: {
             "@type": "PostalAddress",
@@ -180,20 +183,23 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isOgPreview = pathname.startsWith("/og/");
+
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
-        <SkipLink />
-        <CustomCursor />
-        <EasterEgg />
-        <Toaster position="bottom-right" />
+        {!isOgPreview ? <SkipLink /> : null}
+        {!isOgPreview ? <CustomCursor /> : null}
+        {!isOgPreview ? <EasterEgg /> : null}
+        {!isOgPreview ? <Toaster position="bottom-right" /> : null}
         <VercelAnalytics />
-        <div className="flex min-h-dvh flex-col">
-          <Header />
-          <main id="main" className="flex-1">
+        <div className={isOgPreview ? "min-h-dvh" : "flex min-h-dvh flex-col"}>
+          {!isOgPreview ? <Header /> : null}
+          <main id="main" className={isOgPreview ? undefined : "flex-1"}>
             <PageTransition />
           </main>
-          <Footer />
+          {!isOgPreview ? <Footer /> : null}
         </div>
       </I18nProvider>
     </QueryClientProvider>

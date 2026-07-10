@@ -8,19 +8,20 @@ export const translations = {
       home: {
         title: "Ubaldo Santos Patón — Full-Stack Software Engineer",
         description:
-          "Ingeniero full-stack con 6+ años en producto. En Wiris: MathType SDK e integraciones edtech y Nubric (assessment matemático). Ex-Rotrafu (+50K servicios).",
-        ogDescription: "Portfolio, proyectos y curriculum.",
+          "Ingeniero full-stack con 6+ años en producto. En Wiris: Assessment (Nubric) e integraciones MathType (Google Workspace, Office, Moodle, editores WYSIWYG). Ex-Rotrafu (+50K servicios).",
+        ogDescription:
+          "Ingeniero full-stack con 6+ años en producto · TypeScript · PHP · Laravel · Vue · Portfolio, proyectos y CV.",
       },
       experience: {
         title: "Experiencia — Ubaldo Santos Patón",
         description:
-          "6+ años en producto: Wiris (MathType SDK & Nubric), Rotrafu (+50K servicios, −35% load time), Prime IT, iThinkUPC.",
+          "6+ años en producto: Wiris (Assessment & MathType Integrations), Rotrafu (+50K servicios, −35% load time), Prime IT, iThinkUPC.",
         ogDescription: "Trayectoria en producto e ingeniería.",
       },
       projects: {
         title: "Proyectos — Ubaldo Santos Patón",
         description:
-          "Nubric, MathType SDK, Office Add-in, ROTRAFU 2.0 y technical assessments en GitHub.",
+          "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 y technical assessments en GitHub.",
         ogDescription: "Producto real y proyectos de aprendizaje verificables.",
       },
       skills: {
@@ -79,7 +80,8 @@ export const translations = {
       currentRole: "Actualmente",
       whatIDo: "Qué hago",
       reachOut: "Contacto",
-      atWiris: "En Wiris: MathType SDK, integraciones edtech y Nubric (assessment matemático).",
+      atWiris:
+        "En Wiris: Assessment (Nubric) e integraciones MathType en Google Workspace, Office add-ins, Moodle y editores WYSIWYG.",
       selectedWork: "Trabajo seleccionado",
       selectedWorkSub: "Roles donde he entregado producto con impacto medible.",
       stack: "Stack principal",
@@ -175,19 +177,19 @@ export const translations = {
       home: {
         title: "Ubaldo Santos Patón — Full-Stack Software Engineer",
         description:
-          "Enginyer full-stack amb més de 6 anys en producte. A Wiris: MathType SDK, integracions edtech i Nubric (assessment matemàtic). Ex-Rotrafu (+50K serveis).",
+          "Enginyer full-stack amb més de 6 anys en producte. A Wiris: Assessment (Nubric) i integracions MathType (Google Workspace, Office, Moodle, editors WYSIWYG). Ex-Rotrafu (+50K serveis).",
         ogDescription: "Portfolio, projectes i currículum.",
       },
       experience: {
         title: "Experiència — Ubaldo Santos Patón",
         description:
-          "Més de 6 anys en producte: Wiris (MathType SDK & Nubric), Rotrafu (+50K serveis, −35% temps de càrrega), Prime IT, iThinkUPC.",
+          "Més de 6 anys en producte: Wiris (Assessment & MathType Integrations), Rotrafu (+50K serveis, −35% temps de càrrega), Prime IT, iThinkUPC.",
         ogDescription: "Trajectòria en producte i enginyeria.",
       },
       projects: {
         title: "Projectes — Ubaldo Santos Patón",
         description:
-          "Nubric, MathType SDK, Office Add-in, ROTRAFU 2.0 i technical assessments a GitHub.",
+          "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 i technical assessments a GitHub.",
         ogDescription: "Producte real i projectes d'aprenentatge verificables.",
       },
       skills: {
@@ -246,7 +248,8 @@ export const translations = {
       currentRole: "Actualment",
       whatIDo: "Què faig",
       reachOut: "Contacte",
-      atWiris: "A Wiris: MathType SDK, integracions edtech i Nubric (assessment matemàtic).",
+      atWiris:
+        "A Wiris: Assessment (Nubric) i integracions MathType a Google Workspace, Office add-ins, Moodle i editors WYSIWYG.",
       selectedWork: "Treball seleccionat",
       selectedWorkSub: "Rols on he lliurat producte amb impacte mesurable.",
       stack: "Stack principal",
@@ -342,19 +345,19 @@ export const translations = {
       home: {
         title: "Ubaldo Santos Patón — Full-Stack Software Engineer",
         description:
-          "Full-stack engineer with 6+ years in product. At Wiris: MathType SDK, edtech integrations and Nubric (math assessment). Ex-Rotrafu (50K+ services).",
+          "Full-stack engineer with 6+ years in product. At Wiris: Assessment (Nubric) and MathType integrations (Google Workspace, Office, Moodle, WYSIWYG editors). Ex-Rotrafu (50K+ services).",
         ogDescription: "Portfolio, projects and résumé.",
       },
       experience: {
         title: "Experience — Ubaldo Santos Patón",
         description:
-          "6+ years in product: Wiris (MathType SDK & Nubric), Rotrafu (50K+ services, −35% load time), Prime IT, iThinkUPC.",
+          "6+ years in product: Wiris (Assessment & MathType Integrations), Rotrafu (50K+ services, −35% load time), Prime IT, iThinkUPC.",
         ogDescription: "Trajectory in product and engineering.",
       },
       projects: {
         title: "Projects — Ubaldo Santos Patón",
         description:
-          "Nubric, MathType SDK, Office Add-in, ROTRAFU 2.0 and verifiable GitHub technical assessments.",
+          "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 and verifiable GitHub technical assessments.",
         ogDescription: "Production product and verifiable learning projects.",
       },
       skills: {
@@ -413,7 +416,8 @@ export const translations = {
       currentRole: "Currently",
       whatIDo: "What I do",
       reachOut: "Reach out",
-      atWiris: "At Wiris: MathType SDK, edtech integrations and Nubric (math assessment).",
+      atWiris:
+        "At Wiris: Assessment (Nubric) and MathType integrations across Google Workspace, Office add-ins, Moodle and WYSIWYG editors.",
       selectedWork: "Selected work",
       selectedWorkSub: "Roles where I've shipped product with measurable impact.",
       stack: "Core stack",

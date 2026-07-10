@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Sparkles } from "lucide-react";
 import { cv } from "@/data/cv";
 import { currentLang, formatPeriod } from "@/lib/format";
-import { routeHead } from "@/lib/seo";
+import { routeHead, seoBreadcrumbs } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { PrimaryStack } from "@/components/primary-stack";
@@ -11,13 +11,7 @@ import { PageHeader, PageShell, pageLeadClass } from "@/components/page-shell";
 import { MotionPage } from "@/components/page-transition";
 
 export const Route = createFileRoute("/skills")({
-  head: () =>
-    routeHead("skills", "/skills", {
-      breadcrumbs: [
-        { name: "Inicio", path: "/" },
-        { name: "Skills", path: "/skills" },
-      ],
-    }),
+  head: () => routeHead("skills", "/skills", { breadcrumbs: seoBreadcrumbs("skills") }),
   component: SkillsPage,
 });
 
