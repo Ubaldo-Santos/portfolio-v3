@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
-const path = require('path');
+const path = require("path");
 
 function toCursorAgentFileName(fileName) {
-  if (!fileName || fileName.startsWith('ecc-')) {
+  if (!fileName || fileName.startsWith("ecc-")) {
     return fileName;
   }
 
@@ -11,7 +11,9 @@ function toCursorAgentFileName(fileName) {
 }
 
 function toCursorAgentRelativePath(relativePath) {
-  const segments = String(relativePath || '').split(/[\\/]+/).filter(Boolean);
+  const segments = String(relativePath || "")
+    .split(/[\\/]+/)
+    .filter(Boolean);
   if (segments.length === 0) {
     return relativePath;
   }

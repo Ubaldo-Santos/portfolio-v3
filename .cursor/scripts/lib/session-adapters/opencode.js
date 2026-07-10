@@ -1,18 +1,18 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { execFileSync } = require('child_process');
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const { execFileSync } = require("child_process");
 
-const { normalizeOpencodeSession, persistCanonicalSnapshot } = require('./canonical-session');
+const { normalizeOpencodeSession, persistCanonicalSnapshot } = require("./canonical-session");
 
-const OPENCODE_TARGET_PREFIXES = ['opencode:'];
+const OPENCODE_TARGET_PREFIXES = ["opencode:"];
 const RECENT_ACTIVITY_THRESHOLD_MS = 5 * 60 * 1000;
 const MAX_MESSAGE_SCAN = 40;
 
 function parseOpencodeTarget(target) {
-  if (typeof target !== 'string') {
+  if (typeof target !== "string") {
     return null;
   }
 
@@ -26,37 +26,38 @@ function parseOpencodeTarget(target) {
 }
 
 function resolveStorageDir(options = {}, context = {}) {
-  const explicit = options.storageDir
-    || context.opencodeStorageDir
-    || process.env.OPENCODE_STORAGE_DIR;
+  const explicit =
+    options.storageDir || context.opencodeStorageDir || process.env.OPENCODE_STORAGE_DIR;
 
-  if (typeof explicit === 'string' && explicit.length > 0) {
+  if (typeof explicit === "string" && explicit.length > 0) {
     return path.resolve(explicit);
   }
 
-  return path.join(os.homedir(), '.local', 'share', 'opencode', 'storage');
+  return path.join(os.homedir(), ".local", "share", "opencode", "storage");
 }
 
 function isSessionInfoFile(filePath) {
   const base = path.basename(filePath);
-  return base.startsWith('ses_') && base.endsWith('.json');
+  return base.startsWith("ses_") && base.endsWith(".json");
 }
 
 function isOpencodeSessionFileTarget(target, cwd) {
-  if (typeof target !== 'string' || target.length === 0) {
+  if (typeof target !== "string" || target.length === 0) {
     return false;
   }
 
   const absoluteTarget = path.resolve(cwd, target);
-  return fs.existsSync(absoluteTarget)
-    && fs.statSync(absoluteTarget).isFile()
-    && isSessionInfoFile(absoluteTarget)
-    && `${path.sep}session${path.sep}`.length > 0
-    && absoluteTarget.includes(`${path.sep}session${path.sep}`);
+  return (
+    fs.existsSync(absoluteTarget) &&
+    fs.statSync(absoluteTarget).isFile() &&
+    isSessionInfoFile(absoluteTarget) &&
+    `${path.sep}session${path.sep}`.length > 0 &&
+    absoluteTarget.includes(`${path.sep}session${path.sep}`)
+  );
 }
 
 function listSessionInfoFiles(storageDir) {
-  const sessionDir = path.join(storageDir, 'session');
+  const sessionDir = path.join(storageDir, "session");
   if (!fs.existsSync(sessionDir) || !fs.statSync(sessionDir).isDirectory()) {
     return [];
   }
@@ -88,7 +89,7 @@ function listSessionInfoFiles(storageDir) {
 
 function readSessionUpdatedMs(filePath) {
   try {
-    const info = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const info = JSON.parse(fs.readFileSync(filePath, "utf8"));
     if (info && info.time && Number.isFinite(info.time.updated)) {
       return info.time.updated;
     }
@@ -110,13 +111,16 @@ function findLatestSessionInfo(storageDir) {
   }
 
   return files
-    .map(filePath => ({ filePath, updatedMs: readSessionUpdatedMs(filePath) }))
+    .map((filePath) => ({ filePath, updatedMs: readSessionUpdatedMs(filePath) }))
     .sort((a, b) => b.updatedMs - a.updatedMs)[0].filePath;
 }
 
 function findSessionInfoById(storageDir, sessionId) {
-  return listSessionInfoFiles(storageDir)
-    .find(filePath => path.basename(filePath, '.json') === sessionId) || null;
+  return (
+    listSessionInfoFiles(storageDir).find(
+      (filePath) => path.basename(filePath, ".json") === sessionId,
+    ) || null
+  );
 }
 
 function resolveSessionInfoPath(target, cwd, options, context) {
@@ -124,23 +128,26 @@ function resolveSessionInfoPath(target, cwd, options, context) {
   const storageDir = resolveStorageDir(options, context);
 
   if (explicitTarget) {
-    if (explicitTarget === 'latest') {
+    if (explicitTarget === "latest") {
       const latest = findLatestSessionInfo(storageDir);
       if (!latest) {
-        throw new Error('No OpenCode sessions found');
+        throw new Error("No OpenCode sessions found");
       }
 
-      return { sessionInfoPath: latest, sourceTarget: { type: 'opencode', value: 'latest' } };
+      return { sessionInfoPath: latest, sourceTarget: { type: "opencode", value: "latest" } };
     }
 
     const absoluteExplicit = path.resolve(cwd, explicitTarget);
     if (fs.existsSync(absoluteExplicit) && isSessionInfoFile(absoluteExplicit)) {
-      return { sessionInfoPath: absoluteExplicit, sourceTarget: { type: 'opencode-session-file', value: absoluteExplicit } };
+      return {
+        sessionInfoPath: absoluteExplicit,
+        sourceTarget: { type: "opencode-session-file", value: absoluteExplicit },
+      };
     }
 
     const byId = findSessionInfoById(storageDir, explicitTarget);
     if (byId) {
-      return { sessionInfoPath: byId, sourceTarget: { type: 'opencode', value: explicitTarget } };
+      return { sessionInfoPath: byId, sourceTarget: { type: "opencode", value: explicitTarget } };
     }
 
     throw new Error(`OpenCode session not found: ${explicitTarget}`);
@@ -148,7 +155,10 @@ function resolveSessionInfoPath(target, cwd, options, context) {
 
   if (isOpencodeSessionFileTarget(target, cwd)) {
     const absoluteTarget = path.resolve(cwd, target);
-    return { sessionInfoPath: absoluteTarget, sourceTarget: { type: 'opencode-session-file', value: absoluteTarget } };
+    return {
+      sessionInfoPath: absoluteTarget,
+      sourceTarget: { type: "opencode-session-file", value: absoluteTarget },
+    };
   }
 
   throw new Error(`Unsupported OpenCode session target: ${target}`);
@@ -160,9 +170,10 @@ function readMessageFiles(messageDir) {
   }
 
   try {
-    return fs.readdirSync(messageDir)
-      .filter(name => name.startsWith('msg_') && name.endsWith('.json'))
-      .map(name => path.join(messageDir, name));
+    return fs
+      .readdirSync(messageDir)
+      .filter((name) => name.startsWith("msg_") && name.endsWith(".json"))
+      .map((name) => path.join(messageDir, name));
   } catch {
     return [];
   }
@@ -172,15 +183,20 @@ function deriveModelFromMessages(messageFiles) {
   for (const filePath of messageFiles.slice(0, MAX_MESSAGE_SCAN)) {
     let message;
     try {
-      message = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      message = JSON.parse(fs.readFileSync(filePath, "utf8"));
     } catch {
       continue;
     }
 
-    if (message && message.role === 'assistant' && typeof message.modelID === 'string' && message.modelID.length > 0) {
+    if (
+      message &&
+      message.role === "assistant" &&
+      typeof message.modelID === "string" &&
+      message.modelID.length > 0
+    ) {
       return {
         model: message.modelID,
-        provider: typeof message.providerID === 'string' ? message.providerID : null
+        provider: typeof message.providerID === "string" ? message.providerID : null,
       };
     }
   }
@@ -189,26 +205,26 @@ function deriveModelFromMessages(messageFiles) {
 }
 
 function deriveObjective(title) {
-  if (typeof title !== 'string') {
-    return '';
+  if (typeof title !== "string") {
+    return "";
   }
 
   const trimmed = title.trim();
   // OpenCode seeds an auto title ("New session - <ISO date>") until the model
   // renames it; treat that as no objective rather than noise.
   if (trimmed.length === 0 || /^New session\b/i.test(trimmed)) {
-    return '';
+    return "";
   }
 
   return trimmed.length > 280 ? `${trimmed.slice(0, 277)}...` : trimmed;
 }
 
 function resolveGitBranch(cwd, resolveBranchImpl) {
-  if (typeof resolveBranchImpl === 'function') {
+  if (typeof resolveBranchImpl === "function") {
     return resolveBranchImpl(cwd);
   }
 
-  if (typeof cwd !== 'string' || cwd.length === 0 || !fs.existsSync(cwd)) {
+  if (typeof cwd !== "string" || cwd.length === 0 || !fs.existsSync(cwd)) {
     return null;
   }
 
@@ -216,13 +232,19 @@ function resolveGitBranch(cwd, resolveBranchImpl) {
     // Strip inherited git env (GIT_DIR etc., set when running inside a git
     // hook) so the -C target is honored instead of the host repo.
     const gitEnv = { ...process.env };
-    for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_PREFIX']) {
+    for (const key of [
+      "GIT_DIR",
+      "GIT_WORK_TREE",
+      "GIT_INDEX_FILE",
+      "GIT_COMMON_DIR",
+      "GIT_PREFIX",
+    ]) {
       delete gitEnv[key];
     }
-    const branch = execFileSync('git', ['-C', cwd, 'rev-parse', '--abbrev-ref', 'HEAD'], {
-      stdio: ['ignore', 'pipe', 'ignore'],
-      encoding: 'utf8',
-      env: gitEnv
+    const branch = execFileSync("git", ["-C", cwd, "rev-parse", "--abbrev-ref", "HEAD"], {
+      stdio: ["ignore", "pipe", "ignore"],
+      encoding: "utf8",
+      env: gitEnv,
     }).trim();
 
     return branch.length > 0 ? branch : null;
@@ -234,17 +256,19 @@ function resolveGitBranch(cwd, resolveBranchImpl) {
 function parseOpencodeSession(sessionInfoPath, options = {}) {
   const storageDir = options.storageDir
     ? path.resolve(options.storageDir)
-    : path.resolve(path.dirname(sessionInfoPath), '..', '..');
-  const info = JSON.parse(fs.readFileSync(sessionInfoPath, 'utf8'));
+    : path.resolve(path.dirname(sessionInfoPath), "..", "..");
+  const info = JSON.parse(fs.readFileSync(sessionInfoPath, "utf8"));
 
-  const sessionId = typeof info.id === 'string' && info.id.length > 0
-    ? info.id
-    : path.basename(sessionInfoPath, '.json');
-  const directory = typeof info.directory === 'string' && info.directory.length > 0 ? info.directory : null;
+  const sessionId =
+    typeof info.id === "string" && info.id.length > 0
+      ? info.id
+      : path.basename(sessionInfoPath, ".json");
+  const directory =
+    typeof info.directory === "string" && info.directory.length > 0 ? info.directory : null;
   const updatedMs = info.time && Number.isFinite(info.time.updated) ? info.time.updated : null;
   const createdMs = info.time && Number.isFinite(info.time.created) ? info.time.created : null;
 
-  const messageFiles = readMessageFiles(path.join(storageDir, 'message', sessionId));
+  const messageFiles = readMessageFiles(path.join(storageDir, "message", sessionId));
   const { model, provider } = deriveModelFromMessages(messageFiles);
 
   return {
@@ -253,32 +277,33 @@ function parseOpencodeSession(sessionInfoPath, options = {}) {
     cwd: directory,
     branch: resolveGitBranch(directory, options.resolveBranchImpl),
     objective: deriveObjective(info.title),
-    title: typeof info.title === 'string' ? info.title : null,
+    title: typeof info.title === "string" ? info.title : null,
     model,
     provider,
-    version: typeof info.version === 'string' ? info.version : null,
-    projectId: typeof info.projectID === 'string' ? info.projectID : null,
+    version: typeof info.version === "string" ? info.version : null,
+    projectId: typeof info.projectID === "string" ? info.projectID : null,
     createdAt: createdMs !== null ? new Date(createdMs).toISOString() : null,
     updatedAt: updatedMs !== null ? new Date(updatedMs).toISOString() : null,
     messageCount: messageFiles.length,
-    active: updatedMs !== null && (Date.now() - updatedMs) <= RECENT_ACTIVITY_THRESHOLD_MS
+    active: updatedMs !== null && Date.now() - updatedMs <= RECENT_ACTIVITY_THRESHOLD_MS,
   };
 }
 
 function createOpencodeAdapter(options = {}) {
   const parseOpencodeSessionImpl = options.parseOpencodeSessionImpl || parseOpencodeSession;
-  const persistCanonicalSnapshotImpl = options.persistCanonicalSnapshotImpl || persistCanonicalSnapshot;
+  const persistCanonicalSnapshotImpl =
+    options.persistCanonicalSnapshotImpl || persistCanonicalSnapshot;
 
   return {
-    id: 'opencode',
-    description: 'OpenCode sessions normalized to ecc.session.v1',
-    targetTypes: ['opencode'],
+    id: "opencode",
+    description: "OpenCode sessions normalized to ecc.session.v1",
+    targetTypes: ["opencode"],
     canOpen(target, context = {}) {
-      if (context.adapterId && context.adapterId !== 'opencode') {
+      if (context.adapterId && context.adapterId !== "opencode") {
         return false;
       }
 
-      if (context.adapterId === 'opencode') {
+      if (context.adapterId === "opencode") {
         return true;
       }
 
@@ -289,9 +314,14 @@ function createOpencodeAdapter(options = {}) {
       const cwd = context.cwd || process.cwd();
 
       return {
-        adapterId: 'opencode',
+        adapterId: "opencode",
         getSnapshot() {
-          const { sessionInfoPath, sourceTarget } = resolveSessionInfoPath(target, cwd, options, context);
+          const { sessionInfoPath, sourceTarget } = resolveSessionInfoPath(
+            target,
+            cwd,
+            options,
+            context,
+          );
           const session = parseOpencodeSessionImpl(sessionInfoPath, options);
           const canonicalSnapshot = normalizeOpencodeSession(session, sourceTarget);
 
@@ -299,13 +329,13 @@ function createOpencodeAdapter(options = {}) {
             loadStateStoreImpl: options.loadStateStoreImpl,
             persist: context.persistSnapshots !== false && options.persistSnapshots !== false,
             recordingDir: context.recordingDir || options.recordingDir,
-            stateStore: options.stateStore
+            stateStore: options.stateStore,
           });
 
           return canonicalSnapshot;
-        }
+        },
       };
-    }
+    },
   };
 }
 
@@ -315,5 +345,5 @@ module.exports = {
   parseOpencodeSession,
   isOpencodeSessionFileTarget,
   findLatestSessionInfo,
-  findSessionInfoById
+  findSessionInfoById,
 };

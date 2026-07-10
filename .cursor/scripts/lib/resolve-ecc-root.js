@@ -1,21 +1,21 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
 
-const CURRENT_PLUGIN_SLUG = 'ecc';
-const LEGACY_PLUGIN_SLUG = 'everything-claude-code';
+const CURRENT_PLUGIN_SLUG = "ecc";
+const LEGACY_PLUGIN_SLUG = "everything-claude-code";
 const CURRENT_PLUGIN_HANDLE = `${CURRENT_PLUGIN_SLUG}@${CURRENT_PLUGIN_SLUG}`;
 const LEGACY_PLUGIN_HANDLE = `${LEGACY_PLUGIN_SLUG}@${LEGACY_PLUGIN_SLUG}`;
 const PLUGIN_CACHE_SLUGS = [CURRENT_PLUGIN_SLUG, LEGACY_PLUGIN_SLUG];
 const PLUGIN_ROOT_SEGMENTS = [
   [CURRENT_PLUGIN_SLUG],
   [CURRENT_PLUGIN_HANDLE],
-  ['marketplaces', CURRENT_PLUGIN_SLUG],
+  ["marketplaces", CURRENT_PLUGIN_SLUG],
   [LEGACY_PLUGIN_SLUG],
   [LEGACY_PLUGIN_HANDLE],
-  ['marketplaces', LEGACY_PLUGIN_SLUG],
+  ["marketplaces", LEGACY_PLUGIN_SLUG],
 ];
 
 /**
@@ -36,17 +36,16 @@ const PLUGIN_ROOT_SEGMENTS = [
  * @returns {string} Resolved ECC root path
  */
 function resolveEccRoot(options = {}) {
-  const envRoot = options.envRoot !== undefined
-    ? options.envRoot
-    : (process.env.CLAUDE_PLUGIN_ROOT || '');
+  const envRoot =
+    options.envRoot !== undefined ? options.envRoot : process.env.CLAUDE_PLUGIN_ROOT || "";
 
   if (envRoot && envRoot.trim()) {
     return envRoot.trim();
   }
 
   const homeDir = options.homeDir || os.homedir();
-  const claudeDir = path.join(homeDir, '.claude');
-  const probe = options.probe || path.join('scripts', 'lib', 'utils.js');
+  const claudeDir = path.join(homeDir, ".claude");
+  const probe = options.probe || path.join("scripts", "lib", "utils.js");
 
   // Standard install — files are copied directly into ~/.claude/
   if (fs.existsSync(path.join(claudeDir, probe))) {
@@ -56,7 +55,7 @@ function resolveEccRoot(options = {}) {
   // Exact legacy plugin install locations. These preserve backwards
   // compatibility without scanning arbitrary plugin trees.
   const legacyPluginRoots = PLUGIN_ROOT_SEGMENTS.map((segments) =>
-    path.join(claudeDir, 'plugins', ...segments)
+    path.join(claudeDir, "plugins", ...segments),
   );
 
   for (const candidate of legacyPluginRoots) {
@@ -69,7 +68,7 @@ function resolveEccRoot(options = {}) {
   // ~/.claude/plugins/cache/<plugin-name>/<org>/<version>/
   try {
     for (const slug of PLUGIN_CACHE_SLUGS) {
-      const cacheBase = path.join(claudeDir, 'plugins', 'cache', slug);
+      const cacheBase = path.join(claudeDir, "plugins", "cache", slug);
       const orgDirs = fs.readdirSync(cacheBase, { withFileTypes: true });
 
       for (const orgEntry of orgDirs) {

@@ -1,4 +1,8 @@
 import { SITE_URL } from "@/lib/site";
+import type { Lang } from "@/data/cv";
+
+/** OG banners are always rendered in English for international social previews. */
+export const OG_LANG: Lang = "en";
 
 export const OG_THEMES = ["light", "dark"] as const;
 export type OgTheme = (typeof OG_THEMES)[number];

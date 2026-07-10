@@ -18,24 +18,24 @@
  * delegate to its exported `run()`, then forward the exit code and stderr.
  */
 
-'use strict';
+"use strict";
 
-const { readStdin, hookEnabled } = require('./adapter');
-const { run } = require('../scripts/hooks/block-no-verify');
+const { readStdin, hookEnabled } = require("./adapter");
+const { run } = require("../scripts/hooks/block-no-verify");
 
 readStdin()
-  .then(raw => {
-    if (!hookEnabled('pre:bash:block-no-verify', ['minimal', 'standard', 'strict'])) {
+  .then((raw) => {
+    if (!hookEnabled("pre:bash:block-no-verify", ["minimal", "standard", "strict"])) {
       process.stdout.write(raw);
       return;
     }
 
-    let command = '';
+    let command = "";
     try {
-      const parsed = JSON.parse(raw || '{}');
-      command = String(parsed.command || parsed.args?.command || '');
+      const parsed = JSON.parse(raw || "{}");
+      command = String(parsed.command || parsed.args?.command || "");
     } catch {
-      command = String(raw || '');
+      command = String(raw || "");
     }
 
     // Local hook accepts either the raw command string or a Claude-Code
@@ -48,7 +48,7 @@ readStdin()
 
     if (result && result.exitCode === 2) {
       if (result.stderr) {
-        process.stderr.write(String(result.stderr) + '\n');
+        process.stderr.write(String(result.stderr) + "\n");
       }
       process.exit(2);
     }

@@ -21,7 +21,7 @@ ECC-native around the `/plan` confirmation gate, with zero dependencies.
 - You just wrote a plan artifact (`.claude/plans/*.plan.md` from `/plan`) and
   need the CONFIRM/approve decision — the canvas verdict replaces a typed
   "yes/proceed".
-- The user should *point at* what to change: reviewing designs, comparisons,
+- The user should _point at_ what to change: reviewing designs, comparisons,
   reports, or any local `.md` / `.html` artifact.
 - The user asks for `/plan-canvas`, a visual review, or "open it in the browser".
 
@@ -59,8 +59,11 @@ ecc-plan-canvas await .claude/plans/feature.plan.md
 {
   "status": "feedback",
   "items": [
-    { "kind": "annotation", "text": "Split this into two phases",
-      "anchor": { "selector": "h2:nth-of-type(3)", "tag": "h2", "snippet": "Phase 2: Migration" } },
+    {
+      "kind": "annotation",
+      "text": "Split this into two phases",
+      "anchor": { "selector": "h2:nth-of-type(3)", "tag": "h2", "snippet": "Phase 2: Migration" }
+    },
     { "kind": "verdict", "verdict": "request-changes" }
   ]
 }
@@ -147,7 +150,7 @@ ecc-plan-canvas await <file> --reply "Reworked the risk table."
 - Polling with `--timeout-ms` in a loop — it exists for tests. Leave the
   plain `await` running instead.
 - Reopening after a user-initiated end "just to show" something.
-- Pasting the whole plan into chat *and* opening a canvas — pick the canvas
+- Pasting the whole plan into chat _and_ opening a canvas — pick the canvas
   and keep the terminal summary to one line.
 - Parsing the canvas chat from state files — everything you need arrives via
   `await`.

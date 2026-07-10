@@ -25,16 +25,16 @@
  * - Allows multiple dev servers to run simultaneously
  */
 
-const path = require('path');
-const { spawnSync } = require('child_process');
+const path = require("path");
+const { spawnSync } = require("child_process");
 
 const MAX_STDIN = 1024 * 1024; // 1MB limit
-let data = '';
+let data = "";
 
 function run(rawInput) {
   try {
-    const input = typeof rawInput === 'string' ? JSON.parse(rawInput) : rawInput;
-    const cmd = input.tool_input?.command || '';
+    const input = typeof rawInput === "string" ? JSON.parse(rawInput) : rawInput;
+    const cmd = input.tool_input?.command || "";
 
     // Detect dev server commands: npm run dev, pnpm dev, yarn dev, bun run dev
     // Use word boundary (\b) to avoid matching partial commands
@@ -45,9 +45,9 @@ function run(rawInput) {
       // e.g., /home/user/Portfolio → "Portfolio", /home/user/my-app-v2 → "my-app-v2"
       const rawName = path.basename(process.cwd());
       // Replace non-alphanumeric characters (except - and _) with underscore to prevent shell injection
-      const sessionName = rawName.replace(/[^a-zA-Z0-9_-]/g, '_') || 'dev';
+      const sessionName = rawName.replace(/[^a-zA-Z0-9_-]/g, "_") || "dev";
 
-      if (process.platform === 'win32') {
+      if (process.platform === "win32") {
         // Windows: open in a new cmd window (non-blocking)
         // Escape double quotes in cmd for cmd /k syntax
         const escapedCmd = cmd.replace(/"/g, '""');
@@ -60,7 +60,7 @@ function run(rawInput) {
         });
       } else {
         // Unix (macOS/Linux): Check tmux is available before transforming
-        const tmuxCheck = spawnSync('which', ['tmux'], { encoding: 'utf8' });
+        const tmuxCheck = spawnSync("which", ["tmux"], { encoding: "utf8" });
         if (tmuxCheck.status === 0) {
           // Escape single quotes for shell safety: 'text' -> 'text'\''text'
           const escapedCmd = cmd.replace(/'/g, "'\\''");
@@ -85,20 +85,20 @@ function run(rawInput) {
     return JSON.stringify(input);
   } catch {
     // Invalid input — pass through original data unchanged
-    return typeof rawInput === 'string' ? rawInput : JSON.stringify(rawInput);
+    return typeof rawInput === "string" ? rawInput : JSON.stringify(rawInput);
   }
 }
 
 if (require.main === module) {
-  process.stdin.setEncoding('utf8');
-  process.stdin.on('data', chunk => {
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => {
     if (data.length < MAX_STDIN) {
       const remaining = MAX_STDIN - data.length;
       data += chunk.substring(0, remaining);
     }
   });
 
-  process.stdin.on('end', () => {
+  process.stdin.on("end", () => {
     process.stdout.write(run(data));
     process.exit(0);
   });

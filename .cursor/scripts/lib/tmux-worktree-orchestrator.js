@@ -1,21 +1,21 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
-const { spawnSync } = require('child_process');
+const fs = require("fs");
+const path = require("path");
+const { spawnSync } = require("child_process");
 
-function slugify(value, fallback = 'worker') {
-  const normalized = String(value || '')
+function slugify(value, fallback = "worker") {
+  const normalized = String(value || "")
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
   return normalized || fallback;
 }
 
 function renderTemplate(template, variables) {
-  if (typeof template !== 'string' || template.trim().length === 0) {
-    throw new Error('launcherCommand must be a non-empty string');
+  if (typeof template !== "string" || template.trim().length === 0) {
+    throw new Error("launcherCommand must be a non-empty string");
   }
 
   return template.replace(/\{([a-z_]+)\}/g, (match, key) => {
@@ -31,7 +31,7 @@ function shellQuote(value) {
 }
 
 function formatCommand(program, args) {
-  return [program, ...args.map(shellQuote)].join(' ');
+  return [program, ...args.map(shellQuote)].join(" ");
 }
 
 function buildTemplateVariables(values) {
@@ -57,21 +57,18 @@ function normalizeSeedPaths(seedPaths, repoRoot) {
   const normalized = [];
 
   for (const entry of entries) {
-    if (typeof entry !== 'string' || entry.trim().length === 0) {
+    if (typeof entry !== "string" || entry.trim().length === 0) {
       continue;
     }
 
     const absolutePath = path.resolve(resolvedRepoRoot, entry);
     const relativePath = path.relative(resolvedRepoRoot, absolutePath);
 
-    if (
-      relativePath.startsWith('..') ||
-      path.isAbsolute(relativePath)
-    ) {
+    if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
       throw new Error(`seedPaths entries must stay inside repoRoot: ${entry}`);
     }
 
-    const normalizedPath = relativePath.split(path.sep).join('/');
+    const normalizedPath = relativePath.split(path.sep).join("/");
     if (seen.has(normalizedPath)) {
       continue;
     }
@@ -100,19 +97,20 @@ function overlaySeedPaths({ repoRoot, seedPaths, worktreePath }) {
       dereference: false,
       force: true,
       preserveTimestamps: true,
-      recursive: true
+      recursive: true,
     });
   }
 }
 
 function buildWorkerArtifacts(workerPlan) {
-  const seededPathsSection = workerPlan.seedPaths.length > 0
-    ? [
-        '',
-        '## Seeded Local Overlays',
-        ...workerPlan.seedPaths.map(seedPath => `- \`${seedPath}\``)
-      ]
-    : [];
+  const seededPathsSection =
+    workerPlan.seedPaths.length > 0
+      ? [
+          "",
+          "## Seeded Local Overlays",
+          ...workerPlan.seedPaths.map((seedPath) => `- \`${seedPath}\``),
+        ]
+      : [];
 
   return {
     dir: workerPlan.coordinationDir,
@@ -121,7 +119,7 @@ function buildWorkerArtifacts(workerPlan) {
         path: workerPlan.taskFilePath,
         content: [
           `# Worker Task: ${workerPlan.workerName}`,
-          '',
+          "",
           `- Session: \`${workerPlan.sessionName}\``,
           `- Repo root: \`${workerPlan.repoRoot}\``,
           `- Worktree: \`${workerPlan.worktreePath}\``,
@@ -129,46 +127,46 @@ function buildWorkerArtifacts(workerPlan) {
           `- Launcher status file: \`${workerPlan.statusFilePath}\``,
           `- Launcher handoff file: \`${workerPlan.handoffFilePath}\``,
           ...seededPathsSection,
-          '',
-          '## Objective',
+          "",
+          "## Objective",
           workerPlan.task,
-          '',
-          '## Completion',
-          'Do not spawn subagents or external agents for this task.',
-          'Report results in your final response.',
+          "",
+          "## Completion",
+          "Do not spawn subagents or external agents for this task.",
+          "Report results in your final response.",
           `The worker launcher captures your response in \`${workerPlan.handoffFilePath}\` automatically.`,
-          `The worker launcher updates \`${workerPlan.statusFilePath}\` automatically.`
-        ].join('\n')
+          `The worker launcher updates \`${workerPlan.statusFilePath}\` automatically.`,
+        ].join("\n"),
       },
       {
         path: workerPlan.handoffFilePath,
         content: [
           `# Handoff: ${workerPlan.workerName}`,
-          '',
-          '## Summary',
-          '- Pending',
-          '',
-          '## Files Changed',
-          '- Pending',
-          '',
-          '## Tests / Verification',
-          '- Pending',
-          '',
-          '## Follow-ups',
-          '- Pending'
-        ].join('\n')
+          "",
+          "## Summary",
+          "- Pending",
+          "",
+          "## Files Changed",
+          "- Pending",
+          "",
+          "## Tests / Verification",
+          "- Pending",
+          "",
+          "## Follow-ups",
+          "- Pending",
+        ].join("\n"),
       },
       {
         path: workerPlan.statusFilePath,
         content: [
           `# Status: ${workerPlan.workerName}`,
-          '',
-          '- State: not started',
+          "",
+          "- State: not started",
           `- Worktree: \`${workerPlan.worktreePath}\``,
-          `- Branch: \`${workerPlan.branchName}\``
-        ].join('\n')
-      }
-    ]
+          `- Branch: \`${workerPlan.branchName}\``,
+        ].join("\n"),
+      },
+    ],
   };
 }
 
@@ -177,22 +175,22 @@ function buildOrchestrationPlan(config = {}) {
   const repoName = path.basename(repoRoot);
   const workers = Array.isArray(config.workers) ? config.workers : [];
   const globalSeedPaths = normalizeSeedPaths(config.seedPaths, repoRoot);
-  const sessionName = slugify(config.sessionName || repoName, 'session');
+  const sessionName = slugify(config.sessionName || repoName, "session");
   const worktreeRoot = path.resolve(config.worktreeRoot || path.dirname(repoRoot));
   const coordinationRoot = path.resolve(
-    config.coordinationRoot || path.join(repoRoot, '.orchestration')
+    config.coordinationRoot || path.join(repoRoot, ".orchestration"),
   );
   const coordinationDir = path.join(coordinationRoot, sessionName);
-  const baseRef = config.baseRef || 'HEAD';
-  const defaultLauncher = config.launcherCommand || '';
+  const baseRef = config.baseRef || "HEAD";
+  const defaultLauncher = config.launcherCommand || "";
 
   if (workers.length === 0) {
-    throw new Error('buildOrchestrationPlan requires at least one worker');
+    throw new Error("buildOrchestrationPlan requires at least one worker");
   }
 
   const seenSlugs = new Set();
   const workerPlans = workers.map((worker, index) => {
-    if (!worker || typeof worker.task !== 'string' || worker.task.trim().length === 0) {
+    if (!worker || typeof worker.task !== "string" || worker.task.trim().length === 0) {
       throw new Error(`Worker ${index + 1} is missing a task`);
     }
 
@@ -207,9 +205,9 @@ function buildOrchestrationPlan(config = {}) {
     const branchName = `orchestrator-${sessionName}-${workerSlug}`;
     const worktreePath = path.join(worktreeRoot, `${repoName}-${sessionName}-${workerSlug}`);
     const workerCoordinationDir = path.join(coordinationDir, workerSlug);
-    const taskFilePath = path.join(workerCoordinationDir, 'task.md');
-    const handoffFilePath = path.join(workerCoordinationDir, 'handoff.md');
-    const statusFilePath = path.join(workerCoordinationDir, 'status.md');
+    const taskFilePath = path.join(workerCoordinationDir, "task.md");
+    const handoffFilePath = path.join(workerCoordinationDir, "handoff.md");
+    const statusFilePath = path.join(workerCoordinationDir, "status.md");
     const launcherCommand = worker.launcherCommand || defaultLauncher;
     const workerSeedPaths = normalizeSeedPaths(worker.seedPaths, repoRoot);
     const seedPaths = normalizeSeedPaths([...globalSeedPaths, ...workerSeedPaths], repoRoot);
@@ -222,20 +220,20 @@ function buildOrchestrationPlan(config = {}) {
       task_file: taskFilePath,
       worker_name: workerName,
       worker_slug: workerSlug,
-      worktree_path: worktreePath
+      worktree_path: worktreePath,
     });
 
     if (!launcherCommand) {
       throw new Error(`Worker ${workerName} is missing a launcherCommand`);
     }
 
-    const gitArgs = ['worktree', 'add', '-b', branchName, worktreePath, baseRef];
+    const gitArgs = ["worktree", "add", "-b", branchName, worktreePath, baseRef];
 
     return {
       branchName,
       coordinationDir: workerCoordinationDir,
       gitArgs,
-      gitCommand: formatCommand('git', gitArgs),
+      gitCommand: formatCommand("git", gitArgs),
       handoffFilePath,
       launchCommand: renderTemplate(launcherCommand, templateVariables),
       repoRoot,
@@ -246,57 +244,57 @@ function buildOrchestrationPlan(config = {}) {
       taskFilePath,
       workerName,
       workerSlug,
-      worktreePath
+      worktreePath,
     };
   });
 
   const tmuxCommands = [
     {
-      cmd: 'tmux',
-      args: ['new-session', '-d', '-s', sessionName, '-n', 'orchestrator', '-c', repoRoot],
-      description: 'Create detached tmux session'
+      cmd: "tmux",
+      args: ["new-session", "-d", "-s", sessionName, "-n", "orchestrator", "-c", repoRoot],
+      description: "Create detached tmux session",
     },
     {
-      cmd: 'tmux',
+      cmd: "tmux",
       args: [
-        'send-keys',
-        '-t',
+        "send-keys",
+        "-t",
         sessionName,
         buildSessionBannerCommand(sessionName, coordinationDir),
-        'C-m'
+        "C-m",
       ],
-      description: 'Print orchestrator session details'
-    }
+      description: "Print orchestrator session details",
+    },
   ];
 
   for (const workerPlan of workerPlans) {
     tmuxCommands.push(
       {
-        cmd: 'tmux',
-        args: ['split-window', '-d', '-t', sessionName, '-c', workerPlan.worktreePath],
-        description: `Create pane for ${workerPlan.workerName}`
+        cmd: "tmux",
+        args: ["split-window", "-d", "-t", sessionName, "-c", workerPlan.worktreePath],
+        description: `Create pane for ${workerPlan.workerName}`,
       },
       {
-        cmd: 'tmux',
-        args: ['select-layout', '-t', sessionName, 'tiled'],
-        description: 'Arrange panes in tiled layout'
+        cmd: "tmux",
+        args: ["select-layout", "-t", sessionName, "tiled"],
+        description: "Arrange panes in tiled layout",
       },
       {
-        cmd: 'tmux',
-        args: ['select-pane', '-t', '<pane-id>', '-T', workerPlan.workerSlug],
-        description: `Label pane ${workerPlan.workerSlug}`
+        cmd: "tmux",
+        args: ["select-pane", "-t", "<pane-id>", "-T", workerPlan.workerSlug],
+        description: `Label pane ${workerPlan.workerSlug}`,
       },
       {
-        cmd: 'tmux',
+        cmd: "tmux",
         args: [
-          'send-keys',
-          '-t',
-          '<pane-id>',
+          "send-keys",
+          "-t",
+          "<pane-id>",
           `cd ${shellQuote(workerPlan.worktreePath)} && ${workerPlan.launchCommand}`,
-          'C-m'
+          "C-m",
         ],
-        description: `Launch worker ${workerPlan.workerName}`
-      }
+        description: `Launch worker ${workerPlan.workerName}`,
+      },
     );
   }
 
@@ -307,7 +305,7 @@ function buildOrchestrationPlan(config = {}) {
     repoRoot,
     sessionName,
     tmuxCommands,
-    workerPlans
+    workerPlans,
   };
 }
 
@@ -316,7 +314,7 @@ function materializePlan(plan) {
     const artifacts = buildWorkerArtifacts(workerPlan);
     fs.mkdirSync(artifacts.dir, { recursive: true });
     for (const file of artifacts.files) {
-      fs.writeFileSync(file.path, file.content + '\n', 'utf8');
+      fs.writeFileSync(file.path, file.content + "\n", "utf8");
     }
   }
 }
@@ -324,16 +322,16 @@ function materializePlan(plan) {
 function runCommand(program, args, options = {}) {
   const result = spawnSync(program, args, {
     cwd: options.cwd,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
   });
 
   if (result.error) {
     throw result.error;
   }
   if (result.status !== 0) {
-    const stderr = (result.stderr || '').trim();
-    throw new Error(`${program} ${args.join(' ')} failed${stderr ? `: ${stderr}` : ''}`);
+    const stderr = (result.stderr || "").trim();
+    throw new Error(`${program} ${args.join(" ")} failed${stderr ? `: ${stderr}` : ""}`);
   }
   return result;
 }
@@ -341,8 +339,8 @@ function runCommand(program, args, options = {}) {
 function commandSucceeds(program, args, options = {}) {
   const result = spawnSync(program, args, {
     cwd: options.cwd,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
   });
   return result.status === 0;
 }
@@ -364,22 +362,22 @@ function canonicalizePath(targetPath) {
 }
 
 function branchExists(repoRoot, branchName) {
-  return commandSucceeds('git', ['show-ref', '--verify', '--quiet', `refs/heads/${branchName}`], {
-    cwd: repoRoot
+  return commandSucceeds("git", ["show-ref", "--verify", "--quiet", `refs/heads/${branchName}`], {
+    cwd: repoRoot,
   });
 }
 
 function listWorktrees(repoRoot) {
-  const listed = runCommand('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot });
-  const lines = (listed.stdout || '').split('\n');
+  const listed = runCommand("git", ["worktree", "list", "--porcelain"], { cwd: repoRoot });
+  const lines = (listed.stdout || "").split("\n");
   const worktrees = [];
 
   for (const line of lines) {
-    if (line.startsWith('worktree ')) {
-      const listedPath = line.slice('worktree '.length).trim();
+    if (line.startsWith("worktree ")) {
+      const listedPath = line.slice("worktree ".length).trim();
       worktrees.push({
         listedPath,
-        canonicalPath: canonicalizePath(listedPath)
+        canonicalPath: canonicalizePath(listedPath),
       });
     }
   }
@@ -388,26 +386,26 @@ function listWorktrees(repoRoot) {
 }
 
 function cleanupExisting(plan) {
-  runCommand('git', ['worktree', 'prune', '--expire', 'now'], { cwd: plan.repoRoot });
+  runCommand("git", ["worktree", "prune", "--expire", "now"], { cwd: plan.repoRoot });
 
-  const hasSession = spawnSync('tmux', ['has-session', '-t', plan.sessionName], {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
+  const hasSession = spawnSync("tmux", ["has-session", "-t", plan.sessionName], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
   });
 
   if (hasSession.status === 0) {
-    runCommand('tmux', ['kill-session', '-t', plan.sessionName], { cwd: plan.repoRoot });
+    runCommand("tmux", ["kill-session", "-t", plan.sessionName], { cwd: plan.repoRoot });
   }
 
   for (const workerPlan of plan.workerPlans) {
     const expectedWorktreePath = canonicalizePath(workerPlan.worktreePath);
     const existingWorktree = listWorktrees(plan.repoRoot).find(
-      worktree => worktree.canonicalPath === expectedWorktreePath
+      (worktree) => worktree.canonicalPath === expectedWorktreePath,
     );
 
     if (existingWorktree) {
-      runCommand('git', ['worktree', 'remove', '--force', existingWorktree.listedPath], {
-        cwd: plan.repoRoot
+      runCommand("git", ["worktree", "remove", "--force", existingWorktree.listedPath], {
+        cwd: plan.repoRoot,
       });
     }
 
@@ -415,10 +413,10 @@ function cleanupExisting(plan) {
       fs.rmSync(workerPlan.worktreePath, { force: true, recursive: true });
     }
 
-    runCommand('git', ['worktree', 'prune', '--expire', 'now'], { cwd: plan.repoRoot });
+    runCommand("git", ["worktree", "prune", "--expire", "now"], { cwd: plan.repoRoot });
 
     if (branchExists(plan.repoRoot, workerPlan.branchName)) {
-      runCommand('git', ['branch', '-D', workerPlan.branchName], { cwd: plan.repoRoot });
+      runCommand("git", ["branch", "-D", workerPlan.branchName], { cwd: plan.repoRoot });
     }
   }
 }
@@ -431,7 +429,7 @@ function rollbackCreatedResources(plan, createdState, runtime = {}) {
 
   if (createdState.sessionCreated) {
     try {
-      runCommandImpl('tmux', ['kill-session', '-t', plan.sessionName], { cwd: plan.repoRoot });
+      runCommandImpl("tmux", ["kill-session", "-t", plan.sessionName], { cwd: plan.repoRoot });
     } catch (error) {
       errors.push(error.message);
     }
@@ -440,13 +438,13 @@ function rollbackCreatedResources(plan, createdState, runtime = {}) {
   for (const workerPlan of [...createdState.workerPlans].reverse()) {
     const expectedWorktreePath = canonicalizePath(workerPlan.worktreePath);
     const existingWorktree = listWorktreesImpl(plan.repoRoot).find(
-      worktree => worktree.canonicalPath === expectedWorktreePath
+      (worktree) => worktree.canonicalPath === expectedWorktreePath,
     );
 
     if (existingWorktree) {
       try {
-        runCommandImpl('git', ['worktree', 'remove', '--force', existingWorktree.listedPath], {
-          cwd: plan.repoRoot
+        runCommandImpl("git", ["worktree", "remove", "--force", existingWorktree.listedPath], {
+          cwd: plan.repoRoot,
         });
       } catch (error) {
         errors.push(error.message);
@@ -456,14 +454,14 @@ function rollbackCreatedResources(plan, createdState, runtime = {}) {
     }
 
     try {
-      runCommandImpl('git', ['worktree', 'prune', '--expire', 'now'], { cwd: plan.repoRoot });
+      runCommandImpl("git", ["worktree", "prune", "--expire", "now"], { cwd: plan.repoRoot });
     } catch (error) {
       errors.push(error.message);
     }
 
     if (branchExistsImpl(plan.repoRoot, workerPlan.branchName)) {
       try {
-        runCommandImpl('git', ['branch', '-D', workerPlan.branchName], { cwd: plan.repoRoot });
+        runCommandImpl("git", ["branch", "-D", workerPlan.branchName], { cwd: plan.repoRoot });
       } catch (error) {
         errors.push(error.message);
       }
@@ -475,7 +473,7 @@ function rollbackCreatedResources(plan, createdState, runtime = {}) {
   }
 
   if (errors.length > 0) {
-    throw new Error(`rollback failed: ${errors.join('; ')}`);
+    throw new Error(`rollback failed: ${errors.join("; ")}`);
   }
 }
 
@@ -489,18 +487,18 @@ function executePlan(plan, runtime = {}) {
   const createdState = {
     workerPlans: [],
     sessionCreated: false,
-    removeCoordinationDir: !fs.existsSync(plan.coordinationDir)
+    removeCoordinationDir: !fs.existsSync(plan.coordinationDir),
   };
 
-  runCommandImpl('git', ['rev-parse', '--is-inside-work-tree'], { cwd: plan.repoRoot });
-  runCommandImpl('tmux', ['-V']);
+  runCommandImpl("git", ["rev-parse", "--is-inside-work-tree"], { cwd: plan.repoRoot });
+  runCommandImpl("tmux", ["-V"]);
 
   if (plan.replaceExisting) {
     cleanupExistingImpl(plan);
   } else {
-    const hasSession = spawnSyncImpl('tmux', ['has-session', '-t', plan.sessionName], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe']
+    const hasSession = spawnSyncImpl("tmux", ["has-session", "-t", plan.sessionName], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
     });
     if (hasSession.status === 0) {
       throw new Error(`tmux session already exists: ${plan.sessionName}`);
@@ -511,38 +509,48 @@ function executePlan(plan, runtime = {}) {
     materializePlanImpl(plan);
 
     for (const workerPlan of plan.workerPlans) {
-      runCommandImpl('git', workerPlan.gitArgs, { cwd: plan.repoRoot });
+      runCommandImpl("git", workerPlan.gitArgs, { cwd: plan.repoRoot });
       createdState.workerPlans.push(workerPlan);
       overlaySeedPathsImpl({
         repoRoot: plan.repoRoot,
         seedPaths: workerPlan.seedPaths,
-        worktreePath: workerPlan.worktreePath
+        worktreePath: workerPlan.worktreePath,
       });
     }
 
     runCommandImpl(
-      'tmux',
-      ['new-session', '-d', '-s', plan.sessionName, '-n', 'orchestrator', '-c', plan.repoRoot],
-      { cwd: plan.repoRoot }
+      "tmux",
+      ["new-session", "-d", "-s", plan.sessionName, "-n", "orchestrator", "-c", plan.repoRoot],
+      { cwd: plan.repoRoot },
     );
     createdState.sessionCreated = true;
     runCommandImpl(
-      'tmux',
+      "tmux",
       [
-        'send-keys',
-        '-t',
+        "send-keys",
+        "-t",
         plan.sessionName,
         buildSessionBannerCommand(plan.sessionName, plan.coordinationDir),
-        'C-m'
+        "C-m",
       ],
-      { cwd: plan.repoRoot }
+      { cwd: plan.repoRoot },
     );
 
     for (const workerPlan of plan.workerPlans) {
       const splitResult = runCommandImpl(
-        'tmux',
-        ['split-window', '-d', '-P', '-F', '#{pane_id}', '-t', plan.sessionName, '-c', workerPlan.worktreePath],
-        { cwd: plan.repoRoot }
+        "tmux",
+        [
+          "split-window",
+          "-d",
+          "-P",
+          "-F",
+          "#{pane_id}",
+          "-t",
+          plan.sessionName,
+          "-c",
+          workerPlan.worktreePath,
+        ],
+        { cwd: plan.repoRoot },
       );
       const paneId = splitResult.stdout.trim();
 
@@ -550,20 +558,22 @@ function executePlan(plan, runtime = {}) {
         throw new Error(`tmux split-window did not return a pane id for ${workerPlan.workerName}`);
       }
 
-      runCommandImpl('tmux', ['select-layout', '-t', plan.sessionName, 'tiled'], { cwd: plan.repoRoot });
-      runCommandImpl('tmux', ['select-pane', '-t', paneId, '-T', workerPlan.workerSlug], {
-        cwd: plan.repoRoot
+      runCommandImpl("tmux", ["select-layout", "-t", plan.sessionName, "tiled"], {
+        cwd: plan.repoRoot,
+      });
+      runCommandImpl("tmux", ["select-pane", "-t", paneId, "-T", workerPlan.workerSlug], {
+        cwd: plan.repoRoot,
       });
       runCommandImpl(
-        'tmux',
+        "tmux",
         [
-          'send-keys',
-          '-t',
+          "send-keys",
+          "-t",
           paneId,
           `cd ${shellQuote(workerPlan.worktreePath)} && ${workerPlan.launchCommand}`,
-          'C-m'
+          "C-m",
         ],
-        { cwd: plan.repoRoot }
+        { cwd: plan.repoRoot },
       );
     }
   } catch (error) {
@@ -571,7 +581,7 @@ function executePlan(plan, runtime = {}) {
       rollbackCreatedResourcesImpl(plan, createdState, {
         branchExists: runtime.branchExists,
         listWorktrees: runtime.listWorktrees,
-        runCommand: runCommandImpl
+        runCommand: runCommandImpl,
       });
     } catch (cleanupError) {
       error.message = `${error.message}; cleanup failed: ${cleanupError.message}`;
@@ -582,7 +592,7 @@ function executePlan(plan, runtime = {}) {
   return {
     coordinationDir: plan.coordinationDir,
     sessionName: plan.sessionName,
-    workerCount: plan.workerPlans.length
+    workerCount: plan.workerPlans.length,
   };
 }
 
@@ -594,5 +604,5 @@ module.exports = {
   overlaySeedPaths,
   rollbackCreatedResources,
   renderTemplate,
-  slugify
+  slugify,
 };

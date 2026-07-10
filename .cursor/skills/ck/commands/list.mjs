@@ -8,14 +8,14 @@
  * exit 0: success  exit 1: no projects
  */
 
-import { readProjects, loadContext, today, renderListTable } from './shared.mjs';
+import { readProjects, loadContext, today, renderListTable } from "./shared.mjs";
 
 const cwd = process.env.PWD || process.cwd();
 const projects = readProjects();
 const entries = Object.entries(projects);
 
 if (entries.length === 0) {
-  console.log('No projects registered. Run /ck:init to get started.');
+  console.log("No projects registered. Run /ck:init to get started.");
   process.exit(1);
 }
 
@@ -34,7 +34,7 @@ const enriched = entries
   .sort((a, b) => a.contextDir.localeCompare(b.contextDir));
 
 const table = renderListTable(enriched, cwd, today());
-console.log('');
+console.log("");
 console.log(table);
-console.log('');
-console.log('Resume which? (number or name)');
+console.log("");
+console.log("Resume which? (number or name)");

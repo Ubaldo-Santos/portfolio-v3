@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 
 // Codex stores MCP servers in ~/.codex/config.toml as TOML tables:
 //   [mcp_servers.NAME]
@@ -14,42 +14,42 @@ const path = require('path');
 // We parse with @iarna/toml when available and fall back to a minimal
 // section parser so the reader degrades gracefully without the dependency.
 function loadTomlParser(parseTomlImpl) {
-  if (typeof parseTomlImpl === 'function') {
+  if (typeof parseTomlImpl === "function") {
     return parseTomlImpl;
   }
 
   try {
-    return require('@iarna/toml').parse;
+    return require("@iarna/toml").parse;
   } catch {
     return null;
   }
 }
 
 function mapCodexServer(name, raw, configPath) {
-  if (!raw || typeof raw !== 'object') {
+  if (!raw || typeof raw !== "object") {
     return null;
   }
 
-  const type = raw.url ? 'http' : 'stdio';
+  const type = raw.url ? "http" : "stdio";
   return {
     name,
     type,
-    command: typeof raw.command === 'string' ? raw.command : null,
+    command: typeof raw.command === "string" ? raw.command : null,
     args: Array.isArray(raw.args) ? raw.args : [],
-    url: typeof raw.url === 'string' ? raw.url : null,
-    env: raw.env && typeof raw.env === 'object' ? raw.env : {},
+    url: typeof raw.url === "string" ? raw.url : null,
+    env: raw.env && typeof raw.env === "object" ? raw.env : {},
     enabled: raw.enabled === false ? false : true,
     source: {
-      harness: 'codex',
-      scope: 'user',
-      configPath
-    }
+      harness: "codex",
+      scope: "user",
+      configPath,
+    },
   };
 }
 
 function readCodexMcp(options = {}) {
   const homeDir = options.homeDir || os.homedir();
-  const configPath = options.configPath || path.join(homeDir, '.codex', 'config.toml');
+  const configPath = options.configPath || path.join(homeDir, ".codex", "config.toml");
 
   if (!fs.existsSync(configPath) || !fs.statSync(configPath).isFile()) {
     return [];
@@ -62,14 +62,15 @@ function readCodexMcp(options = {}) {
 
   let parsed;
   try {
-    parsed = parseToml(fs.readFileSync(configPath, 'utf8'));
+    parsed = parseToml(fs.readFileSync(configPath, "utf8"));
   } catch {
     return [];
   }
 
-  const block = parsed && typeof parsed.mcp_servers === 'object' && parsed.mcp_servers
-    ? parsed.mcp_servers
-    : {};
+  const block =
+    parsed && typeof parsed.mcp_servers === "object" && parsed.mcp_servers
+      ? parsed.mcp_servers
+      : {};
 
   return Object.entries(block)
     .map(([name, raw]) => mapCodexServer(name, raw, configPath))
@@ -78,5 +79,5 @@ function readCodexMcp(options = {}) {
 
 module.exports = {
   readCodexMcp,
-  mapCodexServer
+  mapCodexServer,
 };

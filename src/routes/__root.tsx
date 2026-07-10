@@ -13,8 +13,10 @@ import { useTranslation } from "react-i18next";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { cv } from "@/data/cv";
-import { BRAND_MARK_URL, OG_IMAGE_URL } from "@/lib/seo";
-import { translations } from "@/i18n/translations";
+import { OG_IMAGE_URL, SITE_URL } from "@/lib/seo";
+import { cvMetaDescription, cvMetaKeywords, cvKnowsAbout } from "@/lib/cv-copy";
+import { detectLang } from "@/lib/detect-lang";
+import { THEME_BACKGROUND_COLORS } from "@/lib/theme-colors";
 import { I18nProvider } from "@/components/i18n-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -69,97 +71,75 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#000000" },
-      {
-        name: "robots",
-        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
-      },
-      {
-        name: "googlebot",
-        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
-      },
-      { name: "format-detection", content: "telephone=no" },
-      { title: translations.es.meta.home.title },
-      { name: "description", content: translations.es.meta.home.description },
-      { name: "author", content: translations.es.meta.author },
-      { name: "keywords", content: translations.es.meta.keywords },
-      { property: "og:site_name", content: translations.es.meta.siteName },
-      { property: "og:type", content: "website" },
-      { property: "og:locale", content: "es_ES" },
-      { property: "og:locale:alternate", content: "ca_ES" },
-      { property: "og:locale:alternate", content: "en_US" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:creator", content: "@ubaldosantos" },
-      { name: "twitter:image", content: OG_IMAGE_URL },
-      { property: "og:image", content: OG_IMAGE_URL },
-      { property: "og:image:type", content: "image/png" },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: translations.es.meta.siteName },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/code-sandbox.svg", type: "image/svg+xml" },
-      { rel: "apple-touch-icon", href: "/code-sandbox.svg" },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Person",
-          "@id": `${cv.basics.url}#person`,
-          name: cv.basics.name,
-          givenName: cv.basics.givenName,
-          familyName: cv.basics.familyName,
-          jobTitle: cv.basics.label.en,
-          description: translations.es.meta.home.description,
-          email: cv.basics.email,
-          telephone: cv.basics.phone,
-          url: cv.basics.url,
-          image: OG_IMAGE_URL,
-          worksFor: { "@type": "Organization", name: cv.work[0].name, url: cv.work[0].url },
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: cv.basics.address.locality,
-            addressCountry: cv.basics.address.countryCode,
-          },
-          knowsLanguage: cv.languages.map((language) => language.code),
-          knowsAbout: [
-            "TypeScript",
-            "PHP",
-            "Laravel",
-            "Vue",
-            "React",
-            "Edtech",
-            "MathType",
-            "Nubric",
-            "Arquitectura hexagonal",
-            "DevOps",
-            "IA aplicada",
-          ],
-          sameAs: cv.basics.profiles.map((profile) => profile.url),
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          "@id": `${cv.basics.url}#website`,
-          url: cv.basics.url,
-          name: translations.es.meta.siteName,
-          description: translations.es.meta.home.description,
-          inLanguage: ["es", "ca", "en"],
-          publisher: { "@id": `${cv.basics.url}#person` },
-        }),
-      },
-    ],
-  }),
+  head: () => {
+    const lang = detectLang();
+    return {
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          name: "robots",
+          content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        },
+        {
+          name: "googlebot",
+          content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        },
+        { name: "format-detection", content: "telephone=no" },
+        { name: "author", content: cv.basics.name },
+        { name: "keywords", content: cvMetaKeywords() },
+      ],
+      links: [
+        { rel: "stylesheet", href: appCss },
+        { rel: "icon", href: "/favicon.ico", sizes: "any" },
+        { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
+        { rel: "icon", href: "/code-sandbox.svg", type: "image/svg+xml" },
+        { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+        { rel: "manifest", href: "/site.webmanifest" },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "@id": `${cv.basics.url}#person`,
+            name: cv.basics.name,
+            givenName: cv.basics.givenName,
+            familyName: cv.basics.familyName,
+            jobTitle: cv.basics.label[lang],
+            description: cvMetaDescription("home", lang),
+            email: cv.basics.email,
+            telephone: cv.basics.phone,
+            url: cv.basics.url,
+            image: OG_IMAGE_URL,
+            worksFor: { "@type": "Organization", name: cv.work[0].name, url: cv.work[0].url },
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: cv.basics.address.locality,
+              addressCountry: cv.basics.address.countryCode,
+            },
+            knowsLanguage: cv.languages.map((language) => language.code),
+            knowsAbout: [...cvKnowsAbout(lang)],
+            sameAs: cv.basics.profiles.map((profile) => profile.url),
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "@id": `${cv.basics.url}#website`,
+            url: cv.basics.url,
+            name: cv.basics.name,
+            description: cvMetaDescription("home", lang),
+            inLanguage: ["es", "ca", "en"],
+            publisher: { "@id": `${cv.basics.url}#person` },
+          }),
+        },
+      ],
+    };
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
@@ -167,10 +147,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const lang = detectLang();
+
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: BOOTSTRAP_SCRIPT }} />
+        {/* Raw tags: TanStack dedupes head() meta by `name`, collapsing the two theme-color entries. */}
+        <meta
+          name="theme-color"
+          content={THEME_BACKGROUND_COLORS.light}
+          media="(prefers-color-scheme: light)"
+        />
+        <meta
+          name="theme-color"
+          content={THEME_BACKGROUND_COLORS.dark}
+          media="(prefers-color-scheme: dark)"
+        />
         <HeadContent />
       </head>
       <body>

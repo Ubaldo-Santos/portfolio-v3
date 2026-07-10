@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Shared work-item mutation helpers for the agent+human JIT board.
@@ -7,29 +7,29 @@
  * server (interactive claim / move), so the two surfaces never diverge.
  */
 
-const DONE_STATUSES = new Set(['done', 'closed', 'resolved', 'merged', 'cancelled']);
+const DONE_STATUSES = new Set(["done", "closed", "resolved", "merged", "cancelled"]);
 const PRIORITY_RANK = { critical: 0, high: 1, urgent: 1, medium: 2, normal: 2, low: 3 };
 
 // Kanban lanes the board renders, and the canonical status each maps to on a move.
 const LANE_TO_STATUS = {
-  ready: 'open',
-  running: 'running',
-  blocked: 'blocked',
-  done: 'done'
+  ready: "open",
+  running: "running",
+  blocked: "blocked",
+  done: "done",
 };
 const VALID_LANES = new Set(Object.keys(LANE_TO_STATUS));
-const VALID_ASSIGNEE_KINDS = new Set(['agent', 'human']);
+const VALID_ASSIGNEE_KINDS = new Set(["agent", "human"]);
 
 function isOpenStatus(status) {
   return !DONE_STATUSES.has(
-    String(status || '')
+    String(status || "")
       .trim()
-      .toLowerCase()
+      .toLowerCase(),
   );
 }
 
 function priorityRank(priority) {
-  return PRIORITY_RANK[String(priority || '').toLowerCase()] ?? 2;
+  return PRIORITY_RANK[String(priority || "").toLowerCase()] ?? 2;
 }
 
 /**
@@ -45,7 +45,11 @@ function selectClaimTarget(store, { id } = {}) {
     return item;
   }
   const { items } = store.listWorkItems({ limit: 100 });
-  return items.filter(item => !item.owner && isOpenStatus(item.status)).sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority))[0] || null;
+  return (
+    items
+      .filter((item) => !item.owner && isOpenStatus(item.status))
+      .sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority))[0] || null
+  );
 }
 
 /**
@@ -55,7 +59,7 @@ function selectClaimTarget(store, { id } = {}) {
  */
 function claimWorkItem(store, { id, owner, assigneeKind, sessionId, status } = {}) {
   if (!owner) {
-    throw new Error('claim requires an owner.');
+    throw new Error("claim requires an owner.");
   }
   const kind = assigneeKind ? String(assigneeKind).toLowerCase() : null;
   if (kind && !VALID_ASSIGNEE_KINDS.has(kind)) {
@@ -63,7 +67,7 @@ function claimWorkItem(store, { id, owner, assigneeKind, sessionId, status } = {
   }
   const target = selectClaimTarget(store, { id });
   if (!target) {
-    return { claimed: false, reason: 'no-unassigned-open-items' };
+    return { claimed: false, reason: "no-unassigned-open-items" };
   }
   if (!isOpenStatus(target.status)) {
     throw new Error(`Work item ${target.id} is already done; cannot claim.`);
@@ -76,9 +80,9 @@ function claimWorkItem(store, { id, owner, assigneeKind, sessionId, status } = {
     ...target,
     owner,
     sessionId: sessionId ?? target.sessionId ?? null,
-    status: status ?? 'running',
+    status: status ?? "running",
     metadata,
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   });
   return { claimed: true, item };
 }
@@ -88,13 +92,13 @@ function claimWorkItem(store, { id, owner, assigneeKind, sessionId, status } = {
  */
 function moveWorkItem(store, { id, lane } = {}) {
   if (!id) {
-    throw new Error('move requires a work item id.');
+    throw new Error("move requires a work item id.");
   }
-  const laneKey = String(lane || '')
+  const laneKey = String(lane || "")
     .trim()
     .toLowerCase();
   if (!VALID_LANES.has(laneKey)) {
-    throw new Error(`Invalid lane '${lane}'. Expected one of ${[...VALID_LANES].join(', ')}.`);
+    throw new Error(`Invalid lane '${lane}'. Expected one of ${[...VALID_LANES].join(", ")}.`);
   }
   const target = store.getWorkItemById(id);
   if (!target) {
@@ -103,7 +107,7 @@ function moveWorkItem(store, { id, lane } = {}) {
   const item = store.upsertWorkItem({
     ...target,
     status: LANE_TO_STATUS[laneKey],
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   });
   return { moved: true, item };
 }
@@ -117,5 +121,5 @@ module.exports = {
   priorityRank,
   selectClaimTarget,
   claimWorkItem,
-  moveWorkItem
+  moveWorkItem,
 };

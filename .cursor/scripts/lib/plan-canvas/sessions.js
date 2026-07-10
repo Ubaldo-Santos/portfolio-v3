@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Plan Canvas session store.
@@ -8,18 +8,18 @@
  * dir so queued human feedback survives a server restart.
  */
 
-const crypto = require('crypto');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const crypto = require("crypto");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 
-const FEEDBACK_KINDS = new Set(['chat', 'annotation', 'verdict']);
-const VERDICTS = new Set(['approve', 'request-changes']);
+const FEEDBACK_KINDS = new Set(["chat", "annotation", "verdict"]);
+const VERDICTS = new Set(["approve", "request-changes"]);
 
 function resolveStateDir(env = process.env) {
   const override = env.ECC_PLAN_CANVAS_STATE_DIR;
   if (override && String(override).trim()) return path.resolve(String(override).trim());
-  return path.join(os.homedir(), '.claude', 'plan-canvas');
+  return path.join(os.homedir(), ".claude", "plan-canvas");
 }
 
 // Canonicalize so `./plan.md`, symlinks, and absolute paths all land on the
@@ -34,7 +34,7 @@ function canonicalizeArtifactPath(filePath) {
 }
 
 function sessionKeyFor(canonicalPath) {
-  return crypto.createHash('sha256').update(canonicalPath).digest('hex').slice(0, 12);
+  return crypto.createHash("sha256").update(canonicalPath).digest("hex").slice(0, 12);
 }
 
 function nowIso() {
@@ -42,7 +42,7 @@ function nowIso() {
 }
 
 function sanitizeText(value, maxLength = 4000) {
-  if (typeof value !== 'string') return '';
+  if (typeof value !== "string") return "";
   return value.slice(0, maxLength);
 }
 
@@ -50,49 +50,49 @@ function sanitizeText(value, maxLength = 4000) {
 // the agent. Returns null for unusable input rather than throwing so a
 // malformed item can never wedge the queue.
 function normalizeFeedbackItem(raw, counter) {
-  if (!raw || typeof raw !== 'object') return null;
+  if (!raw || typeof raw !== "object") return null;
   const kind = FEEDBACK_KINDS.has(raw.kind) ? raw.kind : null;
   if (!kind) return null;
   const item = {
     id: `fb-${counter}`,
     kind,
     text: sanitizeText(raw.text),
-    at: nowIso()
+    at: nowIso(),
   };
-  if (kind === 'verdict') {
+  if (kind === "verdict") {
     if (!VERDICTS.has(raw.verdict)) return null;
     item.verdict = raw.verdict;
   }
-  if (kind === 'annotation') {
-    const anchor = raw.anchor && typeof raw.anchor === 'object' ? raw.anchor : null;
-    if (!anchor || typeof anchor.selector !== 'string') return null;
+  if (kind === "annotation") {
+    const anchor = raw.anchor && typeof raw.anchor === "object" ? raw.anchor : null;
+    if (!anchor || typeof anchor.selector !== "string") return null;
     item.anchor = {
       selector: sanitizeText(anchor.selector, 500),
       tag: sanitizeText(anchor.tag, 60),
-      snippet: sanitizeText(anchor.snippet, 400)
+      snippet: sanitizeText(anchor.snippet, 400),
     };
-    if (anchor.textRange && typeof anchor.textRange === 'object') {
+    if (anchor.textRange && typeof anchor.textRange === "object") {
       item.anchor.textRange = {
-        text: sanitizeText(anchor.textRange.text, 1000)
+        text: sanitizeText(anchor.textRange.text, 1000),
       };
     }
     if (!item.text) return null;
   }
-  if (kind === 'chat' && !item.text) return null;
+  if (kind === "chat" && !item.text) return null;
   return item;
 }
 
 function createSessionStore({ stateDir = resolveStateDir() } = {}) {
-  const stateFile = path.join(stateDir, 'sessions.json');
+  const stateFile = path.join(stateDir, "sessions.json");
   let state = { sessions: {}, feedbackCounter: 0 };
 
   function load() {
     try {
-      const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
-      if (parsed && typeof parsed === 'object' && parsed.sessions) {
+      const parsed = JSON.parse(fs.readFileSync(stateFile, "utf8"));
+      if (parsed && typeof parsed === "object" && parsed.sessions) {
         state = {
           sessions: parsed.sessions,
-          feedbackCounter: Number(parsed.feedbackCounter) || 0
+          feedbackCounter: Number(parsed.feedbackCounter) || 0,
         };
       }
     } catch {
@@ -126,7 +126,7 @@ function createSessionStore({ stateDir = resolveStateDir() } = {}) {
     const canonical = canonicalizeArtifactPath(filePath);
     const key = sessionKeyFor(canonical);
     const existing = state.sessions[key];
-    if (existing && existing.status === 'ended' && existing.endedBy === 'user' && !reopen) {
+    if (existing && existing.status === "ended" && existing.endedBy === "user" && !reopen) {
       return { session: existing, refused: true };
     }
     const session = existing || {
@@ -134,9 +134,9 @@ function createSessionStore({ stateDir = resolveStateDir() } = {}) {
       file: canonical,
       chat: [],
       pendingFeedback: [],
-      createdAt: nowIso()
+      createdAt: nowIso(),
     };
-    session.status = 'open';
+    session.status = "open";
     delete session.endedBy;
     session.updatedAt = nowIso();
     state.sessions[key] = session;
@@ -149,7 +149,7 @@ function createSessionStore({ stateDir = resolveStateDir() } = {}) {
   // across reloads.
   function queueFeedback(key, rawItems, { endSession = false } = {}) {
     const session = get(key);
-    if (!session || session.status === 'ended') return null;
+    if (!session || session.status === "ended") return null;
     const accepted = [];
     for (const raw of Array.isArray(rawItems) ? rawItems : []) {
       state.feedbackCounter += 1;
@@ -158,13 +158,13 @@ function createSessionStore({ stateDir = resolveStateDir() } = {}) {
     }
     session.pendingFeedback.push(...accepted);
     for (const item of accepted) {
-      session.chat.push({ role: 'user', kind: item.kind, text: chatLineFor(item), at: item.at });
+      session.chat.push({ role: "user", kind: item.kind, text: chatLineFor(item), at: item.at });
     }
     if (endSession) {
-      session.status = 'ended';
-      session.endedBy = 'user';
+      session.status = "ended";
+      session.endedBy = "user";
     } else if (accepted.length > 0) {
-      session.status = 'feedback';
+      session.status = "feedback";
     }
     session.updatedAt = nowIso();
     persist();
@@ -176,31 +176,31 @@ function createSessionStore({ stateDir = resolveStateDir() } = {}) {
   // ended (with attribution) so agents know to stop polling.
   function takeFeedback(key) {
     const session = get(key);
-    if (!session) return { status: 'missing' };
+    if (!session) return { status: "missing" };
     if (session.pendingFeedback.length > 0) {
       const items = session.pendingFeedback;
       session.pendingFeedback = [];
-      const result = { status: 'feedback', items };
-      if (session.status === 'ended') {
+      const result = { status: "feedback", items };
+      if (session.status === "ended") {
         result.sessionEnded = true;
         result.endedBy = session.endedBy;
       } else {
-        session.status = 'open';
+        session.status = "open";
       }
       session.updatedAt = nowIso();
       persist();
       return result;
     }
-    if (session.status === 'ended') {
-      return { status: 'ended', endedBy: session.endedBy };
+    if (session.status === "ended") {
+      return { status: "ended", endedBy: session.endedBy };
     }
-    return { status: 'waiting' };
+    return { status: "waiting" };
   }
 
   function addAgentReply(key, text) {
     const session = get(key);
     if (!session) return null;
-    const entry = { role: 'agent', kind: 'chat', text: sanitizeText(text), at: nowIso() };
+    const entry = { role: "agent", kind: "chat", text: sanitizeText(text), at: nowIso() };
     session.chat.push(entry);
     session.updatedAt = nowIso();
     persist();
@@ -210,26 +210,26 @@ function createSessionStore({ stateDir = resolveStateDir() } = {}) {
   function end(key, endedBy) {
     const session = get(key);
     if (!session) return null;
-    session.status = 'ended';
-    session.endedBy = endedBy === 'user' ? 'user' : 'agent';
+    session.status = "ended";
+    session.endedBy = endedBy === "user" ? "user" : "agent";
     session.updatedAt = nowIso();
     persist();
     return session;
   }
 
   function list() {
-    return Object.values(state.sessions).map(session => ({
+    return Object.values(state.sessions).map((session) => ({
       key: session.key,
       file: session.file,
       status: session.status,
       endedBy: session.endedBy,
       pending: session.pendingFeedback.length,
-      updatedAt: session.updatedAt
+      updatedAt: session.updatedAt,
     }));
   }
 
   function hasOpenSessions() {
-    return Object.values(state.sessions).some(session => session.status !== 'ended');
+    return Object.values(state.sessions).some((session) => session.status !== "ended");
   }
 
   return {
@@ -243,17 +243,17 @@ function createSessionStore({ stateDir = resolveStateDir() } = {}) {
     addAgentReply,
     end,
     list,
-    hasOpenSessions
+    hasOpenSessions,
   };
 }
 
 // One-line rendering of a feedback item for the conversation transcript.
 function chatLineFor(item) {
-  if (item.kind === 'verdict') {
-    const label = item.verdict === 'approve' ? 'Approved the plan' : 'Requested changes';
+  if (item.kind === "verdict") {
+    const label = item.verdict === "approve" ? "Approved the plan" : "Requested changes";
     return item.text ? `${label}: ${item.text}` : label;
   }
-  if (item.kind === 'annotation') {
+  if (item.kind === "annotation") {
     const where = item.anchor.snippet || item.anchor.selector;
     return `[${where}] ${item.text}`;
   }
@@ -265,5 +265,5 @@ module.exports = {
   createSessionStore,
   normalizeFeedbackItem,
   resolveStateDir,
-  sessionKeyFor
+  sessionKeyFor,
 };

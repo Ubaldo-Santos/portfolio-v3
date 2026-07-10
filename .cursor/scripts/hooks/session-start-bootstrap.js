@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-'use strict';
+"use strict";
 
 /**
  * session-start-bootstrap.js
@@ -26,16 +26,16 @@
  *      through unchanged so Claude Code can continue normally.
  */
 
-const fs = require('fs');
-const path = require('path');
-const { spawnSync } = require('child_process');
-const { resolveEccRoot } = require('../lib/resolve-ecc-root');
+const fs = require("fs");
+const path = require("path");
+const { spawnSync } = require("child_process");
+const { resolveEccRoot } = require("../lib/resolve-ecc-root");
 
 // Read the raw JSON event from stdin
-const raw = fs.readFileSync(0, 'utf8');
+const raw = fs.readFileSync(0, "utf8");
 
 // Path (relative to plugin root) to the hook runner
-const rel = path.join('scripts', 'hooks', 'run-with-flags.js');
+const rel = path.join("scripts", "hooks", "run-with-flags.js");
 
 // Resolve the ECC plugin root via the shared resolver, probing for the runner
 // so a valid root is one that actually contains run-with-flags.js.
@@ -45,17 +45,17 @@ const script = path.join(root, rel);
 if (fs.existsSync(script)) {
   const result = spawnSync(
     process.execPath,
-    [script, 'session:start', 'scripts/hooks/session-start.js', 'minimal,standard,strict'],
+    [script, "session:start", "scripts/hooks/session-start.js", "minimal,standard,strict"],
     {
       input: raw,
-      encoding: 'utf8',
+      encoding: "utf8",
       env: process.env,
       cwd: process.cwd(),
       timeout: 30000,
-    }
+    },
   );
 
-  const stdout = typeof result.stdout === 'string' ? result.stdout : '';
+  const stdout = typeof result.stdout === "string" ? result.stdout : "";
   if (stdout) {
     process.stdout.write(stdout);
   } else {
@@ -70,9 +70,9 @@ if (fs.existsSync(script)) {
     const reason = result.error
       ? result.error.message
       : result.signal
-        ? 'signal ' + result.signal
-        : 'missing exit status';
-    process.stderr.write('[SessionStart] ERROR: session-start hook failed: ' + reason + '\n');
+        ? "signal " + result.signal
+        : "missing exit status";
+    process.stderr.write("[SessionStart] ERROR: session-start hook failed: " + reason + "\n");
     process.exit(1);
   }
 
@@ -80,6 +80,6 @@ if (fs.existsSync(script)) {
 }
 
 process.stderr.write(
-  '[SessionStart] WARNING: could not resolve ECC plugin root; skipping session-start hook\n'
+  "[SessionStart] WARNING: could not resolve ECC plugin root; skipping session-start hook\n",
 );
 process.stdout.write(raw);

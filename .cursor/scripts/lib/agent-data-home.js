@@ -12,13 +12,13 @@
  * @see https://github.com/affaan-m/ECC/issues/2065
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const AGENT_DATA_HOME_ENV = 'ECC_AGENT_DATA_HOME';
-const DEFAULT_CLAUDE_DIR_NAME = '.claude';
-const DEFAULT_CURSOR_ECC_DIR_SEGMENTS = ['.cursor', 'ecc'];
-const PROJECT_CONFIG_RELATIVE = path.join('.cursor', 'ecc-agent-data.json');
+const AGENT_DATA_HOME_ENV = "ECC_AGENT_DATA_HOME";
+const DEFAULT_CLAUDE_DIR_NAME = ".claude";
+const DEFAULT_CURSOR_ECC_DIR_SEGMENTS = [".cursor", "ecc"];
+const PROJECT_CONFIG_RELATIVE = path.join(".cursor", "ecc-agent-data.json");
 
 /**
  * Home directory for tilde expansion and default agent-data paths.
@@ -41,23 +41,21 @@ function getHomeDirFromEnv() {
   if (explicitHome && String(explicitHome).trim().length > 0) {
     return path.resolve(explicitHome);
   }
-  return require('os').homedir();
+  return require("os").homedir();
 }
 
 function expandHomePath(value, baseDir) {
-  if (!value || typeof value !== 'string') return null;
+  if (!value || typeof value !== "string") return null;
   const trimmed = value.trim();
   if (!trimmed) return null;
-  if (trimmed.startsWith('~')) {
-    const remainder = trimmed.slice(1).replace(/^[/\\]+/, '');
+  if (trimmed.startsWith("~")) {
+    const remainder = trimmed.slice(1).replace(/^[/\\]+/, "");
     return remainder ? path.join(getHomeDirFromEnv(), remainder) : getHomeDirFromEnv();
   }
   if (path.isAbsolute(trimmed)) {
     return path.resolve(trimmed);
   }
-  const base = baseDir && String(baseDir).trim()
-    ? path.resolve(baseDir)
-    : process.cwd();
+  const base = baseDir && String(baseDir).trim() ? path.resolve(baseDir) : process.cwd();
   return path.resolve(base, trimmed);
 }
 
@@ -66,7 +64,7 @@ function expandHomePath(value, baseDir) {
  */
 function resolveProjectRootFromConfigPath(configPath) {
   const configDir = path.dirname(path.resolve(configPath));
-  if (path.basename(configDir) === '.cursor') {
+  if (path.basename(configDir) === ".cursor") {
     return path.dirname(configDir);
   }
   return configDir;
@@ -95,26 +93,26 @@ function getDefaultClaudeAgentDataHome() {
 }
 
 function readProjectConfigAt(configPath) {
-  if (!configPath || typeof configPath !== 'string') return null;
+  if (!configPath || typeof configPath !== "string") return null;
   if (!fs.existsSync(configPath)) return null;
 
   try {
-    const parsed = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+    const parsed = JSON.parse(fs.readFileSync(configPath, "utf8"));
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
     const candidate = parsed.agentDataHome || parsed.ECC_AGENT_DATA_HOME;
-    if (typeof candidate !== 'string' || !candidate.trim()) return null;
+    if (typeof candidate !== "string" || !candidate.trim()) return null;
     const projectRoot = resolveProjectRootFromConfigPath(configPath);
     return expandHomePath(candidate, projectRoot);
   } catch (error) {
     console.error(
-      `[ECC] Failed to read or parse agent data config at ${configPath}: ${error.message}`
+      `[ECC] Failed to read or parse agent data config at ${configPath}: ${error.message}`,
     );
     return null;
   }
 }
 
 function readProjectConfig(projectDir) {
-  if (!projectDir || typeof projectDir !== 'string') return null;
+  if (!projectDir || typeof projectDir !== "string") return null;
   return readProjectConfigAt(path.join(path.resolve(projectDir), PROJECT_CONFIG_RELATIVE));
 }
 
@@ -126,9 +124,9 @@ function resolveProjectDir() {
   ];
 
   for (const candidate of candidates) {
-    if (!candidate || typeof candidate !== 'string') continue;
+    if (!candidate || typeof candidate !== "string") continue;
     const resolved = path.resolve(candidate);
-    if (fs.existsSync(path.join(resolved, '.cursor'))) {
+    if (fs.existsSync(path.join(resolved, ".cursor"))) {
       return resolved;
     }
   }

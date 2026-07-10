@@ -14,15 +14,19 @@
  * never exceeds the Stop hook budget (90 s reserved for overhead).
  */
 
-'use strict';
+"use strict";
 
-const crypto = require('crypto');
-const { execFileSync, spawnSync } = require('child_process');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const crypto = require("crypto");
+const { execFileSync, spawnSync } = require("child_process");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 
-const { findProjectRoot, detectFormatter, resolveFormatterBin } = require('../lib/resolve-formatter');
+const {
+  findProjectRoot,
+  detectFormatter,
+  resolveFormatterBin,
+} = require("../lib/resolve-formatter");
 
 const MAX_STDIN = 1024 * 1024;
 // Total ms budget reserved for all batches (leaves headroom below the 300s Stop timeout)
@@ -34,14 +38,21 @@ const UNSAFE_PATH_CHARS = /[&|<>^%!\s()]/;
 
 /** Parse the accumulator text into a deduplicated array of file paths. */
 function parseAccumulator(raw) {
-  return [...new Set(raw.split('\n').map(l => l.trim()).filter(Boolean))];
+  return [
+    ...new Set(
+      raw
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean),
+    ),
+  ];
 }
 
 function getAccumFile() {
   const raw =
     process.env.CLAUDE_SESSION_ID ||
-    crypto.createHash('sha1').update(process.cwd()).digest('hex').slice(0, 12);
-  const sessionId = raw.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 64);
+    crypto.createHash("sha1").update(process.cwd()).digest("hex").slice(0, 12);
+  const sessionId = raw.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 64);
   return path.join(os.tmpdir(), `ecc-edited-${sessionId}.txt`);
 }
 
@@ -52,24 +63,33 @@ function formatBatch(projectRoot, files, timeoutMs) {
   const resolved = resolveFormatterBin(projectRoot, formatter);
   if (!resolved) return;
 
-  const existingFiles = files.filter(f => fs.existsSync(f));
+  const existingFiles = files.filter((f) => fs.existsSync(f));
   if (existingFiles.length === 0) return;
 
   const fileArgs =
-    formatter === 'biome'
-      ? [...resolved.prefix, 'check', '--write', ...existingFiles]
-      : [...resolved.prefix, '--write', ...existingFiles];
+    formatter === "biome"
+      ? [...resolved.prefix, "check", "--write", ...existingFiles]
+      : [...resolved.prefix, "--write", ...existingFiles];
 
   try {
-    if (process.platform === 'win32' && resolved.bin.endsWith('.cmd')) {
-      if (existingFiles.some(f => UNSAFE_PATH_CHARS.test(f))) {
-        process.stderr.write('[Hook] stop-format-typecheck: skipping batch — unsafe path chars\n');
+    if (process.platform === "win32" && resolved.bin.endsWith(".cmd")) {
+      if (existingFiles.some((f) => UNSAFE_PATH_CHARS.test(f))) {
+        process.stderr.write("[Hook] stop-format-typecheck: skipping batch — unsafe path chars\n");
         return;
       }
-      const result = spawnSync(resolved.bin, fileArgs, { cwd: projectRoot, shell: true, stdio: 'pipe', timeout: timeoutMs });
+      const result = spawnSync(resolved.bin, fileArgs, {
+        cwd: projectRoot,
+        shell: true,
+        stdio: "pipe",
+        timeout: timeoutMs,
+      });
       if (result.error) throw result.error;
     } else {
-      execFileSync(resolved.bin, fileArgs, { cwd: projectRoot, stdio: ['pipe', 'pipe', 'pipe'], timeout: timeoutMs });
+      execFileSync(resolved.bin, fileArgs, {
+        cwd: projectRoot,
+        stdio: ["pipe", "pipe", "pipe"],
+        timeout: timeoutMs,
+      });
     }
   } catch {
     // Formatter not installed or failed — non-blocking
@@ -81,7 +101,7 @@ function findTsConfigDir(filePath) {
   const fsRoot = path.parse(dir).root;
   let depth = 0;
   while (dir !== fsRoot && depth < 20) {
-    if (fs.existsSync(path.join(dir, 'tsconfig.json'))) return dir;
+    if (fs.existsSync(path.join(dir, "tsconfig.json"))) return dir;
     dir = path.dirname(dir);
     depth++;
   }
@@ -89,13 +109,18 @@ function findTsConfigDir(filePath) {
 }
 
 function typecheckBatch(tsConfigDir, editedFiles, timeoutMs) {
-  const isWin = process.platform === 'win32';
-  const npxBin = isWin ? 'npx.cmd' : 'npx';
-  const args = ['tsc', '--noEmit', '--pretty', 'false'];
-  const opts = { cwd: tsConfigDir, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: timeoutMs };
+  const isWin = process.platform === "win32";
+  const npxBin = isWin ? "npx.cmd" : "npx";
+  const args = ["tsc", "--noEmit", "--pretty", "false"];
+  const opts = {
+    cwd: tsConfigDir,
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "pipe"],
+    timeout: timeoutMs,
+  };
 
-  let stdout = '';
-  let stderr = '';
+  let stdout = "";
+  let stderr = "";
   let failed = false;
 
   try {
@@ -104,31 +129,36 @@ function typecheckBatch(tsConfigDir, editedFiles, timeoutMs) {
       const result = spawnSync(npxBin, args, { ...opts, shell: true });
       if (result.error) return; // timed out or not found — non-blocking
       if (result.status !== 0) {
-        stdout = result.stdout || '';
-        stderr = result.stderr || '';
+        stdout = result.stdout || "";
+        stderr = result.stderr || "";
         failed = true;
       }
     } else {
       execFileSync(npxBin, args, opts);
     }
   } catch (err) {
-    stdout = err.stdout || '';
-    stderr = err.stderr || '';
+    stdout = err.stdout || "";
+    stderr = err.stderr || "";
     failed = true;
   }
 
   if (!failed) return;
 
-  const lines = (stdout + stderr).split('\n');
+  const lines = (stdout + stderr).split("\n");
   for (const filePath of editedFiles) {
     const relPath = path.relative(tsConfigDir, filePath);
     const candidates = new Set([filePath, relPath]);
     const relevantLines = lines
-      .filter(line => { for (const c of candidates) { if (line.includes(c)) return true; } return false; })
+      .filter((line) => {
+        for (const c of candidates) {
+          if (line.includes(c)) return true;
+        }
+        return false;
+      })
       .slice(0, 10);
     if (relevantLines.length > 0) {
       process.stderr.write(`[Hook] TypeScript errors in ${path.basename(filePath)}:\n`);
-      relevantLines.forEach(line => process.stderr.write(line + '\n'));
+      relevantLines.forEach((line) => process.stderr.write(line + "\n"));
     }
   }
 }
@@ -138,12 +168,16 @@ function main() {
 
   let raw;
   try {
-    raw = fs.readFileSync(accumFile, 'utf8');
+    raw = fs.readFileSync(accumFile, "utf8");
   } catch {
     return; // No accumulator — nothing edited this response
   }
 
-  try { fs.unlinkSync(accumFile); } catch { /* best-effort */ }
+  try {
+    fs.unlinkSync(accumFile);
+  } catch {
+    /* best-effort */
+  }
 
   const files = parseAccumulator(raw);
   if (files.length === 0) return;
@@ -195,10 +229,10 @@ function run(rawInput) {
 }
 
 if (require.main === module) {
-  let stdinData = '';
+  let stdinData = "";
   let truncated = false;
-  process.stdin.setEncoding('utf8');
-  process.stdin.on('data', chunk => {
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => {
     if (stdinData.length < MAX_STDIN) {
       const remaining = MAX_STDIN - stdinData.length;
       stdinData += chunk.substring(0, remaining);
@@ -207,13 +241,15 @@ if (require.main === module) {
       truncated = true;
     }
   });
-  process.stdin.on('end', () => {
+  process.stdin.on("end", () => {
     const output = run(stdinData);
     // Never echo truncated stdin (invalid JSON would be reported as a Stop
     // hook failure, #2090); flush stdout before exiting so large payloads
     // are not cut at the pipe buffer.
     if (truncated) {
-      process.stderr.write('[Hook] stop-format-typecheck: stdin exceeded 1MB; suppressing pass-through (fail-open)\n');
+      process.stderr.write(
+        "[Hook] stop-format-typecheck: stdin exceeded 1MB; suppressing pass-through (fail-open)\n",
+      );
       process.exit(0);
     }
     if (!output) {

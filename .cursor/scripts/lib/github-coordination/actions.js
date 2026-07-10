@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-const { loadPolicy } = require('./policy');
-const { mergeIssueBody, normalizeBodyForComparison } = require('./parsing');
-const { getIssue, listIssues, editIssue, commentIssue, normalizeLabels } = require('./gh-api');
+const { loadPolicy } = require("./policy");
+const { mergeIssueBody, normalizeBodyForComparison } = require("./parsing");
+const { getIssue, listIssues, editIssue, commentIssue, normalizeLabels } = require("./gh-api");
 const {
   assertIssueClaimable,
   buildIssueComment,
@@ -12,26 +12,28 @@ const {
   summarizeStateForOutput,
   syncIssueLabels,
   verifyDependenciesClosed,
-} = require('./state');
-const { upsertCoordinationWorkItem } = require('./store');
-const { extractIssueReferences, extractTasks } = require('./parsing');
+} = require("./state");
+const { upsertCoordinationWorkItem } = require("./store");
+const { extractIssueReferences, extractTasks } = require("./parsing");
 
 function assertValidRepo(repo) {
-  if (typeof repo !== 'string' || !repo.trim()) {
+  if (typeof repo !== "string" || !repo.trim()) {
     throw new Error(`invalid repo: expected non-empty string, got ${JSON.stringify(repo)}`);
   }
 }
 
 function assertValidIssueNumber(issueNumber) {
   if (!Number.isFinite(issueNumber) || issueNumber <= 0 || !Number.isInteger(issueNumber)) {
-    throw new Error(`invalid issueNumber: expected positive integer, got ${JSON.stringify(issueNumber)}`);
+    throw new Error(
+      `invalid issueNumber: expected positive integer, got ${JSON.stringify(issueNumber)}`,
+    );
   }
 }
 
 function staleCoordinationLabels(issue, nextLabels, policy) {
   const epicLabel = policy.labels && policy.labels.epic;
-  return normalizeLabels(issue.labels).filter(l =>
-    (l.startsWith('coordination:') || l === epicLabel) && !nextLabels.includes(l)
+  return normalizeLabels(issue.labels).filter(
+    (l) => (l.startsWith("coordination:") || l === epicLabel) && !nextLabels.includes(l),
   );
 }
 
@@ -53,14 +55,23 @@ function applyClaim(repo, issueNumber, options = {}, context = {}) {
 
   assertIssueClaimable(issue, currentState);
 
-  const nextState = buildIssueStateFromAction(issue, currentState, 'claim', {
-    owner: options.actor || options.owner || currentState.owner || issue.author?.login || null,
-    branch: options.branch || currentState.branch || null,
-    status: options.status || 'claimed',
-    validation: options.validation || currentState.validation || 'pending',
-    review: options.review || currentState.review || (policy.review.required ? 'requested' : 'not-requested'),
-    projectState: options.projectState || 'in-progress',
-  }, policy);
+  const nextState = buildIssueStateFromAction(
+    issue,
+    currentState,
+    "claim",
+    {
+      owner: options.actor || options.owner || currentState.owner || issue.author?.login || null,
+      branch: options.branch || currentState.branch || null,
+      status: options.status || "claimed",
+      validation: options.validation || currentState.validation || "pending",
+      review:
+        options.review ||
+        currentState.review ||
+        (policy.review.required ? "requested" : "not-requested"),
+      projectState: options.projectState || "in-progress",
+    },
+    policy,
+  );
 
   const trackedIssue = {
     ...issue,
@@ -68,34 +79,60 @@ function applyClaim(repo, issueNumber, options = {}, context = {}) {
   };
   const body = mergeIssueBody(issue, nextState, policy);
   if (!options.dryRun) {
-    editIssue(repo, issueNumber, {
-      body,
-      addLabels: trackedIssue.labels,
-      removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
-    }, options);
-    commentIssue(repo, issueNumber, buildIssueComment('claimed', repo, issueNumber, nextState), options);
-    upsertCoordinationWorkItem(store, repo, trackedIssue, nextState, 'claim', { ...context, policy });
+    editIssue(
+      repo,
+      issueNumber,
+      {
+        body,
+        addLabels: trackedIssue.labels,
+        removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
+      },
+      options,
+    );
+    commentIssue(
+      repo,
+      issueNumber,
+      buildIssueComment("claimed", repo, issueNumber, nextState),
+      options,
+    );
+    upsertCoordinationWorkItem(store, repo, trackedIssue, nextState, "claim", {
+      ...context,
+      policy,
+    });
   }
 
-  return summarizeStateForOutput(repo, trackedIssue, nextState, 'claim', policy);
+  return summarizeStateForOutput(repo, trackedIssue, nextState, "claim", policy);
 }
 
 function applySync(repo, options = {}, context = {}) {
   assertValidRepo(repo);
   const policy = context.policy || loadPolicy(context.rootDir || process.cwd(), options.configPath);
   const store = context.store || null;
-  const issues = listIssues(repo, { ...options, state: options.state || 'all', limit: options.limit || 100 });
+  const issues = listIssues(repo, {
+    ...options,
+    state: options.state || "all",
+    limit: options.limit || 100,
+  });
   const syncedAt = new Date().toISOString();
   const results = [];
 
   for (const issue of issues) {
     const currentState = getCoordinationState(issue, policy);
-    const nextState = buildIssueStateFromAction(issue, currentState, 'sync', {
-      status: currentState.status,
-      validation: currentState.validation,
-      review: currentState.review,
-      projectState: currentState.project && currentState.project.state ? currentState.project.state : 'backlog',
-    }, policy);
+    const nextState = buildIssueStateFromAction(
+      issue,
+      currentState,
+      "sync",
+      {
+        status: currentState.status,
+        validation: currentState.validation,
+        review: currentState.review,
+        projectState:
+          currentState.project && currentState.project.state
+            ? currentState.project.state
+            : "backlog",
+      },
+      policy,
+    );
 
     const trackedIssue = {
       ...issue,
@@ -109,10 +146,13 @@ function applySync(repo, options = {}, context = {}) {
       if (normalizeBodyForComparison(body) !== normalizeBodyForComparison(issue.body)) {
         editIssue(repo, issue.number, { body }, options);
       }
-      snapshot = upsertCoordinationWorkItem(store, repo, trackedIssue, nextState, 'sync', { ...context, policy });
+      snapshot = upsertCoordinationWorkItem(store, repo, trackedIssue, nextState, "sync", {
+        ...context,
+        policy,
+      });
     }
     results.push({
-      ...summarizeStateForOutput(repo, trackedIssue, nextState, 'sync', policy),
+      ...summarizeStateForOutput(repo, trackedIssue, nextState, "sync", policy),
       syncedAt,
       labelPlan,
       snapshot: snapshot || null,
@@ -135,21 +175,29 @@ function applyValidate(repo, issueNumber, options = {}, context = {}, existingIs
   const state = getCoordinationState(issue, policy);
   const dependencyNumbers = Array.isArray(state.dependencies) ? state.dependencies : [];
   const closedDependencies = verifyDependenciesClosed(repo, dependencyNumbers, options);
-  const missingDependencies = dependencyNumbers.filter(number => !closedDependencies.includes(number));
+  const missingDependencies = dependencyNumbers.filter(
+    (number) => !closedDependencies.includes(number),
+  );
   const validations = [];
 
   if (missingDependencies.length > 0) {
-    validations.push({ check: 'dependencies', ok: false, detail: missingDependencies.join(',') });
+    validations.push({ check: "dependencies", ok: false, detail: missingDependencies.join(",") });
   } else {
-    validations.push({ check: 'dependencies', ok: true, detail: 'closed' });
+    validations.push({ check: "dependencies", ok: true, detail: "closed" });
   }
 
-  const ok = validations.every(entry => entry.ok);
-  const nextState = buildIssueStateFromAction(issue, state, 'validate', {
-    status: ok ? 'validated' : state.status,
-    validation: ok ? 'passed' : 'failed',
-    projectState: ok ? 'ready' : (state.project && state.project.state) || 'backlog',
-  }, policy);
+  const ok = validations.every((entry) => entry.ok);
+  const nextState = buildIssueStateFromAction(
+    issue,
+    state,
+    "validate",
+    {
+      status: ok ? "validated" : state.status,
+      validation: ok ? "passed" : "failed",
+      projectState: ok ? "ready" : (state.project && state.project.state) || "backlog",
+    },
+    policy,
+  );
   const trackedIssue = {
     ...issue,
     labels: desiredLabelsForState(nextState, policy),
@@ -157,16 +205,24 @@ function applyValidate(repo, issueNumber, options = {}, context = {}, existingIs
 
   if (!options.dryRun) {
     const body = mergeIssueBody(issue, nextState, policy);
-    editIssue(repo, issueNumber, {
-      body,
-      addLabels: trackedIssue.labels,
-      removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
-    }, options);
-    upsertCoordinationWorkItem(context.store || null, repo, trackedIssue, nextState, 'validate', { ...context, policy });
+    editIssue(
+      repo,
+      issueNumber,
+      {
+        body,
+        addLabels: trackedIssue.labels,
+        removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
+      },
+      options,
+    );
+    upsertCoordinationWorkItem(context.store || null, repo, trackedIssue, nextState, "validate", {
+      ...context,
+      policy,
+    });
   }
 
   return {
-    ...summarizeStateForOutput(repo, trackedIssue, nextState, 'validate', policy),
+    ...summarizeStateForOutput(repo, trackedIssue, nextState, "validate", policy),
     ok,
     validations,
     missingDependencies,
@@ -182,19 +238,29 @@ function applyPublish(repo, issueNumber, options = {}, context = {}) {
   const validation = applyValidate(repo, issueNumber, { ...options, dryRun: true }, context, issue);
 
   if (!validation.ok) {
-    throw new Error(`Issue #${issueNumber} is not ready to publish: ${validation.validations.map(entry => `${entry.check}=${entry.ok}`).join(', ')}`);
+    throw new Error(
+      `Issue #${issueNumber} is not ready to publish: ${validation.validations.map((entry) => `${entry.check}=${entry.ok}`).join(", ")}`,
+    );
   }
 
-  if (policy.review && policy.review.required && state.review !== 'approved') {
-    throw new Error(`Issue #${issueNumber} cannot be published: review approval required (current: ${state.review})`);
+  if (policy.review && policy.review.required && state.review !== "approved") {
+    throw new Error(
+      `Issue #${issueNumber} cannot be published: review approval required (current: ${state.review})`,
+    );
   }
 
-  const nextState = buildIssueStateFromAction(issue, state, 'publish', {
-    status: 'published',
-    validation: 'passed',
-    review: state.review === 'changes-requested' ? state.review : 'approved',
-    projectState: 'done',
-  }, policy);
+  const nextState = buildIssueStateFromAction(
+    issue,
+    state,
+    "publish",
+    {
+      status: "published",
+      validation: "passed",
+      review: state.review === "changes-requested" ? state.review : "approved",
+      projectState: "done",
+    },
+    policy,
+  );
   const trackedIssue = {
     ...issue,
     labels: desiredLabelsForState(nextState, policy),
@@ -202,18 +268,31 @@ function applyPublish(repo, issueNumber, options = {}, context = {}) {
 
   if (!options.dryRun) {
     const body = mergeIssueBody(issue, nextState, policy);
-    editIssue(repo, issueNumber, {
-      body,
-      addLabels: trackedIssue.labels,
-      removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
-    }, options);
-    commentIssue(repo, issueNumber, buildIssueComment('published', repo, issueNumber, nextState, {
-      validation: 'passed',
-    }), options);
-    upsertCoordinationWorkItem(context.store || null, repo, trackedIssue, nextState, 'publish', { ...context, policy });
+    editIssue(
+      repo,
+      issueNumber,
+      {
+        body,
+        addLabels: trackedIssue.labels,
+        removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
+      },
+      options,
+    );
+    commentIssue(
+      repo,
+      issueNumber,
+      buildIssueComment("published", repo, issueNumber, nextState, {
+        validation: "passed",
+      }),
+      options,
+    );
+    upsertCoordinationWorkItem(context.store || null, repo, trackedIssue, nextState, "publish", {
+      ...context,
+      policy,
+    });
   }
 
-  return summarizeStateForOutput(repo, trackedIssue, nextState, 'publish', policy);
+  return summarizeStateForOutput(repo, trackedIssue, nextState, "publish", policy);
 }
 
 function applyReview(repo, issueNumber, options = {}, context = {}) {
@@ -222,12 +301,19 @@ function applyReview(repo, issueNumber, options = {}, context = {}) {
   const policy = context.policy || loadPolicy(context.rootDir || process.cwd(), options.configPath);
   const issue = getIssue(repo, issueNumber, options);
   const state = getCoordinationState(issue, policy);
-  const reviewState = options.review || 'approved';
-  const nextState = buildIssueStateFromAction(issue, state, 'review', {
-    status: reviewState === 'approved' ? 'ready' : reviewState === 'requested' ? 'claimed' : 'blocked',
-    review: reviewState,
-    projectState: reviewState === 'approved' ? 'ready' : 'blocked',
-  }, policy);
+  const reviewState = options.review || "approved";
+  const nextState = buildIssueStateFromAction(
+    issue,
+    state,
+    "review",
+    {
+      status:
+        reviewState === "approved" ? "ready" : reviewState === "requested" ? "claimed" : "blocked",
+      review: reviewState,
+      projectState: reviewState === "approved" ? "ready" : "blocked",
+    },
+    policy,
+  );
   const trackedIssue = {
     ...issue,
     labels: desiredLabelsForState(nextState, policy),
@@ -235,18 +321,31 @@ function applyReview(repo, issueNumber, options = {}, context = {}) {
 
   if (!options.dryRun) {
     const body = mergeIssueBody(issue, nextState, policy);
-    editIssue(repo, issueNumber, {
-      body,
-      addLabels: trackedIssue.labels,
-      removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
-    }, options);
-    commentIssue(repo, issueNumber, buildIssueComment('reviewed', repo, issueNumber, nextState, {
-      review: reviewState,
-    }), options);
-    upsertCoordinationWorkItem(context.store || null, repo, trackedIssue, nextState, 'review', { ...context, policy });
+    editIssue(
+      repo,
+      issueNumber,
+      {
+        body,
+        addLabels: trackedIssue.labels,
+        removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
+      },
+      options,
+    );
+    commentIssue(
+      repo,
+      issueNumber,
+      buildIssueComment("reviewed", repo, issueNumber, nextState, {
+        review: reviewState,
+      }),
+      options,
+    );
+    upsertCoordinationWorkItem(context.store || null, repo, trackedIssue, nextState, "review", {
+      ...context,
+      policy,
+    });
   }
 
-  return summarizeStateForOutput(repo, trackedIssue, nextState, 'review', policy);
+  return summarizeStateForOutput(repo, trackedIssue, nextState, "review", policy);
 }
 
 function applyDecompose(repo, issueNumber, options = {}, context = {}) {
@@ -257,12 +356,20 @@ function applyDecompose(repo, issueNumber, options = {}, context = {}) {
   const state = getCoordinationState(issue, policy);
   const tasks = extractTasks(issue.body);
   const dependencies = extractIssueReferences(issue.body);
-  const nextState = buildIssueStateFromAction(issue, state, 'decompose', {
-    tasks,
-    dependencies,
-    status: tasks.some(task => !task.done) ? 'claimed' : state.status,
-    projectState: tasks.some(task => !task.done) ? 'in-progress' : (state.project && state.project.state) || 'backlog',
-  }, policy);
+  const nextState = buildIssueStateFromAction(
+    issue,
+    state,
+    "decompose",
+    {
+      tasks,
+      dependencies,
+      status: tasks.some((task) => !task.done) ? "claimed" : state.status,
+      projectState: tasks.some((task) => !task.done)
+        ? "in-progress"
+        : (state.project && state.project.state) || "backlog",
+    },
+    policy,
+  );
 
   const trackedIssue = {
     ...issue,
@@ -271,20 +378,33 @@ function applyDecompose(repo, issueNumber, options = {}, context = {}) {
 
   if (!options.dryRun) {
     const body = mergeIssueBody(issue, nextState, policy);
-    editIssue(repo, issueNumber, {
-      body,
-      addLabels: trackedIssue.labels,
-      removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
-    }, options);
-    commentIssue(repo, issueNumber, buildIssueComment('decomposed', repo, issueNumber, nextState, {
-      taskCount: String(tasks.length),
-      dependencyCount: String(dependencies.length),
-    }), options);
-    upsertCoordinationWorkItem(context.store || null, repo, trackedIssue, nextState, 'decompose', { ...context, policy });
+    editIssue(
+      repo,
+      issueNumber,
+      {
+        body,
+        addLabels: trackedIssue.labels,
+        removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
+      },
+      options,
+    );
+    commentIssue(
+      repo,
+      issueNumber,
+      buildIssueComment("decomposed", repo, issueNumber, nextState, {
+        taskCount: String(tasks.length),
+        dependencyCount: String(dependencies.length),
+      }),
+      options,
+    );
+    upsertCoordinationWorkItem(context.store || null, repo, trackedIssue, nextState, "decompose", {
+      ...context,
+      policy,
+    });
   }
 
   return {
-    ...summarizeStateForOutput(repo, trackedIssue, nextState, 'decompose', policy),
+    ...summarizeStateForOutput(repo, trackedIssue, nextState, "decompose", policy),
     tasks,
     dependencyCount: dependencies.length,
   };
@@ -294,12 +414,12 @@ function applyUnblock(repo, options = {}, context = {}) {
   assertValidRepo(repo);
   const policy = context.policy || loadPolicy(context.rootDir || process.cwd(), options.configPath);
   const store = context.store || null;
-  const issues = listIssues(repo, { ...options, state: 'all', limit: options.limit || 100 });
+  const issues = listIssues(repo, { ...options, state: "all", limit: options.limit || 100 });
   const results = [];
 
   for (const issue of issues) {
     const state = getCoordinationState(issue, policy);
-    if (state.status !== 'blocked') {
+    if (state.status !== "blocked") {
       continue;
     }
 
@@ -309,11 +429,17 @@ function applyUnblock(repo, options = {}, context = {}) {
       continue;
     }
 
-    const nextState = buildIssueStateFromAction(issue, state, 'unblock', {
-      status: 'ready',
-      projectState: 'ready',
-      validation: state.validation === 'failed' ? 'pending' : state.validation,
-    }, policy);
+    const nextState = buildIssueStateFromAction(
+      issue,
+      state,
+      "unblock",
+      {
+        status: "ready",
+        projectState: "ready",
+        validation: state.validation === "failed" ? "pending" : state.validation,
+      },
+      policy,
+    );
     const trackedIssue = {
       ...issue,
       labels: desiredLabelsForState(nextState, policy),
@@ -321,18 +447,31 @@ function applyUnblock(repo, options = {}, context = {}) {
 
     if (!options.dryRun) {
       const body = mergeIssueBody(issue, nextState, policy);
-      editIssue(repo, issue.number, {
-        body,
-        addLabels: trackedIssue.labels,
-        removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
-      }, options);
-      commentIssue(repo, issue.number, buildIssueComment('unblocked', repo, issue.number, nextState, {
-        dependencies: dependencyNumbers.length > 0 ? dependencyNumbers.join(',') : 'none',
-      }), options);
-      upsertCoordinationWorkItem(store, repo, trackedIssue, nextState, 'unblock', { ...context, policy });
+      editIssue(
+        repo,
+        issue.number,
+        {
+          body,
+          addLabels: trackedIssue.labels,
+          removeLabels: staleCoordinationLabels(issue, trackedIssue.labels, policy),
+        },
+        options,
+      );
+      commentIssue(
+        repo,
+        issue.number,
+        buildIssueComment("unblocked", repo, issue.number, nextState, {
+          dependencies: dependencyNumbers.length > 0 ? dependencyNumbers.join(",") : "none",
+        }),
+        options,
+      );
+      upsertCoordinationWorkItem(store, repo, trackedIssue, nextState, "unblock", {
+        ...context,
+        policy,
+      });
     }
 
-    results.push(summarizeStateForOutput(repo, trackedIssue, nextState, 'unblock', policy));
+    results.push(summarizeStateForOutput(repo, trackedIssue, nextState, "unblock", policy));
   }
 
   return {
@@ -344,32 +483,29 @@ function applyUnblock(repo, options = {}, context = {}) {
 
 function formatSummary(payload) {
   const lines = [
-    `${payload.action || 'sync'} epic #${payload.issueNumber}: ${payload.issueTitle}`,
+    `${payload.action || "sync"} epic #${payload.issueNumber}: ${payload.issueTitle}`,
     `Repo: ${payload.repo}`,
     `Status: ${payload.status}`,
-    `Owner: ${payload.owner || '(unassigned)'}`,
-    `Branch: ${payload.branch || '(none)'}`,
-    `Validation: ${payload.validation || 'pending'}`,
-    `Review: ${payload.review || 'not-requested'}`,
+    `Owner: ${payload.owner || "(unassigned)"}`,
+    `Branch: ${payload.branch || "(none)"}`,
+    `Validation: ${payload.validation || "pending"}`,
+    `Review: ${payload.review || "not-requested"}`,
   ];
   if (payload.tasks && payload.tasks.length > 0) {
     lines.push(`Tasks: ${payload.tasks.length}`);
   }
   if (payload.dependencies && payload.dependencies.length > 0) {
-    lines.push(`Dependencies: ${payload.dependencies.join(', ')}`);
+    lines.push(`Dependencies: ${payload.dependencies.join(", ")}`);
   }
-  return `${lines.join('\n')}\n`;
+  return `${lines.join("\n")}\n`;
 }
 
 function formatCollection(payload) {
-  const lines = [
-    `Repo: ${payload.repo}`,
-    `Items: ${payload.count}`,
-  ];
+  const lines = [`Repo: ${payload.repo}`, `Items: ${payload.count}`];
   for (const item of payload.items || []) {
     lines.push(`- #${item.issueNumber} ${item.status}: ${item.issueTitle}`);
   }
-  return `${lines.join('\n')}\n`;
+  return `${lines.join("\n")}\n`;
 }
 
 module.exports = {

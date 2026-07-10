@@ -7,13 +7,13 @@
  * scope creep, or tool loops.
  */
 
-'use strict';
+"use strict";
 
-const crypto = require('crypto');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { sanitizeSessionId, readBridge, renameWithRetry } = require('../lib/session-bridge');
+const crypto = require("crypto");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const { sanitizeSessionId, readBridge, renameWithRetry } = require("../lib/session-bridge");
 
 const CONTEXT_WARNING_PCT = 35;
 const CONTEXT_CRITICAL_PCT = 25;
@@ -25,12 +25,12 @@ const LOOP_THRESHOLD = 3;
 const STALE_SECONDS = 60;
 
 function isEnabledEnv(value, defaultValue = true) {
-  if (value === undefined || value === null || String(value).trim() === '') {
+  if (value === undefined || value === null || String(value).trim() === "") {
     return defaultValue;
   }
   const normalized = String(value).trim().toLowerCase();
-  if (['0', 'false', 'no', 'off', 'disabled'].includes(normalized)) return false;
-  if (['1', 'true', 'yes', 'on', 'enabled'].includes(normalized)) return true;
+  if (["0", "false", "no", "off", "disabled"].includes(normalized)) return false;
+  if (["1", "true", "yes", "on", "enabled"].includes(normalized)) return true;
   return defaultValue;
 }
 
@@ -54,7 +54,7 @@ function getWarnPath(sessionId) {
  */
 function readWarnState(sessionId) {
   try {
-    return JSON.parse(fs.readFileSync(getWarnPath(sessionId), 'utf8'));
+    return JSON.parse(fs.readFileSync(getWarnPath(sessionId), "utf8"));
   } catch {
     return { callsSinceWarn: 0, lastSeverity: null, lastMessage: null };
   }
@@ -77,12 +77,16 @@ function readWarnState(sessionId) {
  */
 function writeWarnState(sessionId, state) {
   const target = getWarnPath(sessionId);
-  const tmp = `${target}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify(state), 'utf8');
+  const tmp = `${target}.${process.pid}.${crypto.randomBytes(4).toString("hex")}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(state), "utf8");
   try {
     renameWithRetry(tmp, target);
   } catch (err) {
-    try { fs.unlinkSync(tmp); } catch { /* ignore */ }
+    try {
+      fs.unlinkSync(tmp);
+    } catch {
+      /* ignore */
+    }
     throw err;
   }
 }
@@ -94,7 +98,7 @@ function writeWarnState(sessionId, state) {
  */
 function detectLoop(recentTools) {
   if (!Array.isArray(recentTools) || recentTools.length < LOOP_THRESHOLD) {
-    return { detected: false, tool: '', count: 0 };
+    return { detected: false, tool: "", count: 0 };
   }
   const counts = {};
   for (const entry of recentTools) {
@@ -103,10 +107,10 @@ function detectLoop(recentTools) {
   }
   for (const [key, count] of Object.entries(counts)) {
     if (count >= LOOP_THRESHOLD) {
-      return { detected: true, tool: key.split(':')[0], count };
+      return { detected: true, tool: key.split(":")[0], count };
     }
   }
-  return { detected: false, tool: '', count: 0 };
+  return { detected: false, tool: "", count: 0 };
 }
 
 /**
@@ -122,17 +126,19 @@ function evaluateConditions(bridge, options = {}) {
     if (remaining <= CONTEXT_CRITICAL_PCT) {
       warnings.push({
         severity: 3,
-        type: 'context',
+        type: "context",
         message:
           `CONTEXT CRITICAL: ${remaining}% remaining. Context nearly exhausted. ` +
-          'Inform the user that context is low and ask how they want to proceed. ' +
-          'Do NOT autonomously save state or write handoff files unless the user asks.'
+          "Inform the user that context is low and ask how they want to proceed. " +
+          "Do NOT autonomously save state or write handoff files unless the user asks.",
       });
     } else if (remaining <= CONTEXT_WARNING_PCT) {
       warnings.push({
         severity: 2,
-        type: 'context',
-        message: `CONTEXT WARNING: ${remaining}% remaining. ` + 'Be aware that context is getting limited. Avoid starting new complex work.'
+        type: "context",
+        message:
+          `CONTEXT WARNING: ${remaining}% remaining. ` +
+          "Be aware that context is getting limited. Avoid starting new complex work.",
       });
     }
   }
@@ -143,20 +149,20 @@ function evaluateConditions(bridge, options = {}) {
     if (cost > COST_CRITICAL_USD) {
       warnings.push({
         severity: 3,
-        type: 'cost',
-        message: `COST CRITICAL: session total ~$${cost.toFixed(2)} (over $${COST_CRITICAL_USD}). Informational only — not an instruction to stop.`
+        type: "cost",
+        message: `COST CRITICAL: session total ~$${cost.toFixed(2)} (over $${COST_CRITICAL_USD}). Informational only — not an instruction to stop.`,
       });
     } else if (cost > COST_WARNING_USD) {
       warnings.push({
         severity: 2,
-        type: 'cost',
-        message: `COST WARNING: session total ~$${cost.toFixed(2)} (over $${COST_WARNING_USD}). Informational only.`
+        type: "cost",
+        message: `COST WARNING: session total ~$${cost.toFixed(2)} (over $${COST_WARNING_USD}). Informational only.`,
       });
     } else if (cost > COST_NOTICE_USD) {
       warnings.push({
         severity: 1,
-        type: 'cost',
-        message: `COST NOTICE: session total ~$${cost.toFixed(2)}. Informational only.`
+        type: "cost",
+        message: `COST NOTICE: session total ~$${cost.toFixed(2)}. Informational only.`,
       });
     }
   }
@@ -166,8 +172,10 @@ function evaluateConditions(bridge, options = {}) {
   if (fileCount > FILES_WARNING_COUNT) {
     warnings.push({
       severity: 2,
-      type: 'scope',
-      message: `SCOPE WARNING: ${fileCount} files modified this session. ` + 'Consider whether changes are too scattered.'
+      type: "scope",
+      message:
+        `SCOPE WARNING: ${fileCount} files modified this session. ` +
+        "Consider whether changes are too scattered.",
     });
   }
 
@@ -176,8 +184,10 @@ function evaluateConditions(bridge, options = {}) {
   if (loop.detected) {
     warnings.push({
       severity: 2,
-      type: 'loop',
-      message: `LOOP WARNING: Tool '${loop.tool}' called ${loop.count} times ` + 'with same parameters in last 5 calls. This may indicate a stuck loop.'
+      type: "loop",
+      message:
+        `LOOP WARNING: Tool '${loop.tool}' called ${loop.count} times ` +
+        "with same parameters in last 5 calls. This may indicate a stuck loop.",
     });
   }
 
@@ -188,9 +198,9 @@ function evaluateConditions(bridge, options = {}) {
  * Map numeric severity to label.
  */
 function severityLabel(n) {
-  if (n >= 3) return 'critical';
-  if (n >= 2) return 'warning';
-  return 'notice';
+  if (n >= 3) return "critical";
+  if (n >= 2) return "warning";
+  return "notice";
 }
 
 /**
@@ -201,7 +211,10 @@ function run(rawInput) {
   try {
     const input = rawInput.trim() ? JSON.parse(rawInput) : {};
 
-    const sessionId = sanitizeSessionId(input.session_id) || sanitizeSessionId(process.env.ECC_SESSION_ID) || sanitizeSessionId(process.env.CLAUDE_SESSION_ID);
+    const sessionId =
+      sanitizeSessionId(input.session_id) ||
+      sanitizeSessionId(process.env.ECC_SESSION_ID) ||
+      sanitizeSessionId(process.env.CLAUDE_SESSION_ID);
 
     if (!sessionId) return rawInput;
 
@@ -210,7 +223,9 @@ function run(rawInput) {
 
     // Stale check for context warnings
     const now = Math.floor(Date.now() / 1000);
-    const lastTs = bridge.last_timestamp ? Math.floor(new Date(bridge.last_timestamp).getTime() / 1000) : 0;
+    const lastTs = bridge.last_timestamp
+      ? Math.floor(new Date(bridge.last_timestamp).getTime() / 1000)
+      : 0;
     const isStale = lastTs > 0 && now - lastTs > STALE_SECONDS;
 
     // If bridge is stale, null out context data (still check cost/scope/loop)
@@ -233,8 +248,8 @@ function run(rawInput) {
     // Combine top 2 warnings
     const message = warnings
       .slice(0, 2)
-      .map(w => w.message)
-      .join('\n');
+      .map((w) => w.message)
+      .join("\n");
 
     // Dedupe on message content, not a call counter. The previous logic
     // re-emitted the *same* warning every DEBOUNCE_CALLS tool calls, so a
@@ -245,7 +260,7 @@ function run(rawInput) {
     // information — and is otherwise suppressed.
     const warnState = readWarnState(sessionId);
     const topSeverity = severityLabel(warnings[0].severity);
-    const escalatedToCritical = topSeverity === 'critical' && warnState.lastSeverity !== 'critical';
+    const escalatedToCritical = topSeverity === "critical" && warnState.lastSeverity !== "critical";
     const sameMessage = warnState.lastMessage === message;
 
     if (sameMessage && !escalatedToCritical) {
@@ -258,9 +273,9 @@ function run(rawInput) {
 
     const output = {
       hookSpecificOutput: {
-        hookEventName: 'PostToolUse',
-        additionalContext: message
-      }
+        hookEventName: "PostToolUse",
+        additionalContext: message,
+      },
     };
 
     return JSON.stringify(output);
@@ -271,13 +286,13 @@ function run(rawInput) {
 }
 
 if (require.main === module) {
-  let data = '';
+  let data = "";
   const MAX_STDIN = 1024 * 1024;
-  process.stdin.setEncoding('utf8');
-  process.stdin.on('data', chunk => {
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => {
     if (data.length < MAX_STDIN) data += chunk.substring(0, MAX_STDIN - data.length);
   });
-  process.stdin.on('end', () => {
+  process.stdin.on("end", () => {
     process.stdout.write(run(data));
     process.exit(0);
   });

@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 /**
  * Parse YAML frontmatter from a markdown string.
@@ -14,15 +14,15 @@ function parseFrontmatter(content) {
   }
 
   const frontmatter = {};
-  for (const line of match[1].split('\n')) {
-    const colonIdx = line.indexOf(':');
+  for (const line of match[1].split("\n")) {
+    const colonIdx = line.indexOf(":");
     if (colonIdx === -1) continue;
 
     const key = line.slice(0, colonIdx).trim();
     let value = line.slice(colonIdx + 1).trim();
 
     // Handle JSON arrays (e.g. tools: ["Read", "Grep"])
-    if (value.startsWith('[') && value.endsWith(']')) {
+    if (value.startsWith("[") && value.endsWith("]")) {
       try {
         value = JSON.parse(value);
       } catch {
@@ -31,14 +31,14 @@ function parseFrontmatter(content) {
     }
 
     // Strip surrounding quotes
-    if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+    if (typeof value === "string" && value.startsWith('"') && value.endsWith('"')) {
       value = value.slice(1, -1);
     }
 
     frontmatter[key] = value;
   }
 
-  return { frontmatter, body: match[2] || '' };
+  return { frontmatter, body: match[2] || "" };
 }
 
 /**
@@ -46,7 +46,7 @@ function parseFrontmatter(content) {
  * Skips headings, list items, code blocks, and table rows.
  */
 function extractSummary(body, maxSentences = 1) {
-  const lines = body.split('\n');
+  const lines = body.split("\n");
   const paragraphs = [];
   let current = [];
   let inCodeBlock = false;
@@ -55,15 +55,15 @@ function extractSummary(body, maxSentences = 1) {
     const trimmed = line.trim();
 
     // Track fenced code blocks
-    if (trimmed.startsWith('```')) {
+    if (trimmed.startsWith("```")) {
       inCodeBlock = !inCodeBlock;
       continue;
     }
     if (inCodeBlock) continue;
 
-    if (trimmed === '') {
+    if (trimmed === "") {
       if (current.length > 0) {
-        paragraphs.push(current.join(' '));
+        paragraphs.push(current.join(" "));
         current = [];
       }
       continue;
@@ -71,14 +71,14 @@ function extractSummary(body, maxSentences = 1) {
 
     // Skip headings, list items (bold, plain, asterisk), numbered lists, table rows
     if (
-      trimmed.startsWith('#') ||
-      trimmed.startsWith('- ') ||
-      trimmed.startsWith('* ') ||
+      trimmed.startsWith("#") ||
+      trimmed.startsWith("- ") ||
+      trimmed.startsWith("* ") ||
       /^\d+\.\s/.test(trimmed) ||
-      trimmed.startsWith('|')
+      trimmed.startsWith("|")
     ) {
       if (current.length > 0) {
-        paragraphs.push(current.join(' '));
+        paragraphs.push(current.join(" "));
         current = [];
       }
       continue;
@@ -87,32 +87,36 @@ function extractSummary(body, maxSentences = 1) {
     current.push(trimmed);
   }
   if (current.length > 0) {
-    paragraphs.push(current.join(' '));
+    paragraphs.push(current.join(" "));
   }
 
-  const firstParagraph = paragraphs.find(p => p.length > 0);
-  if (!firstParagraph) return '';
+  const firstParagraph = paragraphs.find((p) => p.length > 0);
+  if (!firstParagraph) return "";
 
   const sentences = firstParagraph.match(/[^.!?]+[.!?]+/g) || [firstParagraph];
-  return sentences.slice(0, maxSentences).map(s => s.trim()).join(' ').trim();
+  return sentences
+    .slice(0, maxSentences)
+    .map((s) => s.trim())
+    .join(" ")
+    .trim();
 }
 
 /**
  * Load and parse a single agent file.
  */
 function loadAgent(filePath) {
-  const content = fs.readFileSync(filePath, 'utf8');
+  const content = fs.readFileSync(filePath, "utf8");
   const { frontmatter, body } = parseFrontmatter(content);
-  const fileName = path.basename(filePath, '.md');
+  const fileName = path.basename(filePath, ".md");
 
   return {
     fileName,
     name: frontmatter.name || fileName,
-    description: frontmatter.description || '',
+    description: frontmatter.description || "",
     tools: Array.isArray(frontmatter.tools) ? frontmatter.tools : [],
-    model: frontmatter.model || 'sonnet',
+    model: frontmatter.model || "sonnet",
     body,
-    byteSize: Buffer.byteLength(content, 'utf8'),
+    byteSize: Buffer.byteLength(content, "utf8"),
   };
 }
 
@@ -122,10 +126,11 @@ function loadAgent(filePath) {
 function loadAgents(agentsDir) {
   if (!fs.existsSync(agentsDir)) return [];
 
-  return fs.readdirSync(agentsDir)
-    .filter(f => f.endsWith('.md'))
+  return fs
+    .readdirSync(agentsDir)
+    .filter((f) => f.endsWith(".md"))
     .sort()
-    .map(f => loadAgent(path.join(agentsDir, f)));
+    .map((f) => loadAgent(path.join(agentsDir, f)));
 }
 
 /**
@@ -150,7 +155,7 @@ function compressToSummary(agent) {
   };
 }
 
-const allowedModes = ['catalog', 'summary', 'full'];
+const allowedModes = ["catalog", "summary", "full"];
 
 /**
  * Build a compressed catalog from a directory of agents.
@@ -163,29 +168,29 @@ const allowedModes = ['catalog', 'summary', 'full'];
  * Returns { agents: [], stats: { totalAgents, originalBytes, compressedBytes, compressedTokenEstimate, mode } }
  */
 function buildAgentCatalog(agentsDir, options = {}) {
-  const mode = options.mode || 'catalog';
+  const mode = options.mode || "catalog";
 
   if (!allowedModes.includes(mode)) {
-    throw new Error(`Invalid mode "${mode}". Allowed modes: ${allowedModes.join(', ')}`);
+    throw new Error(`Invalid mode "${mode}". Allowed modes: ${allowedModes.join(", ")}`);
   }
 
   const filter = options.filter || null;
 
   let agents = loadAgents(agentsDir);
 
-  if (typeof filter === 'function') {
+  if (typeof filter === "function") {
     agents = agents.filter(filter);
   }
 
   const originalBytes = agents.reduce((sum, a) => sum + a.byteSize, 0);
 
   let compressed;
-  if (mode === 'catalog') {
+  if (mode === "catalog") {
     compressed = agents.map(compressToCatalog);
-  } else if (mode === 'summary') {
+  } else if (mode === "summary") {
     compressed = agents.map(compressToSummary);
   } else {
-    compressed = agents.map(a => ({
+    compressed = agents.map((a) => ({
       name: a.name,
       description: a.description,
       tools: a.tools,
@@ -203,7 +208,7 @@ function buildAgentCatalog(agentsDir, options = {}) {
     stats: {
       totalAgents: agents.length,
       originalBytes,
-      compressedBytes: Buffer.byteLength(compressedJson, 'utf8'),
+      compressedBytes: Buffer.byteLength(compressedJson, "utf8"),
       compressedTokenEstimate,
       mode,
     },

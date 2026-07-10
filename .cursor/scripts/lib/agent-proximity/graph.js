@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Lightweight dependency-graph builder for the agent-proximity metric.
@@ -13,14 +13,14 @@
  * channels that slot into the same adjacency shape.
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const SOURCE_EXTENSIONS = ['.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx'];
-const RESOLVE_EXTENSIONS = ['.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx', '.json'];
+const SOURCE_EXTENSIONS = [".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx"];
+const RESOLVE_EXTENSIONS = [".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".json"];
 
 function toRepoRel(repoRoot, absPath) {
-  return path.relative(repoRoot, absPath).split(path.sep).join('/');
+  return path.relative(repoRoot, absPath).split(path.sep).join("/");
 }
 
 // Match relative specifiers only (./ or ../). Bare specifiers are node_modules
@@ -29,7 +29,7 @@ const SPEC_PATTERNS = [
   /require\(\s*['"](\.[^'"]+)['"]\s*\)/g,
   /import\s+(?:[^'"]*?\s+from\s+)?['"](\.[^'"]+)['"]/g,
   /import\(\s*['"](\.[^'"]+)['"]\s*\)/g,
-  /export\s+(?:\*|\{[^}]*\})\s+from\s+['"](\.[^'"]+)['"]/g
+  /export\s+(?:\*|\{[^}]*\})\s+from\s+['"](\.[^'"]+)['"]/g,
 ];
 
 function extractRelativeSpecifiers(source) {
@@ -53,7 +53,7 @@ function resolveSpecifier(repoRoot, fromFile, spec) {
   const target = path.resolve(baseDir, spec);
   const candidates = [target];
   for (const ext of RESOLVE_EXTENSIONS) candidates.push(target + ext);
-  for (const ext of RESOLVE_EXTENSIONS) candidates.push(path.join(target, 'index' + ext));
+  for (const ext of RESOLVE_EXTENSIONS) candidates.push(path.join(target, "index" + ext));
   for (const cand of candidates) {
     try {
       if (fs.existsSync(cand) && fs.statSync(cand).isFile()) {
@@ -83,12 +83,12 @@ function buildDependencyGraph(repoRoot, files, deps = {}) {
   const adjacency = {};
   const scanned = [];
   for (const rel of files || []) {
-    const normalized = String(rel).replace(/\\/g, '/');
+    const normalized = String(rel).replace(/\\/g, "/");
     if (!isSourceFile(normalized)) continue;
     scanned.push(normalized);
-    let source = '';
+    let source = "";
     try {
-      source = String(read(path.join(repoRoot, normalized), 'utf8'));
+      source = String(read(path.join(repoRoot, normalized), "utf8"));
     } catch {
       adjacency[normalized] = adjacency[normalized] || [];
       continue;
@@ -110,19 +110,19 @@ function buildDependencyGraph(repoRoot, files, deps = {}) {
  */
 function buildDependencyGraphFromSources(sources = {}) {
   const adjacency = {};
-  const fileList = Object.keys(sources).map(f => f.replace(/\\/g, '/'));
+  const fileList = Object.keys(sources).map((f) => f.replace(/\\/g, "/"));
   const fileSet = new Set(fileList);
   const tryResolve = (fromFile, spec) => {
     const base = path.posix.dirname(fromFile);
     const target = path.posix.normalize(path.posix.join(base, spec));
     const candidates = [target];
     for (const ext of RESOLVE_EXTENSIONS) candidates.push(target + ext);
-    for (const ext of RESOLVE_EXTENSIONS) candidates.push(path.posix.join(target, 'index' + ext));
-    return candidates.find(c => fileSet.has(c)) || null;
+    for (const ext of RESOLVE_EXTENSIONS) candidates.push(path.posix.join(target, "index" + ext));
+    return candidates.find((c) => fileSet.has(c)) || null;
   };
   for (const file of fileList) {
     const edges = new Set();
-    for (const spec of extractRelativeSpecifiers(String(sources[file] || ''))) {
+    for (const spec of extractRelativeSpecifiers(String(sources[file] || ""))) {
       const resolved = tryResolve(file, spec);
       if (resolved && resolved !== file) edges.add(resolved);
     }
@@ -136,5 +136,5 @@ module.exports = {
   buildDependencyGraphFromSources,
   extractRelativeSpecifiers,
   resolveSpecifier,
-  isSourceFile
+  isSourceFile,
 };

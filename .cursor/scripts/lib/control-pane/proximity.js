@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Control-pane integration for the agent-space proximity metric.
@@ -9,11 +9,11 @@
  * advisories and a 3D position per agent. See docs/design/agent-proximity.md.
  */
 
-const path = require('path');
-const { execFileSync } = require('child_process');
+const path = require("path");
+const { execFileSync } = require("child_process");
 
-const { scanAirspace, buildProximityTriggers } = require('../agent-proximity');
-const { buildDependencyGraph } = require('../agent-proximity/graph');
+const { scanAirspace, buildProximityTriggers } = require("../agent-proximity");
+const { buildDependencyGraph } = require("../agent-proximity/graph");
 
 /**
  * Parse `git diff --unified=0` output into per-file NEW-side line ranges. Hunk
@@ -27,11 +27,11 @@ const { buildDependencyGraph } = require('../agent-proximity/graph');
 function parseDiffRanges(diff) {
   const byFile = new Map();
   let current = null;
-  for (const line of String(diff || '').split('\n')) {
+  for (const line of String(diff || "").split("\n")) {
     const fileMatch = line.match(/^\+\+\+ b\/(.+)$/);
     if (fileMatch) {
       const name = fileMatch[1].trim();
-      current = name === '/dev/null' ? null : name;
+      current = name === "/dev/null" ? null : name;
       if (current && !byFile.has(current)) byFile.set(current, []);
       continue;
     }
@@ -46,11 +46,11 @@ function parseDiffRanges(diff) {
 }
 
 function runGitDiff(worktreePath, base, extraArgs) {
-  return execFileSync('git', ['-C', worktreePath, 'diff', ...extraArgs, `${base}...HEAD`], {
-    encoding: 'utf8',
+  return execFileSync("git", ["-C", worktreePath, "diff", ...extraArgs, `${base}...HEAD`], {
+    encoding: "utf8",
     timeout: 5000,
     maxBuffer: 8 * 1024 * 1024,
-    stdio: ['ignore', 'pipe', 'ignore']
+    stdio: ["ignore", "pipe", "ignore"],
   });
 }
 
@@ -62,10 +62,12 @@ function runGitDiff(worktreePath, base, extraArgs) {
 function defaultWorkingSetFor(session) {
   const wt = session && session.worktree;
   if (!wt || !wt.path) return [];
-  const base = wt.base || 'HEAD';
+  const base = wt.base || "HEAD";
   try {
-    const ranges = parseDiffRanges(runGitDiff(wt.path, base, ['--unified=0']));
-    return [...ranges.entries()].map(([path, lines]) => (lines.length > 0 ? { path, lines } : { path }));
+    const ranges = parseDiffRanges(runGitDiff(wt.path, base, ["--unified=0"]));
+    return [...ranges.entries()].map(([path, lines]) =>
+      lines.length > 0 ? { path, lines } : { path },
+    );
   } catch {
     return [];
   }
@@ -77,11 +79,11 @@ function defaultWorkingSetFor(session) {
 function defaultChangedFilesFor(session) {
   const wt = session && session.worktree;
   if (!wt || !wt.path) return [];
-  const base = wt.base || 'HEAD';
+  const base = wt.base || "HEAD";
   try {
-    return runGitDiff(wt.path, base, ['--name-only'])
-      .split('\n')
-      .map(s => s.trim())
+    return runGitDiff(wt.path, base, ["--name-only"])
+      .split("\n")
+      .map((s) => s.trim())
       .filter(Boolean);
   } catch {
     return [];
@@ -95,16 +97,20 @@ function defaultChangedFilesFor(session) {
  * (returns file-name strings) for tests.
  */
 function sessionsToAgents(sessions, deps = {}) {
-  const workingSetFor = deps.workingSetFor || (deps.changedFilesFor ? session => deps.changedFilesFor(session).map(p => ({ path: p })) : defaultWorkingSetFor);
+  const workingSetFor =
+    deps.workingSetFor ||
+    (deps.changedFilesFor
+      ? (session) => deps.changedFilesFor(session).map((p) => ({ path: p }))
+      : defaultWorkingSetFor);
   const agents = [];
   for (const session of sessions || []) {
-    const files = workingSetFor(session).map(f => ({ weight: 1, ...f }));
+    const files = workingSetFor(session).map((f) => ({ weight: 1, ...f }));
     if (files.length === 0) continue;
     agents.push({
       agentId: session.id,
       label: session.task || session.id,
       startedAt: session.createdAt || null,
-      files
+      files,
     });
   }
   return agents;
@@ -118,7 +124,7 @@ function sessionsToAgents(sessions, deps = {}) {
  * @returns {{ enabled, advisories, positions, links, counts }}
  */
 function buildProximitySnapshot(sessions, options = {}) {
-  const repoRoot = path.resolve(options.repoRoot || path.join(__dirname, '..', '..', '..'));
+  const repoRoot = path.resolve(options.repoRoot || path.join(__dirname, "..", "..", ".."));
   const agents = sessionsToAgents(sessions, options);
 
   // Need at least two participating agents for a collision to be possible.
@@ -126,13 +132,17 @@ function buildProximitySnapshot(sessions, options = {}) {
     return {
       enabled: true,
       advisories: [],
-      positions: agents.map(a => ({ agentId: a.agentId, position: [0, 0, 0], fileCount: a.files.length })),
+      positions: agents.map((a) => ({
+        agentId: a.agentId,
+        position: [0, 0, 0],
+        fileCount: a.files.length,
+      })),
       links: [],
-      counts: { agents: agents.length, advisories: 0, resolutions: 0 }
+      counts: { agents: agents.length, advisories: 0, resolutions: 0 },
     };
   }
 
-  const touched = [...new Set(agents.flatMap(a => a.files.map(f => f.path)))];
+  const touched = [...new Set(agents.flatMap((a) => a.files.map((f) => f.path)))];
   let graph = { adjacency: {}, files: [] };
   try {
     graph = options.graph || buildDependencyGraph(repoRoot, touched, options.graphDeps || {});
@@ -141,11 +151,11 @@ function buildProximitySnapshot(sessions, options = {}) {
   }
 
   const scan = scanAirspace(agents, graph, options);
-  const labels = new Map(agents.map(a => [a.agentId, a.label]));
-  const advisories = scan.advisories.map(adv => ({
+  const labels = new Map(agents.map((a) => [a.agentId, a.label]));
+  const advisories = scan.advisories.map((adv) => ({
     ...adv,
     aLabel: labels.get(adv.a) || adv.a,
-    bLabel: labels.get(adv.b) || adv.b
+    bLabel: labels.get(adv.b) || adv.b,
   }));
   return {
     enabled: true,
@@ -153,7 +163,7 @@ function buildProximitySnapshot(sessions, options = {}) {
     triggers: buildProximityTriggers(scan.advisories),
     positions: scan.positions,
     links: scan.links,
-    counts: scan.counts
+    counts: scan.counts,
   };
 }
 
@@ -165,7 +175,7 @@ function buildProximitySnapshot(sessions, options = {}) {
  */
 function dispatchProximityTriggers(triggers, deps = {}) {
   const send = deps.sendMessage;
-  if (typeof send !== 'function') return { dispatched: 0, skipped: (triggers || []).length };
+  if (typeof send !== "function") return { dispatched: 0, skipped: (triggers || []).length };
   let dispatched = 0;
   let skipped = 0;
   for (const t of triggers || []) {
@@ -188,9 +198,9 @@ function dispatchProximityTriggers(triggers, deps = {}) {
 function createProximityDispatcher(deps = {}) {
   const send = deps.sendMessage;
   const cooldownMs = Number.isFinite(deps.cooldownMs) ? deps.cooldownMs : 5 * 60 * 1000;
-  const now = typeof deps.now === 'function' ? deps.now : () => Date.now();
+  const now = typeof deps.now === "function" ? deps.now : () => Date.now();
   const lastFired = new Map();
-  const keyOf = t => `${t.to}<-${t.from}:${t.type}`;
+  const keyOf = (t) => `${t.to}<-${t.from}:${t.type}`;
 
   return {
     dispatch(triggers) {
@@ -205,7 +215,7 @@ function createProximityDispatcher(deps = {}) {
           suppressed += 1;
           continue;
         }
-        if (typeof send !== 'function') {
+        if (typeof send !== "function") {
           skipped += 1;
           continue;
         }
@@ -221,7 +231,7 @@ function createProximityDispatcher(deps = {}) {
     },
     reset() {
       lastFired.clear();
-    }
+    },
   };
 }
 
@@ -238,7 +248,12 @@ async function runProximityTick(deps = {}) {
   const triggers = prox.triggers || [];
   let result;
   if (deps.dryRun || !deps.dispatcher) {
-    result = { dispatched: 0, suppressed: 0, skipped: triggers.length, dryRun: Boolean(deps.dryRun) };
+    result = {
+      dispatched: 0,
+      suppressed: 0,
+      skipped: triggers.length,
+      dryRun: Boolean(deps.dryRun),
+    };
   } else {
     result = deps.dispatcher.dispatch(triggers);
   }
@@ -246,7 +261,7 @@ async function runProximityTick(deps = {}) {
     counts: prox.counts || {},
     advisories: prox.advisories || [],
     triggers,
-    result
+    result,
   };
 }
 
@@ -258,5 +273,5 @@ module.exports = {
   parseDiffRanges,
   dispatchProximityTriggers,
   createProximityDispatcher,
-  runProximityTick
+  runProximityTick,
 };

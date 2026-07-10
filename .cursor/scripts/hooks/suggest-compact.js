@@ -23,26 +23,20 @@
  *   can cross 50 while the window is barely used.
  */
 
-const fs = require('fs');
-const path = require('path');
-const {
-  getTempDir,
-  writeFile,
-  readStdinJson,
-  log,
-  output
-} = require('../lib/utils');
+const fs = require("fs");
+const path = require("path");
+const { getTempDir, writeFile, readStdinJson, log, output } = require("../lib/utils");
 const {
   readLatestContextTokens,
   resolveContextWindowTokens,
   resolveContextThreshold,
   resolveContextInterval,
   computeContextBucket,
-  formatWindowLabel
-} = require('../lib/transcript-context');
+  formatWindowLabel,
+} = require("../lib/transcript-context");
 
-const COUNTER_FILE_PREFIX = 'claude-tool-count-';
-const CONTEXT_BUCKET_FILE_PREFIX = 'claude-context-bucket-';
+const COUNTER_FILE_PREFIX = "claude-tool-count-";
+const CONTEXT_BUCKET_FILE_PREFIX = "claude-context-bucket-";
 const STATE_FILE_PREFIXES = [COUNTER_FILE_PREFIX, CONTEXT_BUCKET_FILE_PREFIX];
 const DEFAULT_COMPACT_STATE_TTL_DAYS = 14;
 
@@ -81,11 +75,11 @@ function cleanupOldCounters(tempDir, retentionDays, currentStateFiles) {
   }
 
   const cutoffMs = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
-  const currentBasenames = new Set(currentStateFiles.map(filePath => path.basename(filePath)));
+  const currentBasenames = new Set(currentStateFiles.map((filePath) => path.basename(filePath)));
 
   for (const entry of entries) {
     if (!entry.isFile()) continue;
-    if (!STATE_FILE_PREFIXES.some(prefix => entry.name.startsWith(prefix))) continue;
+    if (!STATE_FILE_PREFIXES.some((prefix) => entry.name.startsWith(prefix))) continue;
     if (currentBasenames.has(entry.name)) continue;
 
     const fullPath = path.join(tempDir, entry.name);
@@ -119,17 +113,15 @@ function incrementToolCallCount(counterFile) {
   let count = 1;
 
   try {
-    const fd = fs.openSync(counterFile, 'a+');
+    const fd = fs.openSync(counterFile, "a+");
     try {
       const buf = Buffer.alloc(64);
       const bytesRead = fs.readSync(fd, buf, 0, 64, 0);
       if (bytesRead > 0) {
-        const parsed = parseInt(buf.toString('utf8', 0, bytesRead).trim(), 10);
+        const parsed = parseInt(buf.toString("utf8", 0, bytesRead).trim(), 10);
         // Clamp to reasonable range — corrupted files could contain huge values
         // that pass Number.isFinite() (e.g., parseInt('9'.repeat(30)) => 1e+29)
-        count = (Number.isFinite(parsed) && parsed > 0 && parsed <= 1000000)
-          ? parsed + 1
-          : 1;
+        count = Number.isFinite(parsed) && parsed > 0 && parsed <= 1000000 ? parsed + 1 : 1;
       }
       // Truncate and write new value
       fs.ftruncateSync(fd, 0);
@@ -151,7 +143,7 @@ function incrementToolCallCount(counterFile) {
  */
 function readLastContextBucket(bucketFile) {
   try {
-    const parsed = parseInt(fs.readFileSync(bucketFile, 'utf8').trim(), 10);
+    const parsed = parseInt(fs.readFileSync(bucketFile, "utf8").trim(), 10);
     return Number.isInteger(parsed) && parsed >= 0 && parsed <= 1000000 ? parsed : -1;
   } catch {
     return -1;
@@ -205,11 +197,13 @@ async function main() {
     input = {};
   }
 
-  const rawSessionId = (input && typeof input.session_id === 'string' && input.session_id)
-    ? input.session_id
-    : (process.env.CLAUDE_SESSION_ID || 'default');
-  const sessionId = rawSessionId.replace(/[^a-zA-Z0-9_-]/g, '') || 'default';
-  const transcriptPath = (input && typeof input.transcript_path === 'string') ? input.transcript_path : '';
+  const rawSessionId =
+    input && typeof input.session_id === "string" && input.session_id
+      ? input.session_id
+      : process.env.CLAUDE_SESSION_ID || "default";
+  const sessionId = rawSessionId.replace(/[^a-zA-Z0-9_-]/g, "") || "default";
+  const transcriptPath =
+    input && typeof input.transcript_path === "string" ? input.transcript_path : "";
 
   const tempDir = getTempDir();
   const counterFile = path.join(tempDir, `${COUNTER_FILE_PREFIX}${sessionId}`);
@@ -219,10 +213,9 @@ async function main() {
   // skips the active session's files. See cleanupOldCounters for details.
   cleanupOldCounters(tempDir, getCounterRetentionDays(), [counterFile, bucketFile]);
 
-  const rawThreshold = parseInt(process.env.COMPACT_THRESHOLD || '50', 10);
-  const threshold = Number.isFinite(rawThreshold) && rawThreshold > 0 && rawThreshold <= 10000
-    ? rawThreshold
-    : 50;
+  const rawThreshold = parseInt(process.env.COMPACT_THRESHOLD || "50", 10);
+  const threshold =
+    Number.isFinite(rawThreshold) && rawThreshold > 0 && rawThreshold <= 10000 ? rawThreshold : 50;
 
   const count = incrementToolCallCount(counterFile);
 
@@ -238,9 +231,13 @@ async function main() {
 
   // Secondary signal: tool-call count at threshold, then every 25 calls.
   if (count === threshold) {
-    messages.push(`[StrategicCompact] ${threshold} tool calls reached - consider /compact if transitioning phases`);
+    messages.push(
+      `[StrategicCompact] ${threshold} tool calls reached - consider /compact if transitioning phases`,
+    );
   } else if (count > threshold && (count - threshold) % 25 === 0) {
-    messages.push(`[StrategicCompact] ${count} tool calls - good checkpoint for /compact if context is stale`);
+    messages.push(
+      `[StrategicCompact] ${count} tool calls - good checkpoint for /compact if context is stale`,
+    );
   }
 
   // log() writes to stderr (debug log). Per the Claude Code hooks guide,
@@ -256,16 +253,16 @@ async function main() {
     }
     output({
       hookSpecificOutput: {
-        hookEventName: 'PreToolUse',
-        additionalContext: messages.join('\n')
-      }
+        hookEventName: "PreToolUse",
+        additionalContext: messages.join("\n"),
+      },
     });
   }
 
   process.exit(0);
 }
 
-main().catch(err => {
-  console.error('[StrategicCompact] Error:', err.message);
+main().catch((err) => {
+  console.error("[StrategicCompact] Error:", err.message);
   process.exit(0);
 });

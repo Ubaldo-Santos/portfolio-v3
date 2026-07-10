@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
-const os = require('os');
+const os = require("os");
 
-const { createStateStore } = require('../state-store');
-const { DEFAULT_SCHEMA_VERSION, DEFAULT_POLICY } = require('./policy');
-const { normalizeLabels } = require('./gh-api');
-const { slugifySegment, mapStateToWorkItemStatus, summarizeProjectProjection } = require('./state');
+const { createStateStore } = require("../state-store");
+const { DEFAULT_SCHEMA_VERSION, DEFAULT_POLICY } = require("./policy");
+const { normalizeLabels } = require("./gh-api");
+const { slugifySegment, mapStateToWorkItemStatus, summarizeProjectProjection } = require("./state");
 
 function epicWorkItemId(repo, issueNumber) {
   return `github-${slugifySegment(repo)}-epic-${issueNumber}`;
@@ -28,16 +28,16 @@ function upsertCoordinationWorkItem(store, repo, issue, state, action, options =
     projectProjection: summarizeProjectProjection(state, options.policy || DEFAULT_POLICY),
     action,
     actionAt: now,
-    syncedBy: 'ecc-github-coordination',
+    syncedBy: "ecc-github-coordination",
   };
 
   return store.upsertWorkItem({
     id: epicWorkItemId(repo, issue.number),
-    source: 'github-epic',
+    source: "github-epic",
     sourceId: String(issue.number),
     title: `Epic #${issue.number}: ${issue.title}`,
     status: mapStateToWorkItemStatus(state.status),
-    priority: state.status === 'blocked' ? 'high' : 'normal',
+    priority: state.status === "blocked" ? "high" : "normal",
     url: issue.url || null,
     owner: state.owner || (issue.author && issue.author.login) || null,
     repoRoot: options.repoRoot || process.cwd(),

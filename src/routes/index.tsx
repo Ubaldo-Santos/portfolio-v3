@@ -2,14 +2,24 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowUpRight } from "lucide-react";
 import { cv } from "@/data/cv";
-import { currentLang, formatPeriod, workAnchorId } from "@/lib/format";
+import { currentLang, formatPeriod, taglineLead, workAnchorId } from "@/lib/format";
+import { cvHomeSelectedWorkSub } from "@/lib/cv-copy";
 import { routeHead } from "@/lib/seo";
+import { selectFeaturedWork } from "@/lib/selected-work";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { PrimaryStack } from "@/components/primary-stack";
 import { WorkTitle } from "@/components/work-title";
 import { PageHeaderBlock, SectionIndex } from "@/components/page-shell";
 import { MotionPage } from "@/components/page-transition";
 import { TechRibbon } from "@/components/tech-ribbon";
+import {
+  ArrowLink,
+  CtaButton,
+  MetaLabel,
+  SectionHeader,
+  SurfaceCard,
+  sectionGap,
+} from "@/components/editorial";
 
 export const Route = createFileRoute("/")({
   head: () => routeHead("home", "/"),
@@ -20,6 +30,7 @@ function Home() {
   const { t, i18n } = useTranslation();
   const lang = currentLang(i18n.language);
   const currentWork = cv.work.find((w) => w.current);
+  const selectedWork = selectFeaturedWork(cv.work);
 
   return (
     <MotionPage>
@@ -42,9 +53,9 @@ function Home() {
             {/* Name block — centered vertically */}
             <div className="flex min-h-0 flex-1 flex-col justify-center py-6 sm:py-8">
               <p className="font-display text-[clamp(2.75rem,12vw,10rem)] leading-[0.86] tracking-tight">
-                <span className="block">Ubaldo</span>
+                <span className="block">{cv.basics.givenName}</span>
                 <span className="font-display-italic block text-muted-foreground">
-                  Santos Patón
+                  {cv.basics.familyName}
                 </span>
               </p>
 
@@ -56,7 +67,7 @@ function Home() {
                 <div className="sm:col-span-5">
                   <SectionIndex index="01" label={t("home.whatIDo")} />
                   <p className="font-display mt-3 text-sm leading-relaxed text-balance sm:mt-4 sm:text-base">
-                    <span className="text-foreground">{cv.basics.tagline.lead[lang]}</span>{" "}
+                    <span className="text-foreground">{taglineLead(lang)}</span>{" "}
                     <span className="text-muted-foreground">{cv.basics.tagline.detail[lang]}</span>
                   </p>
                 </div>
@@ -64,10 +75,11 @@ function Home() {
                 <div className="sm:col-span-4">
                   <SectionIndex index="02" label={t("home.currentRole")} />
                   {currentWork ? (
-                    <Link
+                    <ArrowLink
                       to="/experience"
                       hash={workAnchorId(currentWork)}
-                      className="group mt-3 inline-flex items-start gap-2 transition-colors hover:text-foreground sm:mt-4"
+                      size="md"
+                      className="mt-3 items-start gap-2 sm:mt-4"
                     >
                       <WorkTitle
                         name={currentWork.name}
@@ -75,28 +87,19 @@ function Home() {
                         lang={lang}
                         size="hero"
                       />
-                      <ArrowUpRight className="mt-1.5 size-5 shrink-0 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 sm:mt-2 sm:size-6" />
-                    </Link>
+                    </ArrowLink>
                   ) : null}
                 </div>
 
                 <div className="sm:col-span-3">
                   <SectionIndex index="03" label={t("home.reachOut")} />
                   <div className="mt-3 flex flex-col items-start gap-3 sm:mt-4">
-                    <Link
-                      to="/contact"
-                      className="group inline-flex items-center justify-between gap-2 rounded-full bg-foreground px-5 py-3 text-sm text-background transition-all hover:gap-3"
-                    >
+                    <CtaButton as={Link} to="/contact" variant="primary" withArrow>
                       {t("actions.contactMe")}
-                      <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                    </Link>
-                    <Link
-                      to="/cv"
-                      className="group inline-flex items-center gap-1.5 px-1 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-                    >
+                    </CtaButton>
+                    <CtaButton as={Link} to="/cv" variant="ghost" withArrow>
                       {t("actions.viewCv")}
-                      <ArrowUpRight className="size-3.5 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                    </Link>
+                    </CtaButton>
                   </div>
                 </div>
               </div>
@@ -114,22 +117,19 @@ function Home() {
         <section className="mx-auto max-w-6xl px-5 py-24 sm:px-8 sm:py-32">
           <Reveal>
             <div className="flex items-end justify-between gap-4">
-              <div>
-                <SectionIndex index="04" />
-                <h2 className="mt-3 font-display text-5xl sm:text-6xl">{t("home.selectedWork")}</h2>
-                <p className="mt-2 max-w-md text-muted-foreground">{t("home.selectedWorkSub")}</p>
-              </div>
-              <Link
-                to="/projects"
-                className="hidden items-center gap-1 text-sm text-muted-foreground hover:text-foreground sm:inline-flex"
-              >
-                {t("actions.viewProject")} <ArrowUpRight className="size-4" />
-              </Link>
+              <SectionHeader
+                index="04"
+                title={t("home.selectedWork")}
+                description={cvHomeSelectedWorkSub(lang)}
+              />
+              <ArrowLink to="/experience" className="hidden sm:inline-flex">
+                {t("actions.viewProject")}
+              </ArrowLink>
             </div>
           </Reveal>
 
           <RevealGroup className="mt-12 divide-y divide-hairline border-y border-hairline">
-            {cv.work.map((w) => (
+            {selectedWork.map((w) => (
               <RevealItem key={workAnchorId(w)}>
                 <Link
                   to="/experience"
@@ -137,9 +137,7 @@ function Home() {
                   className="group flex flex-col gap-3 py-6 transition-colors hover:bg-surface/50 sm:flex-row sm:items-center sm:justify-between sm:py-8"
                 >
                   <div>
-                    <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                      {formatPeriod(w.startDate, w.endDate, lang)}
-                    </div>
+                    <MetaLabel size="sm">{formatPeriod(w.startDate, w.endDate, lang)}</MetaLabel>
                     <div className="mt-2">
                       <WorkTitle name={w.name} position={w.position} lang={lang} size="list" />
                     </div>
@@ -147,7 +145,10 @@ function Home() {
                       {w.summary[lang]}
                     </p>
                   </div>
-                  <ArrowUpRight className="size-6 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
+                  <ArrowUpRight
+                    className="size-6 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground"
+                    aria-hidden
+                  />
                 </Link>
               </RevealItem>
             ))}
@@ -159,26 +160,26 @@ function Home() {
           <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
             <Reveal>
               <div className="flex items-end justify-between gap-4">
-                <div>
-                  <SectionIndex index="05" />
-                  <h2 className="mt-3 font-display text-5xl">{t("home.stack")}</h2>
-                </div>
-                <Link
-                  to="/skills"
-                  className="hidden shrink-0 items-center gap-1 text-sm text-muted-foreground hover:text-foreground sm:inline-flex"
-                >
-                  {t("actions.viewSkills")} <ArrowUpRight className="size-4" />
-                </Link>
+                <SectionHeader index="05" title={t("home.stack")} />
+                <ArrowLink to="/skills" className="hidden shrink-0 sm:inline-flex">
+                  {t("actions.viewSkills")}
+                </ArrowLink>
               </div>
             </Reveal>
             <Reveal delay={0.1}>
-              <Link
+              <SurfaceCard
+                as={Link}
                 to="/skills"
-                className="group mt-12 flex items-center justify-between gap-6 rounded-3xl border border-hairline bg-background/60 p-6 transition-colors hover:bg-background sm:p-8"
+                variant="feature"
+                padding="md"
+                className={`flex items-center justify-between gap-6 bg-background/60 hover:bg-background ${sectionGap.lead}`}
               >
                 <PrimaryStack />
-                <ArrowUpRight className="size-6 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
-              </Link>
+                <ArrowUpRight
+                  className="size-6 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground"
+                  aria-hidden
+                />
+              </SurfaceCard>
             </Reveal>
           </div>
         </section>

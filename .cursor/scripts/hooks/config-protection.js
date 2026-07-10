@@ -11,59 +11,59 @@
  *   2 = block (existing config file modification attempted)
  */
 
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 const MAX_STDIN = 1024 * 1024;
-let raw = '';
+let raw = "";
 
 const PROTECTED_FILES = new Set([
   // ESLint (legacy + v9 flat config, JS/TS/MJS/CJS)
-  '.eslintrc',
-  '.eslintrc.js',
-  '.eslintrc.cjs',
-  '.eslintrc.json',
-  '.eslintrc.yml',
-  '.eslintrc.yaml',
-  'eslint.config.js',
-  'eslint.config.mjs',
-  'eslint.config.cjs',
-  'eslint.config.ts',
-  'eslint.config.mts',
-  'eslint.config.cts',
+  ".eslintrc",
+  ".eslintrc.js",
+  ".eslintrc.cjs",
+  ".eslintrc.json",
+  ".eslintrc.yml",
+  ".eslintrc.yaml",
+  "eslint.config.js",
+  "eslint.config.mjs",
+  "eslint.config.cjs",
+  "eslint.config.ts",
+  "eslint.config.mts",
+  "eslint.config.cts",
   // Prettier (all config variants including ESM)
-  '.prettierrc',
-  '.prettierrc.js',
-  '.prettierrc.cjs',
-  '.prettierrc.json',
-  '.prettierrc.yml',
-  '.prettierrc.yaml',
-  'prettier.config.js',
-  'prettier.config.cjs',
-  'prettier.config.mjs',
+  ".prettierrc",
+  ".prettierrc.js",
+  ".prettierrc.cjs",
+  ".prettierrc.json",
+  ".prettierrc.yml",
+  ".prettierrc.yaml",
+  "prettier.config.js",
+  "prettier.config.cjs",
+  "prettier.config.mjs",
   // Biome
-  'biome.json',
-  'biome.jsonc',
+  "biome.json",
+  "biome.jsonc",
   // Ruff (Python)
-  '.ruff.toml',
-  'ruff.toml',
+  ".ruff.toml",
+  "ruff.toml",
   // Note: pyproject.toml is intentionally NOT included here because it
   // contains project metadata alongside linter config. Blocking all edits
   // to pyproject.toml would prevent legitimate dependency changes.
   // Shell / Style / Markdown
-  '.shellcheckrc',
-  '.stylelintrc',
-  '.stylelintrc.json',
-  '.stylelintrc.yml',
-  '.markdownlint.json',
-  '.markdownlint.yaml',
-  '.markdownlintrc'
+  ".shellcheckrc",
+  ".stylelintrc",
+  ".stylelintrc.json",
+  ".stylelintrc.yml",
+  ".markdownlint.json",
+  ".markdownlint.yaml",
+  ".markdownlintrc",
 ]);
 
 function parseInput(inputOrRaw) {
-  if (typeof inputOrRaw === 'string') {
+  if (typeof inputOrRaw === "string") {
     try {
       return inputOrRaw.trim() ? JSON.parse(inputOrRaw) : {};
     } catch {
@@ -71,7 +71,7 @@ function parseInput(inputOrRaw) {
     }
   }
 
-  return inputOrRaw && typeof inputOrRaw === 'object' ? inputOrRaw : {};
+  return inputOrRaw && typeof inputOrRaw === "object" ? inputOrRaw : {};
 }
 
 /**
@@ -84,13 +84,13 @@ function run(inputOrRaw, options = {}) {
       exitCode: 2,
       stderr:
         `BLOCKED: Hook input exceeded ${options.maxStdin || MAX_STDIN} bytes. ` +
-        'Refusing to bypass config-protection on a truncated payload. ' +
-        'Retry with a smaller edit or disable the config-protection hook temporarily.'
+        "Refusing to bypass config-protection on a truncated payload. " +
+        "Retry with a smaller edit or disable the config-protection hook temporarily.",
     };
   }
 
   const input = parseInput(inputOrRaw);
-  const filePath = input?.tool_input?.file_path || input?.tool_input?.file || '';
+  const filePath = input?.tool_input?.file_path || input?.tool_input?.file || "";
   if (!filePath) return { exitCode: 0 };
 
   const basename = path.basename(filePath);
@@ -112,7 +112,7 @@ function run(inputOrRaw, options = {}) {
       fs.lstatSync(filePath);
       // lstat succeeded — something (file, dir, or symlink) exists here.
     } catch (err) {
-      if (err && err.code === 'ENOENT') {
+      if (err && err.code === "ENOENT") {
         exists = false;
       }
       // Any other error (EACCES, EPERM, ELOOP, etc.) leaves exists=true
@@ -127,9 +127,9 @@ function run(inputOrRaw, options = {}) {
       exitCode: 2,
       stderr:
         `BLOCKED: Modifying ${basename} is not allowed. ` +
-        'Fix the source code to satisfy linter/formatter rules instead of ' +
-        'weakening the config. If this is a legitimate config change, ' +
-        'disable the config-protection hook temporarily.'
+        "Fix the source code to satisfy linter/formatter rules instead of " +
+        "weakening the config. If this is a legitimate config change, " +
+        "disable the config-protection hook temporarily.",
     };
   }
 
@@ -139,9 +139,9 @@ function run(inputOrRaw, options = {}) {
 module.exports = { run };
 
 // Stdin fallback for spawnSync execution
-let truncated = /^(1|true|yes)$/i.test(String(process.env.ECC_HOOK_INPUT_TRUNCATED || ''));
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', chunk => {
+let truncated = /^(1|true|yes)$/i.test(String(process.env.ECC_HOOK_INPUT_TRUNCATED || ""));
+process.stdin.setEncoding("utf8");
+process.stdin.on("data", (chunk) => {
   if (raw.length < MAX_STDIN) {
     const remaining = MAX_STDIN - raw.length;
     raw += chunk.substring(0, remaining);
@@ -151,14 +151,14 @@ process.stdin.on('data', chunk => {
   }
 });
 
-process.stdin.on('end', () => {
+process.stdin.on("end", () => {
   const result = run(raw, {
     truncated,
-    maxStdin: Number(process.env.ECC_HOOK_INPUT_MAX_BYTES) || MAX_STDIN
+    maxStdin: Number(process.env.ECC_HOOK_INPUT_MAX_BYTES) || MAX_STDIN,
   });
 
   if (result.stderr) {
-    process.stderr.write(result.stderr + '\n');
+    process.stderr.write(result.stderr + "\n");
   }
 
   if (result.exitCode === 2) {

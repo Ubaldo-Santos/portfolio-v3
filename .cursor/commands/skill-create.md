@@ -43,13 +43,13 @@ git log --oneline -n 200 | cut -d' ' -f2- | head -50
 
 Look for these pattern types:
 
-| Pattern | Detection Method |
-|---------|-----------------|
+| Pattern                | Detection Method                               |
+| ---------------------- | ---------------------------------------------- |
 | **Commit conventions** | Regex on commit messages (feat:, fix:, chore:) |
-| **File co-changes** | Files that always change together |
-| **Workflow sequences** | Repeated file change patterns |
-| **Architecture** | Folder structure and naming conventions |
-| **Testing patterns** | Test file locations, naming, coverage |
+| **File co-changes**    | Files that always change together              |
+| **Workflow sequences** | Repeated file change patterns                  |
+| **Architecture**       | Folder structure and naming conventions        |
+| **Testing patterns**   | Test file locations, naming, coverage          |
 
 ### Step 3: Generate SKILL.md
 
@@ -67,15 +67,19 @@ analyzed_commits: {count}
 # {Repo Name} Patterns
 
 ## Commit Conventions
+
 {detected commit message patterns}
 
 ## Code Architecture
+
 {detected folder structure and organization}
 
 ## Workflows
+
 {detected repeating file change patterns}
 
 ## Testing Patterns
+
 {detected test conventions}
 ```
 
@@ -118,4 +122,4 @@ For advanced features (10k+ commits, team sharing, auto-PRs), use the [Skill Cre
 
 ---
 
-*Part of [Everything Claude Code](https://github.com/affaan-m/everything-claude-code)*
+_Part of [Everything Claude Code](https://github.com/affaan-m/everything-claude-code)_

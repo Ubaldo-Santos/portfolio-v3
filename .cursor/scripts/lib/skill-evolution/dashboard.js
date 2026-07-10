@@ -1,30 +1,35 @@
-'use strict';
+"use strict";
 
-const health = require('./health');
-const tracker = require('./tracker');
-const versioning = require('./versioning');
+const health = require("./health");
+const tracker = require("./tracker");
+const versioning = require("./versioning");
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
-const SPARKLINE_CHARS = '\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588';
-const EMPTY_BLOCK = '\u2591';
-const FILL_BLOCK = '\u2588';
+const SPARKLINE_CHARS = "\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588";
+const EMPTY_BLOCK = "\u2591";
+const FILL_BLOCK = "\u2588";
 const DEFAULT_PANEL_WIDTH = 64;
-const VALID_PANELS = new Set(['success-rate', 'failures', 'amendments', 'versions']);
+const VALID_PANELS = new Set(["success-rate", "failures", "amendments", "versions"]);
 
 function sparkline(values) {
   if (!Array.isArray(values) || values.length === 0) {
-    return '';
+    return "";
   }
 
-  return values.map(value => {
-    if (value === null || value === undefined) {
-      return EMPTY_BLOCK;
-    }
+  return values
+    .map((value) => {
+      if (value === null || value === undefined) {
+        return EMPTY_BLOCK;
+      }
 
-    const clamped = Math.max(0, Math.min(1, value));
-    const index = Math.min(Math.round(clamped * (SPARKLINE_CHARS.length - 1)), SPARKLINE_CHARS.length - 1);
-    return SPARKLINE_CHARS[index];
-  }).join('');
+      const clamped = Math.max(0, Math.min(1, value));
+      const index = Math.min(
+        Math.round(clamped * (SPARKLINE_CHARS.length - 1)),
+        SPARKLINE_CHARS.length - 1,
+      );
+      return SPARKLINE_CHARS[index];
+    })
+    .join("");
 }
 
 function horizontalBar(value, max, width) {
@@ -40,23 +45,27 @@ function horizontalBar(value, max, width) {
 function panelBox(title, lines, width) {
   const innerWidth = width || DEFAULT_PANEL_WIDTH;
   const output = [];
-  output.push('\u250C\u2500 ' + title + ' ' + '\u2500'.repeat(Math.max(0, innerWidth - title.length - 4)) + '\u2510');
+  output.push(
+    "\u250C\u2500 " +
+      title +
+      " " +
+      "\u2500".repeat(Math.max(0, innerWidth - title.length - 4)) +
+      "\u2510",
+  );
 
   for (const line of lines) {
-    const truncated = line.length > innerWidth - 2
-      ? line.slice(0, innerWidth - 2)
-      : line;
-    output.push('\u2502 ' + truncated.padEnd(innerWidth - 2) + '\u2502');
+    const truncated = line.length > innerWidth - 2 ? line.slice(0, innerWidth - 2) : line;
+    output.push("\u2502 " + truncated.padEnd(innerWidth - 2) + "\u2502");
   }
 
-  output.push('\u2514' + '\u2500'.repeat(innerWidth - 1) + '\u2518');
-  return output.join('\n');
+  output.push("\u2514" + "\u2500".repeat(innerWidth - 1) + "\u2518");
+  return output.join("\n");
 }
 
 function bucketByDay(records, nowMs, days) {
   const buckets = [];
   for (let i = days - 1; i >= 0; i -= 1) {
-    const dayEnd = nowMs - (i * DAY_IN_MS);
+    const dayEnd = nowMs - i * DAY_IN_MS;
     const dayStart = dayEnd - DAY_IN_MS;
     const dateStr = new Date(dayEnd).toISOString().slice(0, 10);
     buckets.push({ date: dateStr, start: dayStart, end: dayEnd, records: [] });
@@ -76,35 +85,33 @@ function bucketByDay(records, nowMs, days) {
     }
   }
 
-  return buckets.map(bucket => ({
+  return buckets.map((bucket) => ({
     date: bucket.date,
-    rate: bucket.records.length > 0
-      ? health.calculateSuccessRate(bucket.records)
-      : null,
+    rate: bucket.records.length > 0 ? health.calculateSuccessRate(bucket.records) : null,
     runs: bucket.records.length,
   }));
 }
 
 function getTrendArrow(successRate7d, successRate30d) {
   if (successRate7d === null || successRate30d === null) {
-    return '\u2192';
+    return "\u2192";
   }
 
   const delta = successRate7d - successRate30d;
   if (delta >= 0.1) {
-    return '\u2197';
+    return "\u2197";
   }
 
   if (delta <= -0.1) {
-    return '\u2198';
+    return "\u2198";
   }
 
-  return '\u2192';
+  return "\u2192";
 }
 
 function formatPercent(value) {
   if (value === null) {
-    return 'n/a';
+    return "n/a";
   }
 
   return `${Math.round(value * 100)}%`;
@@ -129,15 +136,14 @@ function renderSuccessRatePanel(records, skills, options = {}) {
   const recordsBySkill = groupRecordsBySkill(records);
 
   const skillData = [];
-  const skillIds = Array.from(new Set([
-    ...Array.from(recordsBySkill.keys()),
-    ...skills.map(s => s.skill_id),
-  ])).sort();
+  const skillIds = Array.from(
+    new Set([...Array.from(recordsBySkill.keys()), ...skills.map((s) => s.skill_id)]),
+  ).sort();
 
   for (const skillId of skillIds) {
     const skillRecords = recordsBySkill.get(skillId) || [];
     const dailyRates = bucketByDay(skillRecords, nowMs, days);
-    const rateValues = dailyRates.map(b => b.rate);
+    const rateValues = dailyRates.map((b) => b.rate);
     const records7d = health.filterRecordsWithinDays(skillRecords, nowMs, 7);
     const records30d = health.filterRecordsWithinDays(skillRecords, nowMs, 30);
     const current7d = health.calculateSuccessRate(records7d);
@@ -155,7 +161,7 @@ function renderSuccessRatePanel(records, skills, options = {}) {
 
   const lines = [];
   if (skillData.length === 0) {
-    lines.push('No skill execution data available.');
+    lines.push("No skill execution data available.");
   } else {
     for (const skill of skillData) {
       const nameCol = skill.skill_id.slice(0, 14).padEnd(14);
@@ -166,18 +172,18 @@ function renderSuccessRatePanel(records, skills, options = {}) {
   }
 
   return {
-    text: panelBox('Success Rate (30d)', lines, width),
+    text: panelBox("Success Rate (30d)", lines, width),
     data: { skills: skillData },
   };
 }
 
 function renderFailureClusterPanel(records, options = {}) {
   const width = options.width || DEFAULT_PANEL_WIDTH;
-  const failures = records.filter(r => r.outcome === 'failure');
+  const failures = records.filter((r) => r.outcome === "failure");
 
   const clusterMap = new Map();
   for (const record of failures) {
-    const reason = (record.failure_reason || 'unknown').toLowerCase().trim();
+    const reason = (record.failure_reason || "unknown").toLowerCase().trim();
     if (!clusterMap.has(reason)) {
       clusterMap.set(reason, { count: 0, skill_ids: new Set() });
     }
@@ -192,9 +198,7 @@ function renderFailureClusterPanel(records, options = {}) {
       pattern,
       count: data.count,
       skill_ids: Array.from(data.skill_ids).sort(),
-      percentage: failures.length > 0
-        ? Math.round((data.count / failures.length) * 100)
-        : 0,
+      percentage: failures.length > 0 ? Math.round((data.count / failures.length) * 100) : 0,
     }))
     .sort((a, b) => b.count - a.count || a.pattern.localeCompare(b.pattern));
 
@@ -202,19 +206,19 @@ function renderFailureClusterPanel(records, options = {}) {
   const lines = [];
 
   if (clusters.length === 0) {
-    lines.push('No failure patterns detected.');
+    lines.push("No failure patterns detected.");
   } else {
     for (const cluster of clusters) {
       const label = cluster.pattern.slice(0, 20).padEnd(20);
       const bar = horizontalBar(cluster.count, maxCount, 16);
       const skillCount = cluster.skill_ids.length;
-      const suffix = skillCount === 1 ? 'skill' : 'skills';
+      const suffix = skillCount === 1 ? "skill" : "skills";
       lines.push(`${label} ${bar} ${String(cluster.count).padStart(3)} (${skillCount} ${suffix})`);
     }
   }
 
   return {
-    text: panelBox('Failure Patterns', lines, width),
+    text: panelBox("Failure Patterns", lines, width),
     data: { clusters, total_failures: failures.length },
   };
 }
@@ -228,18 +232,18 @@ function renderAmendmentPanel(skillsById, options = {}) {
       continue;
     }
 
-    const log = versioning.getEvolutionLog(skill.skill_dir, 'amendments');
+    const log = versioning.getEvolutionLog(skill.skill_dir, "amendments");
     for (const entry of log) {
-      const status = typeof entry.status === 'string' ? entry.status : null;
+      const status = typeof entry.status === "string" ? entry.status : null;
       const isPending = status
         ? health.PENDING_AMENDMENT_STATUSES.has(status)
-        : entry.event === 'proposal';
+        : entry.event === "proposal";
 
       if (isPending) {
         amendments.push({
           skill_id: skillId,
-          event: entry.event || 'proposal',
-          status: status || 'pending',
+          event: entry.event || "proposal",
+          status: status || "pending",
           created_at: entry.created_at || null,
         });
       }
@@ -254,22 +258,24 @@ function renderAmendmentPanel(skillsById, options = {}) {
 
   const lines = [];
   if (amendments.length === 0) {
-    lines.push('No pending amendments.');
+    lines.push("No pending amendments.");
   } else {
     for (const amendment of amendments) {
       const name = amendment.skill_id.slice(0, 14).padEnd(14);
       const event = amendment.event.padEnd(10);
       const status = amendment.status.padEnd(10);
-      const time = amendment.created_at ? amendment.created_at.slice(0, 19) : '-';
+      const time = amendment.created_at ? amendment.created_at.slice(0, 19) : "-";
       lines.push(`${name} ${event} ${status} ${time}`);
     }
 
-    lines.push('');
-    lines.push(`${amendments.length} amendment${amendments.length === 1 ? '' : 's'} pending review`);
+    lines.push("");
+    lines.push(
+      `${amendments.length} amendment${amendments.length === 1 ? "" : "s"} pending review`,
+    );
   }
 
   return {
-    text: panelBox('Pending Amendments', lines, width),
+    text: panelBox("Pending Amendments", lines, width),
     data: { amendments, total: amendments.length },
   };
 }
@@ -288,7 +294,7 @@ function renderVersionTimelinePanel(skillsById, options = {}) {
       continue;
     }
 
-    const amendmentLog = versioning.getEvolutionLog(skill.skill_dir, 'amendments');
+    const amendmentLog = versioning.getEvolutionLog(skill.skill_dir, "amendments");
     const reasonByVersion = new Map();
     for (const entry of amendmentLog) {
       if (entry.version && entry.reason) {
@@ -298,7 +304,7 @@ function renderVersionTimelinePanel(skillsById, options = {}) {
 
     skillVersions.push({
       skill_id: skillId,
-      versions: versions.map(v => ({
+      versions: versions.map((v) => ({
         version: v.version,
         created_at: v.created_at,
         reason: reasonByVersion.get(v.version) || null,
@@ -310,20 +316,20 @@ function renderVersionTimelinePanel(skillsById, options = {}) {
 
   const lines = [];
   if (skillVersions.length === 0) {
-    lines.push('No version history available.');
+    lines.push("No version history available.");
   } else {
     for (const skill of skillVersions) {
       lines.push(skill.skill_id);
       for (const version of skill.versions) {
-        const date = version.created_at ? version.created_at.slice(0, 10) : '-';
-        const reason = version.reason || '-';
+        const date = version.created_at ? version.created_at.slice(0, 10) : "-";
+        const reason = version.reason || "-";
         lines.push(`  v${version.version} \u2500\u2500 ${date} \u2500\u2500 ${reason}`);
       }
     }
   }
 
   return {
-    text: panelBox('Version History', lines, width),
+    text: panelBox("Version History", lines, width),
     data: { skills: skillVersions },
   };
 }
@@ -342,28 +348,30 @@ function renderDashboard(options = {}) {
   const summary = health.summarizeHealthReport(report);
 
   const panelRenderers = {
-    'success-rate': () => renderSuccessRatePanel(records, report.skills, dashboardOptions),
-    'failures': () => renderFailureClusterPanel(records, dashboardOptions),
-    'amendments': () => renderAmendmentPanel(skillsById, dashboardOptions),
-    'versions': () => renderVersionTimelinePanel(skillsById, dashboardOptions),
+    "success-rate": () => renderSuccessRatePanel(records, report.skills, dashboardOptions),
+    failures: () => renderFailureClusterPanel(records, dashboardOptions),
+    amendments: () => renderAmendmentPanel(skillsById, dashboardOptions),
+    versions: () => renderVersionTimelinePanel(skillsById, dashboardOptions),
   };
 
   const selectedPanel = options.panel || null;
   if (selectedPanel && !VALID_PANELS.has(selectedPanel)) {
-    throw new Error(`Unknown panel: ${selectedPanel}. Valid panels: ${Array.from(VALID_PANELS).join(', ')}`);
+    throw new Error(
+      `Unknown panel: ${selectedPanel}. Valid panels: ${Array.from(VALID_PANELS).join(", ")}`,
+    );
   }
 
   const panels = {};
   const textParts = [];
 
   const header = [
-    'ECC Skill Health Dashboard',
+    "ECC Skill Health Dashboard",
     `Generated: ${now}`,
     `Skills: ${summary.total_skills} total, ${summary.healthy_skills} healthy, ${summary.declining_skills} declining`,
-    '',
+    "",
   ];
 
-  textParts.push(header.join('\n'));
+  textParts.push(header.join("\n"));
 
   if (selectedPanel) {
     const result = panelRenderers[selectedPanel]();
@@ -377,7 +385,7 @@ function renderDashboard(options = {}) {
     }
   }
 
-  const text = textParts.join('\n\n') + '\n';
+  const text = textParts.join("\n\n") + "\n";
   const data = {
     generated_at: now,
     summary,

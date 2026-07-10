@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const path = require('path');
+const path = require("path");
 
 const posix = path.posix;
 
@@ -11,11 +11,13 @@ const posix = path.posix;
 const INLINE_LINK_PATTERN = /(!?\]\()([^()\s]+)(\s+"[^"]*")?(\))/g;
 
 function toPosix(relativePath) {
-  return String(relativePath || '').replace(/\\/g, '/').replace(/^\.\//, '');
+  return String(relativePath || "")
+    .replace(/\\/g, "/")
+    .replace(/^\.\//, "");
 }
 
 function stripTrailingSlash(value) {
-  return value.length > 1 ? value.replace(/\/+$/, '') : value;
+  return value.length > 1 ? value.replace(/\/+$/, "") : value;
 }
 
 // Build file + directory lookup maps from the plan's own file placements.
@@ -39,8 +41,8 @@ function buildInstallIndex(fileMappings) {
 
     byFile.set(sourceRel, destRel);
 
-    const sourceParts = sourceRel.split('/');
-    const destParts = destRel.split('/');
+    const sourceParts = sourceRel.split("/");
+    const destParts = destRel.split("/");
     // Map every source ancestor directory to its installed counterpart by
     // removing the same count of trailing segments from the dest path.
     for (let depth = 1; depth < sourceParts.length; depth += 1) {
@@ -49,8 +51,8 @@ function buildInstallIndex(fileMappings) {
       if (destDepth < 1) {
         continue;
       }
-      const sourceDir = sourceParts.slice(0, depth).join('/');
-      const destDir = destParts.slice(0, destDepth).join('/');
+      const sourceDir = sourceParts.slice(0, depth).join("/");
+      const destDir = destParts.slice(0, destDepth).join("/");
       // Only record real prefix-insertion mappings (suffix preserved). If a
       // directory resolves to itself (no namespace change) we skip it so the
       // rewriter leaves those links alone.
@@ -65,11 +67,11 @@ function buildInstallIndex(fileMappings) {
 
 function isExternalOrAnchor(target) {
   return (
-    target === ''
-    || target.startsWith('#')
-    || target.startsWith('/')
-    || target.startsWith('mailto:')
-    || /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(target) // has a URL scheme (http:, https:, file:, ...)
+    target === "" ||
+    target.startsWith("#") ||
+    target.startsWith("/") ||
+    target.startsWith("mailto:") ||
+    /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(target) // has a URL scheme (http:, https:, file:, ...)
   );
 }
 
@@ -77,11 +79,11 @@ function isExternalOrAnchor(target) {
 // path, then return the install-relative path it should point to, or null when
 // the target is not installed by this plan (leave such links untouched).
 function resolveInstalledTarget(target, sourceDir, index) {
-  const hadTrailingSlash = target.endsWith('/');
+  const hadTrailingSlash = target.endsWith("/");
   const resolved = stripTrailingSlash(toPosix(posix.normalize(posix.join(sourceDir, target))));
 
   // Escapes the repo root (starts with `..`) -> not something we placed.
-  if (resolved === '' || resolved === '.' || resolved.startsWith('..')) {
+  if (resolved === "" || resolved === "." || resolved.startsWith("..")) {
     return null;
   }
 
@@ -120,7 +122,7 @@ function rewriteRelativeLinks(content, options) {
 
   const installedSourceDir = posix.dirname(installedSource);
   const sourceDir = posix.dirname(normalizedSource);
-  const lines = String(content).split('\n');
+  const lines = String(content).split("\n");
   let inFence = false;
 
   for (let i = 0; i < lines.length; i += 1) {
@@ -133,43 +135,40 @@ function rewriteRelativeLinks(content, options) {
       continue; // never rewrite inside fenced code blocks
     }
 
-    lines[i] = lines[i].replace(
-      INLINE_LINK_PATTERN,
-      (match, open, target, title, close) => {
-        // Preserve any `#fragment` so anchors survive the rewrite.
-        const hashIdx = target.indexOf('#');
-        const pathPart = hashIdx === -1 ? target : target.slice(0, hashIdx);
-        const fragment = hashIdx === -1 ? '' : target.slice(hashIdx);
+    lines[i] = lines[i].replace(INLINE_LINK_PATTERN, (match, open, target, title, close) => {
+      // Preserve any `#fragment` so anchors survive the rewrite.
+      const hashIdx = target.indexOf("#");
+      const pathPart = hashIdx === -1 ? target : target.slice(0, hashIdx);
+      const fragment = hashIdx === -1 ? "" : target.slice(hashIdx);
 
-        if (isExternalOrAnchor(pathPart)) {
-          return match;
-        }
-
-        const resolution = resolveInstalledTarget(pathPart, sourceDir, index);
-        if (!resolution) {
-          return match;
-        }
-
-        let rewritten = posix.relative(installedSourceDir, resolution.installed);
-        if (rewritten === '') {
-          rewritten = '.';
-        }
-        if (resolution.trailingSlash && !rewritten.endsWith('/')) {
-          rewritten += '/';
-        }
-        // If the recomputed link points to the same place as the original
-        // (e.g. an intra-namespace `./sibling.md` whose endpoints both shift by
-        // the same prefix), keep the original text verbatim — including any
-        // leading `./` — so the rewrite stays a strict no-op where it must.
-        if (posix.normalize(rewritten) === posix.normalize(pathPart)) {
-          return match;
-        }
-        return `${open}${rewritten}${fragment}${title || ''}${close}`;
+      if (isExternalOrAnchor(pathPart)) {
+        return match;
       }
-    );
+
+      const resolution = resolveInstalledTarget(pathPart, sourceDir, index);
+      if (!resolution) {
+        return match;
+      }
+
+      let rewritten = posix.relative(installedSourceDir, resolution.installed);
+      if (rewritten === "") {
+        rewritten = ".";
+      }
+      if (resolution.trailingSlash && !rewritten.endsWith("/")) {
+        rewritten += "/";
+      }
+      // If the recomputed link points to the same place as the original
+      // (e.g. an intra-namespace `./sibling.md` whose endpoints both shift by
+      // the same prefix), keep the original text verbatim — including any
+      // leading `./` — so the rewrite stays a strict no-op where it must.
+      if (posix.normalize(rewritten) === posix.normalize(pathPart)) {
+        return match;
+      }
+      return `${open}${rewritten}${fragment}${title || ""}${close}`;
+    });
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 module.exports = {

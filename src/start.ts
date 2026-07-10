@@ -1,6 +1,14 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
 
+import i18n from "@/i18n";
+import { detectLang } from "@/lib/detect-lang";
 import { renderErrorPage } from "./lib/error-page";
+
+const i18nMiddleware = createMiddleware().server(async ({ next }) => {
+  const lang = detectLang();
+  await i18n.changeLanguage(lang);
+  return next();
+});
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
@@ -10,7 +18,7 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
       throw error;
     }
     console.error(error);
-    return new Response(renderErrorPage(), {
+    return new Response(renderErrorPage(detectLang()), {
       status: 500,
       headers: { "content-type": "text/html; charset=utf-8" },
     });
@@ -18,5 +26,5 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 });
 
 export const startInstance = createStart(() => ({
-  requestMiddleware: [errorMiddleware],
+  requestMiddleware: [i18nMiddleware, errorMiddleware],
 }));

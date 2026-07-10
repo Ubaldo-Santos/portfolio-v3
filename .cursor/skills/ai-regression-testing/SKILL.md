@@ -140,7 +140,7 @@ const REQUIRED_FIELDS = [
   "role",
   "created_at",
   "avatar_url",
-  "notification_settings",  // ← Added after bug found it missing
+  "notification_settings", // ← Added after bug found it missing
 ];
 
 describe("GET /api/user/profile", () => {
@@ -199,6 +199,7 @@ describe("GET /api/user/messages (conversation list)", () => {
 
 ```markdown
 <!-- .claude/commands/bug-check.md -->
+
 # Bug Check
 
 ## Step 1: Automated Tests (mandatory, cannot skip)
@@ -252,7 +253,7 @@ User: "バグチェックして" (or "/bug-check")
 ```typescript
 // FAIL: AI adds field to production path only
 if (isSandboxMode()) {
-  return { data: { id, email, name } };  // Missing new field
+  return { data: { id, email, name } }; // Missing new field
 }
 // Production path
 return { data: { id, email, name, notification_settings } };
@@ -286,17 +287,14 @@ it("sandbox and production return same fields", async () => {
 // FAIL: New column added to response but not to SELECT
 const { data } = await supabase
   .from("users")
-  .select("id, email, name")  // notification_settings not here
+  .select("id, email, name") // notification_settings not here
   .single();
 
 return { data: { ...data, notification_settings: data.notification_settings } };
 // → notification_settings is always undefined
 
 // PASS: Use SELECT * or explicitly include new columns
-const { data } = await supabase
-  .from("users")
-  .select("*")
-  .single();
+const { data } = await supabase.from("users").select("*").single();
 ```
 
 ### Pattern 3: Error State Leakage
@@ -322,7 +320,7 @@ catch (err) {
 ```typescript
 // FAIL: No rollback on failure
 const handleRemove = async (id: string) => {
-  setItems(prev => prev.filter(i => i.id !== id));
+  setItems((prev) => prev.filter((i) => i.id !== id));
   await fetch(`/api/items/${id}`, { method: "DELETE" });
   // If API fails, item is gone from UI but still in DB
 };
@@ -330,12 +328,12 @@ const handleRemove = async (id: string) => {
 // PASS: Capture previous state and rollback on failure
 const handleRemove = async (id: string) => {
   const prevItems = [...items];
-  setItems(prev => prev.filter(i => i.id !== id));
+  setItems((prev) => prev.filter((i) => i.id !== id));
   try {
     const res = await fetch(`/api/items/${id}`, { method: "DELETE" });
     if (!res.ok) throw new Error("API error");
   } catch {
-    setItems(prevItems);  // Rollback
+    setItems(prevItems); // Rollback
     alert("削除に失敗しました");
   }
 };
@@ -361,17 +359,18 @@ No bug in /api/user/notifications  → Don't write test (yet)
 
 ## Quick Reference
 
-| AI Regression Pattern | Test Strategy | Priority |
-|---|---|---|
-| Sandbox/production mismatch | Assert same response shape in sandbox mode |  High |
-| SELECT clause omission | Assert all required fields in response |  High |
-| Error state leakage | Assert state cleanup on error |  Medium |
-| Missing rollback | Assert state restored on API failure |  Medium |
-| Type cast masking null | Assert field is not undefined |  Medium |
+| AI Regression Pattern       | Test Strategy                              | Priority |
+| --------------------------- | ------------------------------------------ | -------- |
+| Sandbox/production mismatch | Assert same response shape in sandbox mode | High     |
+| SELECT clause omission      | Assert all required fields in response     | High     |
+| Error state leakage         | Assert state cleanup on error              | Medium   |
+| Missing rollback            | Assert state restored on API failure       | Medium   |
+| Type cast masking null      | Assert field is not undefined              | Medium   |
 
 ## DO / DON'T
 
 **DO:**
+
 - Write tests immediately after finding a bug (before fixing it if possible)
 - Test the API response shape, not the implementation
 - Run tests as the first step of every bug-check
@@ -379,6 +378,7 @@ No bug in /api/user/notifications  → Don't write test (yet)
 - Name tests after the bug they prevent (e.g., "BUG-R1 regression")
 
 **DON'T:**
+
 - Write tests for code that has never had a bug
 - Trust AI self-review as a substitute for automated tests
 - Skip sandbox path testing because "it's just mock data"

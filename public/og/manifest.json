@@ -1,72 +1,77 @@
-[
-  {
-    "size": "1200x630",
-    "theme": "light",
-    "width": 1200,
-    "height": 630,
-    "filename": "1200x630-light.png"
-  },
-  {
-    "size": "1200x600",
-    "theme": "light",
-    "width": 1200,
-    "height": 600,
-    "filename": "1200x600-light.png"
-  },
-  {
-    "size": "1200x1200",
-    "theme": "light",
-    "width": 1200,
-    "height": 1200,
-    "filename": "1200x1200-light.png"
-  },
-  {
-    "size": "800x418",
-    "theme": "light",
-    "width": 800,
-    "height": 418,
-    "filename": "800x418-light.png"
-  },
-  {
-    "size": "600x315",
-    "theme": "light",
-    "width": 600,
-    "height": 315,
-    "filename": "600x315-light.png"
-  },
-  {
-    "size": "1200x630",
-    "theme": "dark",
-    "width": 1200,
-    "height": 630,
-    "filename": "1200x630-dark.png"
-  },
-  {
-    "size": "1200x600",
-    "theme": "dark",
-    "width": 1200,
-    "height": 600,
-    "filename": "1200x600-dark.png"
-  },
-  {
-    "size": "1200x1200",
-    "theme": "dark",
-    "width": 1200,
-    "height": 1200,
-    "filename": "1200x1200-dark.png"
-  },
-  {
-    "size": "800x418",
-    "theme": "dark",
-    "width": 800,
-    "height": 418,
-    "filename": "800x418-dark.png"
-  },
-  {
-    "size": "600x315",
-    "theme": "dark",
-    "width": 600,
-    "height": 315,
-    "filename": "600x315-dark.png"
-  }
-]
+{
+  "generatedAt": "2026-07-10T19:14:57.672Z",
+  "method": "cursor-browser-screenshot",
+  "baseUrl": "http://127.0.0.1:4177",
+  "variants": [
+    {
+      "size": "1200x630",
+      "theme": "light",
+      "width": 1200,
+      "height": 630,
+      "filename": "1200x630-light.png"
+    },
+    {
+      "size": "1200x600",
+      "theme": "light",
+      "width": 1200,
+      "height": 600,
+      "filename": "1200x600-light.png"
+    },
+    {
+      "size": "1200x1200",
+      "theme": "light",
+      "width": 1200,
+      "height": 1200,
+      "filename": "1200x1200-light.png"
+    },
+    {
+      "size": "800x418",
+      "theme": "light",
+      "width": 800,
+      "height": 418,
+      "filename": "800x418-light.png"
+    },
+    {
+      "size": "600x315",
+      "theme": "light",
+      "width": 600,
+      "height": 315,
+      "filename": "600x315-light.png"
+    },
+    {
+      "size": "1200x630",
+      "theme": "dark",
+      "width": 1200,
+      "height": 630,
+      "filename": "1200x630-dark.png"
+    },
+    {
+      "size": "1200x600",
+      "theme": "dark",
+      "width": 1200,
+      "height": 600,
+      "filename": "1200x600-dark.png"
+    },
+    {
+      "size": "1200x1200",
+      "theme": "dark",
+      "width": 1200,
+      "height": 1200,
+      "filename": "1200x1200-dark.png"
+    },
+    {
+      "size": "800x418",
+      "theme": "dark",
+      "width": 800,
+      "height": 418,
+      "filename": "800x418-dark.png"
+    },
+    {
+      "size": "600x315",
+      "theme": "dark",
+      "width": 600,
+      "height": 315,
+      "filename": "600x315-dark.png"
+    }
+  ]
+}

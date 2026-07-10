@@ -1,19 +1,19 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
-const Ajv = require('ajv');
+const fs = require("fs");
+const path = require("path");
+const Ajv = require("ajv");
 
-const SCHEMA_PATH = path.join(__dirname, '..', '..', '..', 'schemas', 'state-store.schema.json');
+const SCHEMA_PATH = path.join(__dirname, "..", "..", "..", "schemas", "state-store.schema.json");
 
 const ENTITY_DEFINITIONS = {
-  session: 'session',
-  skillRun: 'skillRun',
-  skillVersion: 'skillVersion',
-  decision: 'decision',
-  installState: 'installState',
-  governanceEvent: 'governanceEvent',
-  workItem: 'workItem',
+  session: "session",
+  skillRun: "skillRun",
+  skillVersion: "skillVersion",
+  decision: "decision",
+  installState: "installState",
+  governanceEvent: "governanceEvent",
+  workItem: "workItem",
 };
 
 let cachedSchema = null;
@@ -25,7 +25,7 @@ function readSchema() {
     return cachedSchema;
   }
 
-  cachedSchema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'));
+  cachedSchema = JSON.parse(fs.readFileSync(SCHEMA_PATH, "utf8"));
   return cachedSchema;
 }
 
@@ -64,9 +64,7 @@ function getEntityValidator(entityName) {
 }
 
 function formatValidationErrors(errors = []) {
-  return errors
-    .map(error => `${error.instancePath || '/'} ${error.message}`)
-    .join('; ');
+  return errors.map((error) => `${error.instancePath || "/"} ${error.message}`).join("; ");
 }
 
 function validateEntity(entityName, payload) {
@@ -81,7 +79,9 @@ function validateEntity(entityName, payload) {
 function assertValidEntity(entityName, payload, label) {
   const result = validateEntity(entityName, payload);
   if (!result.valid) {
-    throw new Error(`Invalid ${entityName}${label ? ` (${label})` : ''}: ${formatValidationErrors(result.errors)}`);
+    throw new Error(
+      `Invalid ${entityName}${label ? ` (${label})` : ""}: ${formatValidationErrors(result.errors)}`,
+    );
   }
 }
 

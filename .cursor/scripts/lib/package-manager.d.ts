@@ -4,7 +4,7 @@
  */
 
 /** Supported package manager names */
-export type PackageManagerName = 'npm' | 'pnpm' | 'yarn' | 'bun';
+export type PackageManagerName = "npm" | "pnpm" | "yarn" | "bun";
 
 /** Configuration for a single package manager */
 export interface PackageManagerConfig {
@@ -27,12 +27,12 @@ export interface PackageManagerConfig {
 
 /** How the package manager was detected */
 export type DetectionSource =
-  | 'environment'
-  | 'project-config'
-  | 'package.json'
-  | 'lock-file'
-  | 'global-config'
-  | 'default';
+  | "environment"
+  | "project-config"
+  | "package.json"
+  | "lock-file"
+  | "global-config"
+  | "default";
 
 /** Result from getPackageManager() */
 export interface PackageManagerResult {
@@ -70,14 +70,20 @@ export function getPackageManager(options?: GetPackageManagerOptions): PackageMa
  * Saves to ~/.claude/package-manager.json.
  * @throws If pmName is not a known package manager or if save fails
  */
-export function setPreferredPackageManager(pmName: PackageManagerName): { packageManager: string; setAt: string };
+export function setPreferredPackageManager(pmName: PackageManagerName): {
+  packageManager: string;
+  setAt: string;
+};
 
 /**
  * Set a project-specific preferred package manager.
  * Saves to <projectDir>/.claude/package-manager.json.
  * @throws If pmName is not a known package manager
  */
-export function setProjectPackageManager(pmName: PackageManagerName, projectDir?: string): { packageManager: string; setAt: string };
+export function setProjectPackageManager(
+  pmName: PackageManagerName,
+  projectDir?: string,
+): { packageManager: string; setAt: string };
 
 /**
  * Get package managers installed on the system.
@@ -103,7 +109,11 @@ export function getRunCommand(script: string, options?: GetPackageManagerOptions
  * @param binary - Binary name (e.g., "prettier", "eslint")
  * @param args - Arguments to pass to the binary
  */
-export function getExecCommand(binary: string, args?: string, options?: GetPackageManagerOptions): string;
+export function getExecCommand(
+  binary: string,
+  args?: string,
+  options?: GetPackageManagerOptions,
+): string;
 
 /**
  * Get a message prompting the user to configure their package manager.

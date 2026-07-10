@@ -16,27 +16,37 @@
  * exit 0: success  exit 1: error
  */
 
-import { readFileSync, mkdirSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync, mkdirSync, writeFileSync } from "fs";
+import { resolve } from "path";
 import {
-  readProjects, writeProjects, loadContext, saveContext,
-  today, shortId, gitSummary, nativeMemoryDir,
+  readProjects,
+  writeProjects,
+  loadContext,
+  saveContext,
+  today,
+  shortId,
+  gitSummary,
+  nativeMemoryDir,
   CURRENT_SESSION,
-} from './shared.mjs';
+} from "./shared.mjs";
 
-const isInit = process.argv.includes('--init');
-const cwd    = process.env.PWD || process.cwd();
+const isInit = process.argv.includes("--init");
+const cwd = process.env.PWD || process.cwd();
 
 // ── Read JSON from stdin ──────────────────────────────────────────────────────
 let input;
 try {
-  const raw = readFileSync(0, 'utf8').trim();
-  if (!raw) throw new Error('empty stdin');
+  const raw = readFileSync(0, "utf8").trim();
+  if (!raw) throw new Error("empty stdin");
   input = JSON.parse(raw);
 } catch (e) {
   console.error(`ck save: invalid JSON on stdin — ${e.message}`);
-  console.log('Expected schema (save):  {"summary":"...","leftOff":"...","nextSteps":["..."],"decisions":[{"what":"...","why":"..."}],"blockers":["..."]}');
-  console.log('Expected schema (--init): {"name":"...","path":"...","description":"...","stack":["..."],"goal":"...","constraints":["..."]}');
+  console.log(
+    'Expected schema (save):  {"summary":"...","leftOff":"...","nextSteps":["..."],"decisions":[{"what":"...","why":"..."}],"blockers":["..."]}',
+  );
+  console.log(
+    'Expected schema (--init): {"name":"...","path":"...","description":"...","stack":["..."],"goal":"...","constraints":["..."]}',
+  );
   process.exit(1);
 }
 
@@ -47,18 +57,21 @@ if (isInit) {
   const { name, path: projectPath, description, stack, goal, constraints, repo } = input;
 
   if (!name || !projectPath) {
-    console.log('ck init: name and path are required.');
+    console.log("ck init: name and path are required.");
     process.exit(1);
   }
 
   const projects = readProjects();
 
   // Derive contextDir (lowercase, spaces→dashes, deduplicate)
-  let contextDir = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  let contextDir = name
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
   let suffix = 2;
-  const existingDirs = Object.values(projects).map(p => p.contextDir);
+  const existingDirs = Object.values(projects).map((p) => p.contextDir);
   while (existingDirs.includes(contextDir) && projects[projectPath]?.contextDir !== contextDir) {
-    contextDir = `${contextDir.replace(/-\d+$/, '')}-${suffix++}`;
+    contextDir = `${contextDir.replace(/-\d+$/, "")}-${suffix++}`;
   }
 
   const context = {
@@ -67,7 +80,7 @@ if (isInit) {
     displayName: name,
     path: projectPath,
     description: description || null,
-    stack: Array.isArray(stack) ? stack : (stack ? [stack] : []),
+    stack: Array.isArray(stack) ? stack : stack ? [stack] : [],
     goal: goal || null,
     constraints: Array.isArray(constraints) ? constraints : [],
     repo: repo || null,
@@ -112,14 +125,14 @@ if (!context) {
 // Get session ID from current-session.json
 let sessionId;
 try {
-  const sess = JSON.parse(readFileSync(CURRENT_SESSION, 'utf8'));
+  const sess = JSON.parse(readFileSync(CURRENT_SESSION, "utf8"));
   sessionId = sess.sessionId || shortId();
 } catch {
   sessionId = shortId();
 }
 
 // Check for duplicate (re-save of same session)
-const existingIdx = context.sessions.findIndex(s => s.id === sessionId);
+const existingIdx = context.sessions.findIndex((s) => s.id === sessionId);
 
 const { summary, leftOff, nextSteps, decisions, blockers, goal } = input;
 
@@ -130,9 +143,9 @@ const gitActivity = gitSummary(cwd, lastSessionDate);
 const session = {
   id: sessionId,
   date: today(),
-  summary: summary || 'Session saved',
+  summary: summary || "Session saved",
   leftOff: leftOff || null,
-  nextSteps: Array.isArray(nextSteps) ? nextSteps : (nextSteps ? [nextSteps] : []),
+  nextSteps: Array.isArray(nextSteps) ? nextSteps : nextSteps ? [nextSteps] : [],
   decisions: Array.isArray(decisions) ? decisions : [],
   blockers: Array.isArray(blockers) ? blockers.filter(Boolean) : [],
   ...(gitActivity ? { gitActivity } : {}),
@@ -164,14 +177,14 @@ try {
 
   const memFile = resolve(memDir, `ck_${today()}_${sessionId.slice(0, 8)}.md`);
   const decisionsBlock = session.decisions.length
-    ? session.decisions.map(d => `- **${d.what}**: ${d.why || ''}`).join('\n')
-    : '- None this session';
+    ? session.decisions.map((d) => `- **${d.what}**: ${d.why || ""}`).join("\n")
+    : "- None this session";
   const nextBlock = session.nextSteps.length
-    ? session.nextSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')
-    : '- None recorded';
+    ? session.nextSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")
+    : "- None recorded";
   const blockersBlock = session.blockers.length
-    ? session.blockers.map(b => `- ${b}`).join('\n')
-    : '- None';
+    ? session.blockers.map((b) => `- ${b}`).join("\n")
+    : "- None";
 
   const memContent = [
     `---`,
@@ -188,7 +201,7 @@ try {
     decisionsBlock,
     ``,
     `## Left Off`,
-    session.leftOff || '—',
+    session.leftOff || "—",
     ``,
     `## Next Steps`,
     nextBlock,
@@ -197,9 +210,9 @@ try {
     blockersBlock,
     ``,
     ...(gitActivity ? [`## Git Activity`, gitActivity, ``] : []),
-  ].join('\n');
+  ].join("\n");
 
-  writeFileSync(memFile, memContent, 'utf8');
+  writeFileSync(memFile, memContent, "utf8");
 } catch (e) {
   // Non-fatal — native memory write failure should not block the save
   process.stderr.write(`ck: warning — could not write native memory entry: ${e.message}\n`);

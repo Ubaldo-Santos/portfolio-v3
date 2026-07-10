@@ -17,7 +17,7 @@
  * keeping the PreToolUse hook fast even for very large sessions.
  */
 
-const fs = require('fs');
+const fs = require("fs");
 
 const STANDARD_CONTEXT_WINDOW_TOKENS = 200000;
 const LARGE_CONTEXT_WINDOW_TOKENS = 1000000;
@@ -26,7 +26,7 @@ const DEFAULT_CONTEXT_THRESHOLD_LARGE = 250000;
 const DEFAULT_CONTEXT_INTERVAL_TOKENS = 60000;
 const DEFAULT_TRANSCRIPT_TAIL_BYTES = 256 * 1024;
 const MAX_TOKEN_SETTING = 10000000;
-const LARGE_WINDOW_MODEL_MARKER = '[1m]';
+const LARGE_WINDOW_MODEL_MARKER = "[1m]";
 
 /**
  * Read the trailing `tailBytes` of a file as UTF-8.
@@ -35,7 +35,7 @@ const LARGE_WINDOW_MODEL_MARKER = '[1m]';
 function readFileTail(filePath, tailBytes) {
   let fd;
   try {
-    fd = fs.openSync(filePath, 'r');
+    fd = fs.openSync(filePath, "r");
   } catch {
     return null;
   }
@@ -45,14 +45,14 @@ function readFileTail(filePath, tailBytes) {
     const start = Math.max(0, size - tailBytes);
     const length = size - start;
     if (length <= 0) {
-      return { text: '', truncated: false };
+      return { text: "", truncated: false };
     }
 
     const buffer = Buffer.alloc(length);
     const bytesRead = fs.readSync(fd, buffer, 0, length, start);
     return {
-      text: buffer.toString('utf8', 0, bytesRead),
-      truncated: start > 0
+      text: buffer.toString("utf8", 0, bytesRead),
+      truncated: start > 0,
     };
   } catch {
     return null;
@@ -71,7 +71,7 @@ function readFileTail(filePath, tailBytes) {
  */
 function extractUsageTokens(record) {
   const usage = record && record.message && record.message.usage;
-  if (!usage || typeof usage !== 'object') {
+  if (!usage || typeof usage !== "object") {
     return 0;
   }
 
@@ -94,18 +94,21 @@ function extractUsageTokens(record) {
  *   null when the transcript is missing, unreadable, or has no usage records.
  */
 function readLatestContextTokens(transcriptPath, options = {}) {
-  if (typeof transcriptPath !== 'string' || !transcriptPath) {
+  if (typeof transcriptPath !== "string" || !transcriptPath) {
     return null;
   }
 
-  const tailBytes = Number.isInteger(options.tailBytes) && options.tailBytes > 0 ? options.tailBytes : DEFAULT_TRANSCRIPT_TAIL_BYTES;
+  const tailBytes =
+    Number.isInteger(options.tailBytes) && options.tailBytes > 0
+      ? options.tailBytes
+      : DEFAULT_TRANSCRIPT_TAIL_BYTES;
 
   const tail = readFileTail(transcriptPath, tailBytes);
   if (!tail) {
     return null;
   }
 
-  const lines = tail.text.split('\n');
+  const lines = tail.text.split("\n");
   // The first line of a truncated tail is almost certainly partial JSON.
   const firstLine = tail.truncated ? 1 : 0;
 
@@ -122,7 +125,8 @@ function readLatestContextTokens(transcriptPath, options = {}) {
 
     const tokens = extractUsageTokens(record);
     if (tokens > 0) {
-      const model = record.message && typeof record.message.model === 'string' ? record.message.model : '';
+      const model =
+        record.message && typeof record.message.model === "string" ? record.message.model : "";
       return { tokens, model };
     }
   }
@@ -140,13 +144,16 @@ function resolveContextWindowTokens(tokens, model) {
   // Explicit window override wins: 400k models (e.g. Opus 4.x) match neither the
   // 200k default nor the 1M marker and would otherwise report ~double usage (#2290).
   // Honor ECC's own knob and Claude Code's native CLAUDE_CODE_AUTO_COMPACT_WINDOW.
-  const env = (typeof process !== 'undefined' && process.env) || {};
-  const envWindow = Number.parseInt(env.ECC_CONTEXT_WINDOW_TOKENS || env.CLAUDE_CODE_AUTO_COMPACT_WINDOW || '', 10);
+  const env = (typeof process !== "undefined" && process.env) || {};
+  const envWindow = Number.parseInt(
+    env.ECC_CONTEXT_WINDOW_TOKENS || env.CLAUDE_CODE_AUTO_COMPACT_WINDOW || "",
+    10,
+  );
   if (Number.isInteger(envWindow) && envWindow > 0) {
     return envWindow;
   }
 
-  if (typeof model === 'string' && model.includes(LARGE_WINDOW_MODEL_MARKER)) {
+  if (typeof model === "string" && model.includes(LARGE_WINDOW_MODEL_MARKER)) {
     return LARGE_CONTEXT_WINDOW_TOKENS;
   }
 
@@ -164,7 +171,7 @@ function resolveContextWindowTokens(tokens, model) {
  */
 function resolveContextThreshold(env, windowTokens) {
   const raw = env && env.COMPACT_CONTEXT_THRESHOLD;
-  if (raw !== undefined && raw !== null && raw !== '') {
+  if (raw !== undefined && raw !== null && raw !== "") {
     const parsed = Number.parseInt(raw, 10);
     if (parsed === 0) {
       return 0;
@@ -174,7 +181,9 @@ function resolveContextThreshold(env, windowTokens) {
     }
   }
 
-  return windowTokens >= LARGE_CONTEXT_WINDOW_TOKENS ? DEFAULT_CONTEXT_THRESHOLD_LARGE : DEFAULT_CONTEXT_THRESHOLD_STANDARD;
+  return windowTokens >= LARGE_CONTEXT_WINDOW_TOKENS
+    ? DEFAULT_CONTEXT_THRESHOLD_LARGE
+    : DEFAULT_CONTEXT_THRESHOLD_STANDARD;
 }
 
 /**
@@ -184,7 +193,9 @@ function resolveContextThreshold(env, windowTokens) {
 function resolveContextInterval(env) {
   const raw = env && env.COMPACT_CONTEXT_INTERVAL;
   const parsed = Number.parseInt(raw, 10);
-  return Number.isInteger(parsed) && parsed > 0 && parsed <= MAX_TOKEN_SETTING ? parsed : DEFAULT_CONTEXT_INTERVAL_TOKENS;
+  return Number.isInteger(parsed) && parsed > 0 && parsed <= MAX_TOKEN_SETTING
+    ? parsed
+    : DEFAULT_CONTEXT_INTERVAL_TOKENS;
 }
 
 /**
@@ -198,7 +209,8 @@ function computeContextBucket(tokens, threshold, interval) {
     return -1;
   }
 
-  const step = Number.isInteger(interval) && interval > 0 ? interval : DEFAULT_CONTEXT_INTERVAL_TOKENS;
+  const step =
+    Number.isInteger(interval) && interval > 0 ? interval : DEFAULT_CONTEXT_INTERVAL_TOKENS;
   return Math.floor((tokens - threshold) / step);
 }
 
@@ -206,7 +218,7 @@ function computeContextBucket(tokens, threshold, interval) {
  * Human-readable label for a context window size (e.g. "200k", "1M").
  */
 function formatWindowLabel(windowTokens) {
-  return windowTokens >= LARGE_CONTEXT_WINDOW_TOKENS ? '1M' : `${Math.round(windowTokens / 1000)}k`;
+  return windowTokens >= LARGE_CONTEXT_WINDOW_TOKENS ? "1M" : `${Math.round(windowTokens / 1000)}k`;
 }
 
 module.exports = {
@@ -221,5 +233,5 @@ module.exports = {
   resolveContextThreshold,
   resolveContextInterval,
   computeContextBucket,
-  formatWindowLabel
+  formatWindowLabel,
 };

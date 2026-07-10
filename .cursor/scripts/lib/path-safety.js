@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 /**
  * Path containment helpers for install-state-driven file operations.
@@ -55,22 +55,24 @@ function isWithinRoot(target, root) {
     return true;
   }
   const rel = path.relative(realRoot, realTarget);
-  return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
+  return rel !== "" && !rel.startsWith("..") && !path.isAbsolute(rel);
 }
 
 /**
  * Fail-closed guard: throw unless `target` is contained within `root`.
  * Returns the canonicalized target path on success.
  */
-function assertWithinTrustedRoot(target, root, action = 'write') {
-  if (!target || typeof target !== 'string') {
+function assertWithinTrustedRoot(target, root, action = "write") {
+  if (!target || typeof target !== "string") {
     throw new Error(`Refusing to ${action}: missing destination path.`);
   }
   if (!root) {
     throw new Error(`Refusing to ${action} '${target}': no trusted install root resolved.`);
   }
   if (!isWithinRoot(target, root)) {
-    throw new Error(`Refusing to ${action} outside the install root: '${target}' is not within '${root}'.`);
+    throw new Error(
+      `Refusing to ${action} outside the install root: '${target}' is not within '${root}'.`,
+    );
   }
   return realpathNearestExisting(target);
 }
@@ -78,5 +80,5 @@ function assertWithinTrustedRoot(target, root, action = 'write') {
 module.exports = {
   realpathNearestExisting,
   isWithinRoot,
-  assertWithinTrustedRoot
+  assertWithinTrustedRoot,
 };

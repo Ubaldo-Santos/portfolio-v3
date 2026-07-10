@@ -16,24 +16,27 @@
  * Configure session: Set ECC_SESSION_ID for session correlation
  */
 
-'use strict';
+"use strict";
 
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 const MAX_STDIN = 1024 * 1024;
 
 // Patterns that indicate potential hardcoded secrets
 const SECRET_PATTERNS = [
-  { name: 'aws_key', pattern: /(?:AKIA|ASIA)[A-Z0-9]{16}/i },
-  { name: 'generic_secret', pattern: /(?:secret|password|token|api[_-]?key)\s*[:=]\s*["'][^"']{8,}/i },
-  { name: 'private_key', pattern: /-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----/ },
-  { name: 'jwt', pattern: /eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/ },
-  { name: 'github_token', pattern: /gh[pousr]_[A-Za-z0-9_]{36,}/ },
+  { name: "aws_key", pattern: /(?:AKIA|ASIA)[A-Z0-9]{16}/i },
+  {
+    name: "generic_secret",
+    pattern: /(?:secret|password|token|api[_-]?key)\s*[:=]\s*["'][^"']{8,}/i,
+  },
+  { name: "private_key", pattern: /-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----/ },
+  { name: "jwt", pattern: /eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/ },
+  { name: "github_token", pattern: /gh[pousr]_[A-Za-z0-9_]{36,}/ },
 ];
 
 // Tool names that represent security-relevant operations
 const SECURITY_RELEVANT_TOOLS = new Set([
-  'Bash', // Could execute arbitrary commands
+  "Bash", // Could execute arbitrary commands
 ]);
 
 // Commands that require governance approval
@@ -59,7 +62,7 @@ const SENSITIVE_PATHS = [
  * Generate a unique event ID.
  */
 function generateEventId() {
-  return `gov-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+  return `gov-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
 }
 
 /**
@@ -67,7 +70,7 @@ function generateEventId() {
  * Returns array of { name, match } for each detected secret.
  */
 function detectSecrets(text) {
-  if (!text || typeof text !== 'string') return [];
+  if (!text || typeof text !== "string") return [];
 
   const findings = [];
   for (const { name, pattern } of SECRET_PATTERNS) {
@@ -82,7 +85,7 @@ function detectSecrets(text) {
  * Check if a command requires governance approval.
  */
 function detectApprovalRequired(command) {
-  if (!command || typeof command !== 'string') return [];
+  if (!command || typeof command !== "string") return [];
 
   const findings = [];
   for (const pattern of APPROVAL_COMMANDS) {
@@ -97,18 +100,18 @@ function detectApprovalRequired(command) {
  * Check if a file path is policy-sensitive.
  */
 function detectSensitivePath(filePath) {
-  if (!filePath || typeof filePath !== 'string') return false;
+  if (!filePath || typeof filePath !== "string") return false;
 
-  return SENSITIVE_PATHS.some(pattern => pattern.test(filePath));
+  return SENSITIVE_PATHS.some((pattern) => pattern.test(filePath));
 }
 
 function fingerprintCommand(command) {
-  if (!command || typeof command !== 'string') return null;
-  return crypto.createHash('sha256').update(command).digest('hex').slice(0, 12);
+  if (!command || typeof command !== "string") return null;
+  return crypto.createHash("sha256").update(command).digest("hex").slice(0, 12);
 }
 
 function summarizeCommand(command) {
-  if (!command || typeof command !== 'string') {
+  if (!command || typeof command !== "string") {
     return {
       commandName: null,
       commandFingerprint: null,
@@ -142,16 +145,14 @@ function emitGovernanceEvent(event) {
  */
 function analyzeForGovernanceEvents(input, context = {}) {
   const events = [];
-  const toolName = input.tool_name || '';
+  const toolName = input.tool_name || "";
   const toolInput = input.tool_input || {};
-  const toolOutput = typeof input.tool_output === 'string' ? input.tool_output : '';
+  const toolOutput = typeof input.tool_output === "string" ? input.tool_output : "";
   const sessionId = context.sessionId || null;
-  const hookPhase = context.hookPhase || 'unknown';
+  const hookPhase = context.hookPhase || "unknown";
 
   // 1. Secret detection in tool input content
-  const inputText = typeof toolInput === 'object'
-    ? JSON.stringify(toolInput)
-    : String(toolInput);
+  const inputText = typeof toolInput === "object" ? JSON.stringify(toolInput) : String(toolInput);
 
   const inputSecrets = detectSecrets(inputText);
   const outputSecrets = detectSecrets(toolOutput);
@@ -161,13 +162,13 @@ function analyzeForGovernanceEvents(input, context = {}) {
     events.push({
       id: generateEventId(),
       sessionId,
-      eventType: 'secret_detected',
+      eventType: "secret_detected",
       payload: {
         toolName,
         hookPhase,
-        secretTypes: allSecrets.map(s => s.name),
-        location: inputSecrets.length > 0 ? 'input' : 'output',
-        severity: 'critical',
+        secretTypes: allSecrets.map((s) => s.name),
+        location: inputSecrets.length > 0 ? "input" : "output",
+        severity: "critical",
       },
       resolvedAt: null,
       resolution: null,
@@ -175,8 +176,8 @@ function analyzeForGovernanceEvents(input, context = {}) {
   }
 
   // 2. Approval-required commands (Bash only)
-  if (toolName === 'Bash') {
-    const command = toolInput.command || '';
+  if (toolName === "Bash") {
+    const command = toolInput.command || "";
     const approvalFindings = detectApprovalRequired(command);
     const commandSummary = summarizeCommand(command);
 
@@ -184,13 +185,13 @@ function analyzeForGovernanceEvents(input, context = {}) {
       events.push({
         id: generateEventId(),
         sessionId,
-        eventType: 'approval_requested',
+        eventType: "approval_requested",
         payload: {
           toolName,
           hookPhase,
           ...commandSummary,
-          matchedPatterns: approvalFindings.map(f => f.pattern),
-          severity: 'high',
+          matchedPatterns: approvalFindings.map((f) => f.pattern),
+          severity: "high",
         },
         resolvedAt: null,
         resolution: null,
@@ -199,18 +200,18 @@ function analyzeForGovernanceEvents(input, context = {}) {
   }
 
   // 3. Policy violation: writing to sensitive paths
-  const filePath = toolInput.file_path || toolInput.path || '';
+  const filePath = toolInput.file_path || toolInput.path || "";
   if (filePath && detectSensitivePath(filePath)) {
     events.push({
       id: generateEventId(),
       sessionId,
-      eventType: 'policy_violation',
+      eventType: "policy_violation",
       payload: {
         toolName,
         hookPhase,
         filePath: filePath.slice(0, 200),
-        reason: 'sensitive_file_access',
-        severity: 'warning',
+        reason: "sensitive_file_access",
+        severity: "warning",
       },
       resolvedAt: null,
       resolution: null,
@@ -218,22 +219,23 @@ function analyzeForGovernanceEvents(input, context = {}) {
   }
 
   // 4. Security-relevant tool usage tracking
-  if (SECURITY_RELEVANT_TOOLS.has(toolName) && hookPhase === 'post') {
-    const command = toolInput.command || '';
-    const hasElevated = /sudo\s/.test(command) || /chmod\s/.test(command) || /chown\s/.test(command);
+  if (SECURITY_RELEVANT_TOOLS.has(toolName) && hookPhase === "post") {
+    const command = toolInput.command || "";
+    const hasElevated =
+      /sudo\s/.test(command) || /chmod\s/.test(command) || /chown\s/.test(command);
     const commandSummary = summarizeCommand(command);
 
     if (hasElevated) {
       events.push({
         id: generateEventId(),
         sessionId,
-        eventType: 'security_finding',
+        eventType: "security_finding",
         payload: {
           toolName,
           hookPhase,
           ...commandSummary,
-          reason: 'elevated_privilege_command',
-          severity: 'medium',
+          reason: "elevated_privilege_command",
+          severity: "medium",
         },
         resolvedAt: null,
         resolution: null,
@@ -252,22 +254,22 @@ function analyzeForGovernanceEvents(input, context = {}) {
  */
 function run(rawInput, options = {}) {
   // Gate on feature flag
-  if (String(process.env.ECC_GOVERNANCE_CAPTURE || '').toLowerCase() !== '1') {
+  if (String(process.env.ECC_GOVERNANCE_CAPTURE || "").toLowerCase() !== "1") {
     return rawInput;
   }
 
   const sessionId = process.env.ECC_SESSION_ID || null;
-  const hookPhase = process.env.CLAUDE_HOOK_EVENT_NAME || 'unknown';
+  const hookPhase = process.env.CLAUDE_HOOK_EVENT_NAME || "unknown";
 
   if (options.truncated) {
     emitGovernanceEvent({
       id: generateEventId(),
       sessionId,
-      eventType: 'hook_input_truncated',
+      eventType: "hook_input_truncated",
       payload: {
-        hookPhase: hookPhase.startsWith('Pre') ? 'pre' : 'post',
+        hookPhase: hookPhase.startsWith("Pre") ? "pre" : "post",
         sizeLimitBytes: options.maxStdin || MAX_STDIN,
-        severity: 'warning',
+        severity: "warning",
       },
       resolvedAt: null,
       resolution: null,
@@ -279,7 +281,7 @@ function run(rawInput, options = {}) {
 
     const events = analyzeForGovernanceEvents(input, {
       sessionId,
-      hookPhase: hookPhase.startsWith('Pre') ? 'pre' : 'post',
+      hookPhase: hookPhase.startsWith("Pre") ? "pre" : "post",
     });
 
     if (events.length > 0) {
@@ -296,10 +298,10 @@ function run(rawInput, options = {}) {
 
 // ── stdin entry point ────────────────────────────────
 if (require.main === module) {
-  let raw = '';
-  let truncated = /^(1|true|yes)$/i.test(String(process.env.ECC_HOOK_INPUT_TRUNCATED || ''));
-  process.stdin.setEncoding('utf8');
-  process.stdin.on('data', chunk => {
+  let raw = "";
+  let truncated = /^(1|true|yes)$/i.test(String(process.env.ECC_HOOK_INPUT_TRUNCATED || ""));
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => {
     if (raw.length < MAX_STDIN) {
       const remaining = MAX_STDIN - raw.length;
       raw += chunk.substring(0, remaining);
@@ -311,7 +313,7 @@ if (require.main === module) {
     }
   });
 
-  process.stdin.on('end', () => {
+  process.stdin.on("end", () => {
     const result = run(raw, {
       truncated,
       maxStdin: Number(process.env.ECC_HOOK_INPUT_MAX_BYTES) || MAX_STDIN,

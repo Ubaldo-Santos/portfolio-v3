@@ -1,20 +1,20 @@
 #!/usr/bin/env node
-'use strict';
+"use strict";
 
-const { runPostBash } = require('./bash-hook-dispatcher');
+const { runPostBash } = require("./bash-hook-dispatcher");
 
-let raw = '';
+let raw = "";
 const MAX_STDIN = 1024 * 1024;
 
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', chunk => {
+process.stdin.setEncoding("utf8");
+process.stdin.on("data", (chunk) => {
   if (raw.length < MAX_STDIN) {
     const remaining = MAX_STDIN - raw.length;
     raw += chunk.substring(0, remaining);
   }
 });
 
-process.stdin.on('end', () => {
+process.stdin.on("end", () => {
   const result = runPostBash(raw);
   if (result.stderr) {
     process.stderr.write(result.stderr);

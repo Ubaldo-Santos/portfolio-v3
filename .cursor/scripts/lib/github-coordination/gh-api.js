@@ -1,9 +1,11 @@
-'use strict';
+"use strict";
 
-const { spawnSync } = require('child_process');
+const { spawnSync } = require("child_process");
 
 function normalizeRepo(repo) {
-  const parts = String(repo || '').split('/').filter(Boolean);
+  const parts = String(repo || "")
+    .split("/")
+    .filter(Boolean);
   if (parts.length !== 2) {
     throw new Error(`Invalid repo format: "${repo}". Expected "owner/repo".`);
   }
@@ -20,36 +22,40 @@ function normalizeIssueNumber(value) {
 }
 
 function normalizeLabelValue(label) {
-  if (typeof label === 'string') {
+  if (typeof label === "string") {
     return label.trim();
   }
-  if (label && typeof label === 'object') {
-    return String(label.name || label.label || '').trim();
+  if (label && typeof label === "object") {
+    return String(label.name || label.label || "").trim();
   }
-  return '';
+  return "";
 }
 
 function normalizeLabels(labels) {
-  return Array.from(new Set((Array.isArray(labels) ? labels : []).map(normalizeLabelValue).filter(Boolean))).sort();
+  return Array.from(
+    new Set((Array.isArray(labels) ? labels : []).map(normalizeLabelValue).filter(Boolean)),
+  ).sort();
 }
 
 function runCommand(command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: options.cwd,
     env: options.env || process.env,
-    encoding: 'utf8',
+    encoding: "utf8",
     maxBuffer: 10 * 1024 * 1024,
   });
 
   if (result.error) {
-    throw new Error(`${command} ${args.join(' ')} failed: ${result.error.message}`);
+    throw new Error(`${command} ${args.join(" ")} failed: ${result.error.message}`);
   }
 
   if (result.status !== 0) {
-    throw new Error(`${command} ${args.join(' ')} failed: ${(result.stderr || result.stdout || '').trim()}`);
+    throw new Error(
+      `${command} ${args.join(" ")} failed: ${(result.stderr || result.stdout || "").trim()}`,
+    );
   }
 
-  return result.stdout || '';
+  return result.stdout || "";
 }
 
 // ECC_GH_SHIM creates a trust boundary: when set, shimPath replaces the real
@@ -60,7 +66,7 @@ function runCommand(command, args, options = {}) {
 // privileges.
 function runGh(args, options = {}) {
   const shimPath = process.env.ECC_GH_SHIM;
-  const command = shimPath ? process.execPath : 'gh';
+  const command = shimPath ? process.execPath : "gh";
   const commandArgs = shimPath ? [shimPath, ...args] : args;
   const env = { ...process.env };
 
@@ -73,23 +79,26 @@ function runGh(args, options = {}) {
 
 function runGhJson(args, options = {}) {
   try {
-    return JSON.parse(runGh(args, options) || 'null');
+    return JSON.parse(runGh(args, options) || "null");
   } catch (error) {
-    throw new Error(`gh ${args.join(' ')} returned invalid JSON: ${error.message}`);
+    throw new Error(`gh ${args.join(" ")} returned invalid JSON: ${error.message}`);
   }
 }
 
 function getIssue(repo, issueNumber, options = {}) {
   const { owner, name } = normalizeRepo(repo);
-  const json = runGhJson([
-    'issue',
-    'view',
-    String(issueNumber),
-    '--repo',
-    `${owner}/${name}`,
-    '--json',
-    'number,title,body,url,state,labels,author,updatedAt,assignees',
-  ], options);
+  const json = runGhJson(
+    [
+      "issue",
+      "view",
+      String(issueNumber),
+      "--repo",
+      `${owner}/${name}`,
+      "--json",
+      "number,title,body,url,state,labels,author,updatedAt,assignees",
+    ],
+    options,
+  );
 
   if (!json) {
     throw new Error(`Unable to load issue #${issueNumber} from ${repo}`);
@@ -101,49 +110,48 @@ function getIssue(repo, issueNumber, options = {}) {
 function listIssues(repo, options = {}) {
   const { owner, name } = normalizeRepo(repo);
   const limit = Number.isFinite(options.limit) ? options.limit : 100;
-  const state = options.state || 'all';
-  return runGhJson([
-    'issue',
-    'list',
-    '--repo',
-    `${owner}/${name}`,
-    '--state',
-    state,
-    '--limit',
-    String(limit),
-    '--json',
-    'number,title,body,url,state,labels,author,updatedAt,assignees',
-  ], options) || [];
+  const state = options.state || "all";
+  return (
+    runGhJson(
+      [
+        "issue",
+        "list",
+        "--repo",
+        `${owner}/${name}`,
+        "--state",
+        state,
+        "--limit",
+        String(limit),
+        "--json",
+        "number,title,body,url,state,labels,author,updatedAt,assignees",
+      ],
+      options,
+    ) || []
+  );
 }
 
 function editIssue(repo, issueNumber, options = {}) {
   const { owner, name } = normalizeRepo(repo);
-  const args = [
-    'issue',
-    'edit',
-    String(issueNumber),
-    '--repo',
-    `${owner}/${name}`,
-  ];
+  const args = ["issue", "edit", String(issueNumber), "--repo", `${owner}/${name}`];
 
   if (options.body !== undefined) {
-    args.push('--body', options.body);
+    args.push("--body", options.body);
   }
 
   for (const label of options.addLabels || []) {
-    args.push('--add-label', label);
+    args.push("--add-label", label);
   }
 
   for (const label of options.removeLabels || []) {
-    args.push('--remove-label', label);
+    args.push("--remove-label", label);
   }
 
   if (options.title) {
-    args.push('--title', options.title);
+    args.push("--title", options.title);
   }
 
   if (options.assignee) {
-    args.push('--add-assignee', options.assignee);
+    args.push("--add-assignee", options.assignee);
   }
 
   return runGh(args, options);
@@ -151,15 +159,10 @@ function editIssue(repo, issueNumber, options = {}) {
 
 function commentIssue(repo, issueNumber, body, options = {}) {
   const { owner, name } = normalizeRepo(repo);
-  return runGh([
-    'issue',
-    'comment',
-    String(issueNumber),
-    '--repo',
-    `${owner}/${name}`,
-    '--body',
-    body,
-  ], options);
+  return runGh(
+    ["issue", "comment", String(issueNumber), "--repo", `${owner}/${name}`, "--body", body],
+    options,
+  );
 }
 
 module.exports = {

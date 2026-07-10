@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const { createGitRunner } = require('./git');
+const { createGitRunner } = require("./git");
 
 const DEFAULT_STALE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
@@ -14,14 +14,14 @@ const DEFAULT_STALE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 //   stale         - clean + no recent activity past the stale threshold
 //   idle          - clean, behind/even with base, nothing to merge
 const STATES = Object.freeze({
-  MAIN: 'main',
-  DETACHED: 'detached',
-  DIRTY: 'dirty',
-  CONFLICT: 'conflict',
-  MERGE_READY: 'merge-ready',
-  MERGED: 'merged',
-  STALE: 'stale',
-  IDLE: 'idle'
+  MAIN: "main",
+  DETACHED: "detached",
+  DIRTY: "dirty",
+  CONFLICT: "conflict",
+  MERGE_READY: "merge-ready",
+  MERGED: "merged",
+  STALE: "stale",
+  IDLE: "idle",
 });
 
 function classifyWorktree(facts, { staleThresholdMs, nowMs }) {
@@ -52,7 +52,7 @@ function classifyWorktree(facts, { staleThresholdMs, nowMs }) {
   // Has unmerged commits (ahead > 0, or unknown merge-base). Stale = unmerged
   // work that has gone quiet past the threshold: a salvage candidate, never a
   // blind delete. Recent unmerged work is merge-ready.
-  const isOld = facts.lastCommitMs !== null && (nowMs - facts.lastCommitMs) > staleThresholdMs;
+  const isOld = facts.lastCommitMs !== null && nowMs - facts.lastCommitMs > staleThresholdMs;
   if (ahead > 0 || facts.aheadBehind === null) {
     return isOld ? STATES.STALE : STATES.MERGE_READY;
   }
@@ -62,13 +62,14 @@ function classifyWorktree(facts, { staleThresholdMs, nowMs }) {
 
 function analyzeWorktree(worktree, options, git) {
   const { baseBranch, staleThresholdMs, nowMs } = options;
-  const isMain = worktree.canonicalRepoRoot === git.repoRoot
-    || worktree.path === git.repoRoot
-    || worktree.branch === baseBranch;
+  const isMain =
+    worktree.canonicalRepoRoot === git.repoRoot ||
+    worktree.path === git.repoRoot ||
+    worktree.branch === baseBranch;
 
   const branch = worktree.branch;
   const dirty = git.isDirty(worktree.path);
-  const aheadBehind = (!isMain && branch) ? git.aheadBehind(branch, baseBranch) : null;
+  const aheadBehind = !isMain && branch ? git.aheadBehind(branch, baseBranch) : null;
   const lastCommitMs = branch ? git.lastCommitMs(branch) : null;
 
   // Only run conflict prediction when it matters: a clean, ahead branch.
@@ -85,7 +86,7 @@ function analyzeWorktree(worktree, options, git) {
     dirty,
     aheadBehind,
     lastCommitMs,
-    conflict: conflictResult.conflicted
+    conflict: conflictResult.conflicted,
   };
 
   const state = classifyWorktree(facts, { staleThresholdMs, nowMs });
@@ -102,25 +103,25 @@ function analyzeWorktree(worktree, options, git) {
     lastCommitMs,
     ageMs,
     conflictFiles: conflictResult.files,
-    conflictMethod: conflictResult.method
+    conflictMethod: conflictResult.method,
   };
 }
 
 function buildLifecycleReport(repoRoot, options = {}, deps = {}) {
   const git = deps.git || createGitRunner(repoRoot, deps.runImpl);
-  const baseBranch = options.baseBranch || 'main';
+  const baseBranch = options.baseBranch || "main";
   const staleThresholdMs = Number.isFinite(options.staleThresholdMs)
     ? options.staleThresholdMs
     : DEFAULT_STALE_MS;
   const nowMs = Number.isFinite(options.nowMs) ? options.nowMs : Date.now();
 
-  const worktrees = git.listWorktrees().map(worktree =>
-    analyzeWorktree(worktree, { baseBranch, staleThresholdMs, nowMs }, git)
-  );
+  const worktrees = git
+    .listWorktrees()
+    .map((worktree) => analyzeWorktree(worktree, { baseBranch, staleThresholdMs, nowMs }, git));
 
-  const conflictQueue = worktrees.filter(w => w.state === STATES.CONFLICT);
-  const staleQueue = worktrees.filter(w => w.state === STATES.STALE);
-  const mergeReady = worktrees.filter(w => w.state === STATES.MERGE_READY);
+  const conflictQueue = worktrees.filter((w) => w.state === STATES.CONFLICT);
+  const staleQueue = worktrees.filter((w) => w.state === STATES.STALE);
+  const mergeReady = worktrees.filter((w) => w.state === STATES.MERGE_READY);
 
   const states = worktrees.reduce((acc, w) => {
     acc[w.state] = (acc[w.state] || 0) + 1;
@@ -128,7 +129,7 @@ function buildLifecycleReport(repoRoot, options = {}, deps = {}) {
   }, {});
 
   return {
-    schemaVersion: 'ecc.worktree-lifecycle.v1',
+    schemaVersion: "ecc.worktree-lifecycle.v1",
     repoRoot,
     baseBranch,
     staleThresholdMs,
@@ -141,8 +142,8 @@ function buildLifecycleReport(repoRoot, options = {}, deps = {}) {
       states,
       conflictCount: conflictQueue.length,
       staleCount: staleQueue.length,
-      mergeReadyCount: mergeReady.length
-    }
+      mergeReadyCount: mergeReady.length,
+    },
   };
 }
 
@@ -157,23 +158,31 @@ function planCleanup(report) {
   const keep = [];
 
   for (const w of report.worktrees) {
-    if (w.state === 'main') {
+    if (w.state === "main") {
       continue;
     }
 
     const unmergedWork = (w.ahead || 0) > 0;
 
-    if (w.state === 'merged') {
+    if (w.state === "merged") {
       // Safe to remove: nothing unique to lose.
-      remove.push({ path: w.path, branch: w.branch, reason: 'fully merged into base' });
+      remove.push({ path: w.path, branch: w.branch, reason: "fully merged into base" });
     } else if (w.dirty) {
-      keep.push({ path: w.path, branch: w.branch, reason: 'has uncommitted changes' });
-    } else if (w.state === 'stale') {
+      keep.push({ path: w.path, branch: w.branch, reason: "has uncommitted changes" });
+    } else if (w.state === "stale") {
       // Unmerged + inactive: preserve first (push/bundle), then remove. Never
       // a blind delete of unmerged work.
-      salvage.push({ path: w.path, branch: w.branch, reason: `unmerged + stale (age ${Math.round((w.ageMs || 0) / 86400000)}d, ${w.ahead} ahead) - push/bundle before removing` });
+      salvage.push({
+        path: w.path,
+        branch: w.branch,
+        reason: `unmerged + stale (age ${Math.round((w.ageMs || 0) / 86400000)}d, ${w.ahead} ahead) - push/bundle before removing`,
+      });
     } else if (unmergedWork) {
-      keep.push({ path: w.path, branch: w.branch, reason: `unmerged work (${w.ahead} commits ahead)` });
+      keep.push({
+        path: w.path,
+        branch: w.branch,
+        reason: `unmerged work (${w.ahead} commits ahead)`,
+      });
     } else {
       keep.push({ path: w.path, branch: w.branch, reason: `state ${w.state}` });
     }
@@ -188,5 +197,5 @@ module.exports = {
   classifyWorktree,
   analyzeWorktree,
   buildLifecycleReport,
-  planCleanup
+  planCleanup,
 };

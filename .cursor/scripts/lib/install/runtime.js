@@ -1,17 +1,17 @@
-'use strict';
+"use strict";
 
 const {
   createLegacyCompatInstallPlan,
   createLegacyInstallPlan,
   createManifestInstallPlan,
-} = require('../install-executor');
+} = require("../install-executor");
 
 function createInstallPlanFromRequest(request, options = {}) {
-  if (!request || typeof request !== 'object') {
-    throw new Error('A normalized install request is required');
+  if (!request || typeof request !== "object") {
+    throw new Error("A normalized install request is required");
   }
 
-  if (request.mode === 'manifest') {
+  if (request.mode === "manifest") {
     return createManifestInstallPlan({
       target: request.target,
       profileId: request.profileId,
@@ -24,7 +24,7 @@ function createInstallPlanFromRequest(request, options = {}) {
     });
   }
 
-  if (request.mode === 'legacy-compat') {
+  if (request.mode === "legacy-compat") {
     return createLegacyCompatInstallPlan({
       target: request.target,
       legacyLanguages: request.legacyLanguages,
@@ -37,7 +37,7 @@ function createInstallPlanFromRequest(request, options = {}) {
     });
   }
 
-  if (request.mode === 'legacy') {
+  if (request.mode === "legacy") {
     return createLegacyInstallPlan({
       target: request.target,
       languages: request.languages,

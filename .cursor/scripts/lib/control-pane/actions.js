@@ -1,71 +1,71 @@
-'use strict';
+"use strict";
 
-const path = require('path');
+const path = require("path");
 
 const ACTION_DEFINITIONS = new Map([
   [
-    'sync-knowledge',
+    "sync-knowledge",
     {
-      label: 'Sync Knowledge',
-      description: 'Import all configured ECC2 memory connectors into the context graph.',
+      label: "Sync Knowledge",
+      description: "Import all configured ECC2 memory connectors into the context graph.",
       args: ({ limit }) => [
-        'run',
-        '--quiet',
-        '--',
-        'graph',
-        'connector-sync',
-        '--all',
-        '--json',
-        '--limit',
+        "run",
+        "--quiet",
+        "--",
+        "graph",
+        "connector-sync",
+        "--all",
+        "--json",
+        "--limit",
         String(limit),
       ],
       executable: true,
     },
   ],
   [
-    'recall-knowledge',
+    "recall-knowledge",
     {
-      label: 'Recall Knowledge',
-      description: 'Run ECC2 context recall for the current operator query.',
+      label: "Recall Knowledge",
+      description: "Run ECC2 context recall for the current operator query.",
       args: ({ query, limit }) => [
-        'run',
-        '--quiet',
-        '--',
-        'graph',
-        'recall',
-        query || 'ECC control pane',
-        '--json',
-        '--limit',
+        "run",
+        "--quiet",
+        "--",
+        "graph",
+        "recall",
+        query || "ECC control pane",
+        "--json",
+        "--limit",
         String(limit),
       ],
       executable: true,
     },
   ],
   [
-    'graph-sync',
+    "graph-sync",
     {
-      label: 'Backfill Graph',
-      description: 'Backfill the ECC2 graph from sessions, decisions, file activity, and messages.',
+      label: "Backfill Graph",
+      description: "Backfill the ECC2 graph from sessions, decisions, file activity, and messages.",
       args: ({ limit }) => [
-        'run',
-        '--quiet',
-        '--',
-        'graph',
-        'sync',
-        '--all',
-        '--json',
-        '--limit',
+        "run",
+        "--quiet",
+        "--",
+        "graph",
+        "sync",
+        "--all",
+        "--json",
+        "--limit",
         String(limit),
       ],
       executable: true,
     },
   ],
   [
-    'open-dashboard',
+    "open-dashboard",
     {
-      label: 'Open TUI',
-      description: 'Launch the ECC2 terminal dashboard.',
-      args: () => ['run', '--quiet', '--', 'dashboard'],
+      label: "Open TUI",
+      description: "Launch the ECC2 terminal dashboard.",
+      args: () => ["run", "--quiet", "--", "dashboard"],
       executable: false,
     },
   ],
@@ -87,10 +87,10 @@ function shellQuote(value) {
 function commandLineFor(action) {
   return [
     `cd ${shellQuote(action.cwd)}`,
-    '&&',
+    "&&",
     shellQuote(action.command),
     ...action.args.map(shellQuote),
-  ].join(' ');
+  ].join(" ");
 }
 
 function buildControlPaneAction(actionId, options = {}) {
@@ -100,15 +100,15 @@ function buildControlPaneAction(actionId, options = {}) {
   }
 
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
-  const cwd = path.join(repoRoot, 'ecc2');
+  const cwd = path.join(repoRoot, "ecc2");
   const limit = normalizeLimit(options.limit);
-  const query = String(options.query || '').trim();
+  const query = String(options.query || "").trim();
   const args = definition.args({ limit, query });
   const action = {
     id: actionId,
     label: definition.label,
     description: definition.description,
-    command: 'cargo',
+    command: "cargo",
     args,
     cwd,
     executable: definition.executable,
@@ -121,8 +121,8 @@ function buildControlPaneAction(actionId, options = {}) {
 }
 
 function buildControlPaneActions(options = {}) {
-  return Array.from(ACTION_DEFINITIONS.keys()).map(actionId =>
-    buildControlPaneAction(actionId, options)
+  return Array.from(ACTION_DEFINITIONS.keys()).map((actionId) =>
+    buildControlPaneAction(actionId, options),
   );
 }
 

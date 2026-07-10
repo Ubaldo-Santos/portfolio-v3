@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Concrete message sink for proximity triggers: delivers a session-to-session
@@ -11,16 +11,16 @@
  * The command runner and binary path are injectable for tests.
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execFileSync } = require('child_process');
+const fs = require("fs");
+const path = require("path");
+const { execFileSync } = require("child_process");
 
 // Proximity trigger type → ecc-tui message kind (value_enum on `--kind`).
 // A steer/hold is a collision warning; a transmit is a "what are you doing" query.
 const KIND_BY_TYPE = {
-  proximity_steer: 'conflict',
-  proximity_hold: 'conflict',
-  proximity_transmit: 'query'
+  proximity_steer: "conflict",
+  proximity_hold: "conflict",
+  proximity_transmit: "query",
 };
 
 /**
@@ -29,9 +29,10 @@ const KIND_BY_TYPE = {
  */
 function resolveEccBin(deps = {}) {
   if (deps.binPath) return deps.binPath;
-  if (process.env.ECC_TUI_BIN && process.env.ECC_TUI_BIN.trim()) return process.env.ECC_TUI_BIN.trim();
-  const repoRoot = deps.repoRoot || path.join(__dirname, '..', '..', '..');
-  for (const rel of ['ecc2/target/release/ecc-tui', 'ecc2/target/debug/ecc-tui']) {
+  if (process.env.ECC_TUI_BIN && process.env.ECC_TUI_BIN.trim())
+    return process.env.ECC_TUI_BIN.trim();
+  const repoRoot = deps.repoRoot || path.join(__dirname, "..", "..", "..");
+  for (const rel of ["ecc2/target/release/ecc-tui", "ecc2/target/debug/ecc-tui"]) {
     const candidate = path.join(repoRoot, rel);
     try {
       if (fs.existsSync(candidate)) return candidate;
@@ -39,15 +40,26 @@ function resolveEccBin(deps = {}) {
       /* ignore */
     }
   }
-  return 'ecc-tui';
+  return "ecc-tui";
 }
 
 /**
  * Build the `messages send` argv for a proximity message.
  */
 function buildSendArgs({ fromSession, toSession, content, msgType }) {
-  const kind = KIND_BY_TYPE[msgType] || 'query';
-  return ['messages', 'send', '--from', String(fromSession), '--to', String(toSession), '--kind', kind, '--text', String(content)];
+  const kind = KIND_BY_TYPE[msgType] || "query";
+  return [
+    "messages",
+    "send",
+    "--from",
+    String(fromSession),
+    "--to",
+    String(toSession),
+    "--kind",
+    kind,
+    "--text",
+    String(content),
+  ];
 }
 
 /**
@@ -55,7 +67,14 @@ function buildSendArgs({ fromSession, toSession, content, msgType }) {
  * delivers via `ecc-tui messages send`. Inject `runCommand(bin, args)` for tests.
  */
 function createEccMessageSink(deps = {}) {
-  const run = deps.runCommand || ((bin, args) => execFileSync(bin, args, { encoding: 'utf8', timeout: 5000, stdio: ['ignore', 'pipe', 'pipe'] }));
+  const run =
+    deps.runCommand ||
+    ((bin, args) =>
+      execFileSync(bin, args, {
+        encoding: "utf8",
+        timeout: 5000,
+        stdio: ["ignore", "pipe", "pipe"],
+      }));
   const bin = resolveEccBin(deps);
   return function sendMessage(message) {
     run(bin, buildSendArgs(message));
@@ -66,5 +85,5 @@ module.exports = {
   KIND_BY_TYPE,
   resolveEccBin,
   buildSendArgs,
-  createEccMessageSink
+  createEccMessageSink,
 };

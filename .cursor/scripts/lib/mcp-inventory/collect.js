@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 
-const { normalizeServerEntry, buildInventory } = require('./canonical-mcp');
-const { readClaudeCodeMcp } = require('./readers/claude-code');
-const { readCodexMcp } = require('./readers/codex');
-const { readOpencodeMcp } = require('./readers/opencode');
+const { normalizeServerEntry, buildInventory } = require("./canonical-mcp");
+const { readClaudeCodeMcp } = require("./readers/claude-code");
+const { readCodexMcp } = require("./readers/codex");
+const { readOpencodeMcp } = require("./readers/opencode");
 
 const DEFAULT_READERS = Object.freeze({
-  'claude-code': readClaudeCodeMcp,
+  "claude-code": readClaudeCodeMcp,
   codex: readCodexMcp,
-  opencode: readOpencodeMcp
+  opencode: readOpencodeMcp,
 });
 
 // Collect MCP server configs from every harness reader, normalize each raw
@@ -21,7 +21,7 @@ function collectMcpInventory(options = {}) {
 
   const rawRecords = [];
   for (const [harness, reader] of Object.entries(readers)) {
-    if (typeof reader !== 'function') {
+    if (typeof reader !== "function") {
       continue;
     }
 
@@ -43,5 +43,5 @@ function collectMcpInventory(options = {}) {
 
 module.exports = {
   collectMcpInventory,
-  DEFAULT_READERS
+  DEFAULT_READERS,
 };

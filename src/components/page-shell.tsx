@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { kickerPage, sectionGap } from "@/components/editorial/tokens";
 import { cn } from "@/lib/utils";
 
 export const pageShellClass = "mx-auto max-w-6xl px-5 pt-6 pb-20 sm:px-8 sm:pt-10 sm:pb-28";
 
 /** Gap between PageHeader and the first content block (contact, skills, CV hint, …). */
-export const pageLeadClass = "mt-12";
+export const pageLeadClass = sectionGap.lead;
 
 /** PageShell bottom padding when full-bleed content follows (e.g. CV canvas). */
 export const pageShellLeadGapClass = "pb-12 sm:pb-16";
@@ -13,8 +14,7 @@ export const pageShellLeadGapClass = "pb-12 sm:pb-16";
 /** Standalone bottom padding for pages whose shell ends before main content. */
 export const pageBottomClass = "pb-20 sm:pb-28";
 
-export const pageKickerClass =
-  "font-mono text-[11px] uppercase tracking-widest text-muted-foreground";
+export const pageKickerClass = kickerPage;
 
 export const pageTitleClass = "mt-2 font-display text-6xl sm:text-7xl";
 
@@ -59,19 +59,29 @@ type PageHeaderProps = {
   page: PageRouteKey;
   /** Defaults to the same label as the navbar (`nav.*`). */
   title?: ReactNode;
+  /** Screen heading level — use `p` when another h1 exists on the page (e.g. /cv article). */
+  titleAs?: "h1" | "p";
   subtitle?: string;
   hint?: string;
   actions?: ReactNode;
 };
 
-export function PageHeaderBlock({ page, title, subtitle, hint, actions }: PageHeaderProps) {
+export function PageHeaderBlock({
+  page,
+  title,
+  titleAs = "h1",
+  subtitle,
+  hint,
+  actions,
+}: PageHeaderProps) {
   const { t } = useTranslation();
   const heading = title ?? t(PAGE_NAV_KEY[page]);
+  const TitleTag = titleAs;
 
   const copy = (
     <div>
       <PageKicker page={page} />
-      <h1 className={pageTitleClass}>{heading}</h1>
+      <TitleTag className={pageTitleClass}>{heading}</TitleTag>
       {subtitle ? <p className="mt-4 max-w-xl text-lg text-muted-foreground">{subtitle}</p> : null}
       {hint ? <p className="mt-4 text-sm text-muted-foreground">{hint}</p> : null}
     </div>

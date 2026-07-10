@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
-const policy = require('./github-coordination/policy');
-const parsing = require('./github-coordination/parsing');
-const ghApi = require('./github-coordination/gh-api');
-const state = require('./github-coordination/state');
-const actions = require('./github-coordination/actions');
-const store = require('./github-coordination/store');
+const policy = require("./github-coordination/policy");
+const parsing = require("./github-coordination/parsing");
+const ghApi = require("./github-coordination/gh-api");
+const state = require("./github-coordination/state");
+const actions = require("./github-coordination/actions");
+const store = require("./github-coordination/store");
 
 module.exports = {
   DEFAULT_CONFIG_FILE: policy.DEFAULT_CONFIG_FILE,

@@ -13,63 +13,56 @@
  *   2 = block (bypass flag detected)
  */
 
-'use strict';
+"use strict";
 
 const MAX_STDIN = 1024 * 1024;
-let raw = '';
+let raw = "";
 
 /**
  * Git commands that support the --no-verify flag.
  */
-const GIT_COMMANDS_WITH_NO_VERIFY = [
-  'commit',
-  'push',
-  'merge',
-  'cherry-pick',
-  'rebase',
-  'am',
-];
+const GIT_COMMANDS_WITH_NO_VERIFY = ["commit", "push", "merge", "cherry-pick", "rebase", "am"];
 
 /**
  * Characters that can appear immediately before 'git' in a command string.
  */
-const VALID_BEFORE_GIT = ' \t\n\r;&|$`(<{!"\']/.~\\';
+const VALID_BEFORE_GIT = " \t\n\r;&|$`(<{!\"']/.~\\";
 
 // Git config section and variable names are case-insensitive
 // (subsection names are case-sensitive but core.hooksPath has none),
 // so we normalize the candidate token to lowercase before matching.
 // See https://git-scm.com/docs/git-config — "The variable names are
 // case-insensitive."
-const GIT_CONFIG_KEY_PREFIX = 'core.hookspath=';
+const GIT_CONFIG_KEY_PREFIX = "core.hookspath=";
 
 const COMMIT_OPTIONS_WITH_VALUE = new Set([
-  '-m',
-  '--message',
-  '-F',
-  '--file',
-  '-C',
-  '--reuse-message',
-  '-c',
-  '--reedit-message',
-  '--author',
-  '--date',
-  '--template',
-  '--fixup',
-  '--squash',
-  '--pathspec-from-file',
+  "-m",
+  "--message",
+  "-F",
+  "--file",
+  "-C",
+  "--reuse-message",
+  "-c",
+  "--reedit-message",
+  "--author",
+  "--date",
+  "--template",
+  "--fixup",
+  "--squash",
+  "--pathspec-from-file",
 ]);
 
 const COMMIT_OPTIONS_WITH_INLINE_VALUE = [
-  '--message=',
-  '--file=',
-  '--reuse-message=',
-  '--reedit-message=',
-  '--author=',
-  '--date=',
-  '--template=',
-  '--fixup=',
-  '--squash=',
-  '--pathspec-from-file=',
+  "--message=",
+  "--file=",
+  "--reuse-message=",
+  "--reedit-message=",
+  "--author=",
+  "--date=",
+  "--template=",
+  "--fixup=",
+  "--squash=",
+  "--pathspec-from-file=",
 ];
 
 // Short options that take a value. When seen as part of a combined
@@ -77,11 +70,11 @@ const COMMIT_OPTIONS_WITH_INLINE_VALUE = [
 // token as the option's value (template path 'n' here), so the scanner
 // must stop at this character — anything after it is the inline value,
 // not another flag.
-const COMMIT_SHORT_OPTIONS_WITH_VALUE = new Set(['m', 'F', 'C', 'c', 't']);
+const COMMIT_SHORT_OPTIONS_WITH_VALUE = new Set(["m", "F", "C", "c", "t"]);
 
 function tokenizeShellWords(input, start = 0, end = input.length) {
   const tokens = [];
-  let value = '';
+  let value = "";
   let tokenStart = null;
   let quote = null;
   let escaped = false;
@@ -102,7 +95,7 @@ function tokenizeShellWords(input, start = 0, end = input.length) {
       start: tokenStart,
       end: index,
     });
-    value = '';
+    value = "";
     tokenStart = null;
   }
 
@@ -122,7 +115,7 @@ function tokenizeShellWords(input, start = 0, end = input.length) {
         continue;
       }
 
-      if (quote === '"' && char === '\\') {
+      if (quote === '"' && char === "\\") {
         beginToken(i);
         escaped = true;
         continue;
@@ -139,7 +132,7 @@ function tokenizeShellWords(input, start = 0, end = input.length) {
       continue;
     }
 
-    if (char === '\\') {
+    if (char === "\\") {
       beginToken(i);
       escaped = true;
       continue;
@@ -155,7 +148,7 @@ function tokenizeShellWords(input, start = 0, end = input.length) {
   }
 
   if (escaped) {
-    value += '\\';
+    value += "\\";
   }
   pushToken(end);
 
@@ -175,7 +168,7 @@ function findCommandSegmentEnd(input, start) {
     }
 
     if (quote) {
-      if (quote === '"' && char === '\\') {
+      if (quote === '"' && char === "\\") {
         escaped = true;
         continue;
       }
@@ -190,12 +183,12 @@ function findCommandSegmentEnd(input, start) {
       continue;
     }
 
-    if (char === '\\') {
+    if (char === "\\") {
       escaped = true;
       continue;
     }
 
-    if (char === ';' || char === '|' || char === '&' || char === '\n') {
+    if (char === ";" || char === "|" || char === "&" || char === "\n") {
       return i;
     }
   }
@@ -221,7 +214,7 @@ function commitOptionContainsInlineValue(value) {
     return false;
   }
 
-  if (COMMIT_OPTIONS_WITH_INLINE_VALUE.some(prefix => value.startsWith(prefix))) {
+  if (COMMIT_OPTIONS_WITH_INLINE_VALUE.some((prefix) => value.startsWith(prefix))) {
     return true;
   }
 
@@ -230,7 +223,7 @@ function commitOptionContainsInlineValue(value) {
 }
 
 function getCommitShortValueOption(value) {
-  if (!value.startsWith('-') || value.startsWith('--') || value === '-') {
+  if (!value.startsWith("-") || value.startsWith("--") || value === "-") {
     return null;
   }
 
@@ -248,19 +241,19 @@ function getCommitShortValueOption(value) {
 }
 
 function isCommitNoVerifyShortFlag(value) {
-  return value === '-n' || /^-n[a-zA-Z]/.test(value);
+  return value === "-n" || /^-n[a-zA-Z]/.test(value);
 }
 
 /**
  * Check if a position in the input is inside a shell comment.
  */
 function isInComment(input, idx) {
-  const lineStart = input.lastIndexOf('\n', idx - 1) + 1;
+  const lineStart = input.lastIndexOf("\n", idx - 1) + 1;
   const before = input.slice(lineStart, idx);
   for (let i = 0; i < before.length; i++) {
-    if (before.charAt(i) === '#') {
-      const prev = i > 0 ? before.charAt(i - 1) : '';
-      if (prev !== '$' && prev !== '\\') return true;
+    if (before.charAt(i) === "#") {
+      const prev = i > 0 ? before.charAt(i - 1) : "";
+      if (prev !== "$" && prev !== "\\") return true;
     }
   }
   return false;
@@ -272,18 +265,18 @@ function isInComment(input, idx) {
 function findGit(input, start) {
   let pos = start;
   while (pos < input.length) {
-    const idx = input.indexOf('git', pos);
+    const idx = input.indexOf("git", pos);
     if (idx === -1) return null;
 
-    const isExe = input.slice(idx + 3, idx + 7).toLowerCase() === '.exe';
+    const isExe = input.slice(idx + 3, idx + 7).toLowerCase() === ".exe";
     const len = isExe ? 7 : 3;
-    const after = input[idx + len] || ' ';
+    const after = input[idx + len] || " ";
     if (!/[\s"']/.test(after)) {
       pos = idx + 1;
       continue;
     }
 
-    const before = idx > 0 ? input[idx - 1] : ' ';
+    const before = idx > 0 ? input[idx - 1] : " ";
     if (VALID_BEFORE_GIT.includes(before)) return { idx, len };
     pos = idx + 1;
   }
@@ -317,12 +310,21 @@ function detectGitCommand(input, start = 0) {
         const cmdIdx = input.indexOf(cmd, searchPos);
         if (cmdIdx === -1) break;
 
-        const before = cmdIdx > 0 ? input[cmdIdx - 1] : ' ';
-        const after = input[cmdIdx + cmd.length] || ' ';
-        if (!/\s/.test(before)) { searchPos = cmdIdx + 1; continue; }
-        if (!/[\s;&#|>)\]}"']/.test(after) && after !== '') { searchPos = cmdIdx + 1; continue; }
+        const before = cmdIdx > 0 ? input[cmdIdx - 1] : " ";
+        const after = input[cmdIdx + cmd.length] || " ";
+        if (!/\s/.test(before)) {
+          searchPos = cmdIdx + 1;
+          continue;
+        }
+        if (!/[\s;&#|>)\]}"']/.test(after) && after !== "") {
+          searchPos = cmdIdx + 1;
+          continue;
+        }
         if (/[;|]/.test(input.slice(git.idx + git.len, cmdIdx))) break;
-        if (isInComment(input, cmdIdx)) { searchPos = cmdIdx + 1; continue; }
+        if (isInComment(input, cmdIdx)) {
+          searchPos = cmdIdx + 1;
+          continue;
+        }
 
         // Verify this token is the first non-flag word after "git" — i.e. the
         // actual subcommand, not an argument value to a different subcommand.
@@ -333,11 +335,20 @@ function detectGitCommand(input, start = 0) {
         let onlyFlagsAndArgs = true;
         let expectFlagArg = false;
         for (const t of tokens) {
-          if (expectFlagArg) { expectFlagArg = false; continue; }
-          if (t.startsWith('-')) {
+          if (expectFlagArg) {
+            expectFlagArg = false;
+            continue;
+          }
+          if (t.startsWith("-")) {
             // -c is a git global flag that takes the next token as its argument
-            if (t === '-c' || t === '-C' || t === '--work-tree' || t === '--git-dir' ||
-                t === '--namespace' || t === '--super-prefix') {
+            if (
+              t === "-c" ||
+              t === "-C" ||
+              t === "--work-tree" ||
+              t === "--git-dir" ||
+              t === "--namespace" ||
+              t === "--super-prefix"
+            ) {
               expectFlagArg = true;
             }
             continue;
@@ -345,7 +356,10 @@ function detectGitCommand(input, start = 0) {
           onlyFlagsAndArgs = false;
           break;
         }
-        if (!onlyFlagsAndArgs) { searchPos = cmdIdx + 1; continue; }
+        if (!onlyFlagsAndArgs) {
+          searchPos = cmdIdx + 1;
+          continue;
+        }
 
         if (cmdIdx < bestIdx) {
           bestIdx = cmdIdx;
@@ -389,11 +403,11 @@ function hasNoVerifyFlag(input, command, offset) {
       continue;
     }
 
-    if (value === '--') {
+    if (value === "--") {
       break;
     }
 
-    if (command === 'commit') {
+    if (command === "commit") {
       if (commitOptionConsumesNextValue(value)) {
         skipNext = true;
         continue;
@@ -404,10 +418,10 @@ function hasNoVerifyFlag(input, command, offset) {
       }
     }
 
-    if (value === '--no-verify') return true;
+    if (value === "--no-verify") return true;
 
     // For commit, -n is shorthand for --no-verify.
-    if (command === 'commit' && isCommitNoVerifyShortFlag(value)) {
+    if (command === "commit" && isCommitNoVerifyShortFlag(value)) {
       return true;
     }
   }
@@ -428,9 +442,9 @@ function hasHooksPathOverride(input, detected) {
     // must compare against the lowercased token.
     const lowered = value.toLowerCase();
 
-    if (value === '-c') {
+    if (value === "-c") {
       const next = tokens[i + 1] && tokens[i + 1].value;
-      if (typeof next === 'string' && next.toLowerCase().startsWith(GIT_CONFIG_KEY_PREFIX)) {
+      if (typeof next === "string" && next.toLowerCase().startsWith(GIT_CONFIG_KEY_PREFIX)) {
         return true;
       }
       i++;
@@ -482,19 +496,19 @@ function checkCommand(input) {
  */
 function extractCommand(rawInput) {
   const trimmed = rawInput.trim();
-  if (!trimmed.startsWith('{')) return trimmed;
+  if (!trimmed.startsWith("{")) return trimmed;
 
   try {
     const parsed = JSON.parse(trimmed);
-    if (typeof parsed !== 'object' || parsed === null) return trimmed;
+    if (typeof parsed !== "object" || parsed === null) return trimmed;
 
     // Claude Code format: { tool_input: { command: "..." } }
     const cmd = parsed.tool_input?.command;
-    if (typeof cmd === 'string') return cmd;
+    if (typeof cmd === "string") return cmd;
 
     // Generic JSON formats
-    for (const key of ['command', 'cmd', 'input', 'shell', 'script']) {
-      if (typeof parsed[key] === 'string') return parsed[key];
+    for (const key of ["command", "cmd", "input", "shell", "script"]) {
+      if (typeof parsed[key] === "string") return parsed[key];
     }
 
     return trimmed;
@@ -524,20 +538,20 @@ module.exports = { run };
 
 // Stdin fallback for spawnSync execution — only when invoked directly, not via require()
 if (require.main === module) {
-  process.stdin.setEncoding('utf8');
-  process.stdin.on('data', chunk => {
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => {
     if (raw.length < MAX_STDIN) {
       const remaining = MAX_STDIN - raw.length;
       raw += chunk.substring(0, remaining);
     }
   });
 
-  process.stdin.on('end', () => {
+  process.stdin.on("end", () => {
     const command = extractCommand(raw);
     const result = checkCommand(command);
 
     if (result.blocked) {
-      process.stderr.write(result.reason + '\n');
+      process.stderr.write(result.reason + "\n");
       process.exit(2);
     }
 

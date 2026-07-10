@@ -13,8 +13,8 @@
  * console.log is often intentional).
  */
 
-const fs = require('fs');
-const { isGitRepo, getGitModifiedFiles, readFile, log } = require('../lib/utils');
+const fs = require("fs");
+const { isGitRepo, getGitModifiedFiles, readFile, log } = require("../lib/utils");
 
 // Files where console.log is expected and should not trigger warnings
 const EXCLUDED_PATTERNS = [
@@ -27,11 +27,11 @@ const EXCLUDED_PATTERNS = [
 ];
 
 const MAX_STDIN = 1024 * 1024; // 1MB limit
-let data = '';
+let data = "";
 let truncated = false;
-process.stdin.setEncoding('utf8');
+process.stdin.setEncoding("utf8");
 
-process.stdin.on('data', chunk => {
+process.stdin.on("data", (chunk) => {
   if (data.length < MAX_STDIN) {
     const remaining = MAX_STDIN - data.length;
     data += chunk.substring(0, remaining);
@@ -48,7 +48,7 @@ process.stdin.on('data', chunk => {
  */
 function passThroughAndExit() {
   if (truncated) {
-    log('[Hook] check-console-log: stdin exceeded 1MB; suppressing pass-through (fail-open)');
+    log("[Hook] check-console-log: stdin exceeded 1MB; suppressing pass-through (fail-open)");
     process.exit(0);
   }
   if (!data) {
@@ -57,29 +57,29 @@ function passThroughAndExit() {
   process.stdout.write(data, () => process.exit(0));
 }
 
-process.stdin.on('end', () => {
+process.stdin.on("end", () => {
   try {
     if (!isGitRepo()) {
       passThroughAndExit();
       return;
     }
 
-    const files = getGitModifiedFiles(['\\.tsx?$', '\\.jsx?$'])
-      .filter(f => fs.existsSync(f))
-      .filter(f => !EXCLUDED_PATTERNS.some(pattern => pattern.test(f)));
+    const files = getGitModifiedFiles(["\\.tsx?$", "\\.jsx?$"])
+      .filter((f) => fs.existsSync(f))
+      .filter((f) => !EXCLUDED_PATTERNS.some((pattern) => pattern.test(f)));
 
     let hasConsole = false;
 
     for (const file of files) {
       const content = readFile(file);
-      if (content && content.includes('console.log')) {
+      if (content && content.includes("console.log")) {
         log(`[Hook] WARNING: console.log found in ${file}`);
         hasConsole = true;
       }
     }
 
     if (hasConsole) {
-      log('[Hook] Remove console.log statements before committing');
+      log("[Hook] Remove console.log statements before committing");
     }
   } catch (err) {
     log(`[Hook] check-console-log error: ${err.message}`);

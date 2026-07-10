@@ -1,41 +1,39 @@
 #!/usr/bin/env node
-'use strict';
+"use strict";
 
 const MAX_STDIN = 1024 * 1024;
-const path = require('path');
-const { splitShellSegments } = require('../lib/shell-split');
-const {
-  extractCommandSubstitutions,
-  extractSubshellGroups
-} = require('../lib/shell-substitution');
+const path = require("path");
+const { splitShellSegments } = require("../lib/shell-split");
+const { extractCommandSubstitutions, extractSubshellGroups } = require("../lib/shell-substitution");
 
-const DEV_COMMAND_WORDS = new Set([
-  'npm',
-  'pnpm',
-  'yarn',
-  'bun',
-  'npx',
-  'tmux'
+const DEV_COMMAND_WORDS = new Set(["npm", "pnpm", "yarn", "bun", "npx", "tmux"]);
+const SKIPPABLE_PREFIX_WORDS = new Set([
+  "env",
+  "command",
+  "builtin",
+  "exec",
+  "noglob",
+  "sudo",
+  "nohup",
 ]);
-const SKIPPABLE_PREFIX_WORDS = new Set(['env', 'command', 'builtin', 'exec', 'noglob', 'sudo', 'nohup']);
 const PREFIX_OPTION_VALUE_WORDS = {
-  env: new Set(['-u', '-C', '-S', '--unset', '--chdir', '--split-string']),
+  env: new Set(["-u", "-C", "-S", "--unset", "--chdir", "--split-string"]),
   sudo: new Set([
-    '-u',
-    '-g',
-    '-h',
-    '-p',
-    '-r',
-    '-t',
-    '-C',
-    '--user',
-    '--group',
-    '--host',
-    '--prompt',
-    '--role',
-    '--type',
-    '--close-from'
-  ])
+    "-u",
+    "-g",
+    "-h",
+    "-p",
+    "-r",
+    "-t",
+    "-C",
+    "--user",
+    "--group",
+    "--host",
+    "--prompt",
+    "--role",
+    "--type",
+    "--close-from",
+  ]),
 };
 
 function readToken(input, startIndex) {
@@ -43,7 +41,7 @@ function readToken(input, startIndex) {
   while (index < input.length && /\s/.test(input[index])) index += 1;
   if (index >= input.length) return null;
 
-  let token = '';
+  let token = "";
   let quote = null;
 
   while (index < input.length) {
@@ -56,7 +54,7 @@ function readToken(input, startIndex) {
         continue;
       }
 
-      if (ch === '\\' && quote === '"' && index + 1 < input.length) {
+      if (ch === "\\" && quote === '"' && index + 1 < input.length) {
         token += input[index + 1];
         index += 2;
         continue;
@@ -75,7 +73,7 @@ function readToken(input, startIndex) {
 
     if (/\s/.test(ch)) break;
 
-    if (ch === '\\' && index + 1 < input.length) {
+    if (ch === "\\" && index + 1 < input.length) {
       token += input[index + 1];
       index += 2;
       continue;
@@ -89,19 +87,19 @@ function readToken(input, startIndex) {
 }
 
 function shouldSkipOptionValue(wrapper, optionToken) {
-  if (!wrapper || !optionToken || optionToken.includes('=')) return false;
+  if (!wrapper || !optionToken || optionToken.includes("=")) return false;
   const optionSet = PREFIX_OPTION_VALUE_WORDS[wrapper];
   return Boolean(optionSet && optionSet.has(optionToken));
 }
 
 function isOptionToken(token) {
-  return token.startsWith('-') && token.length > 1;
+  return token.startsWith("-") && token.length > 1;
 }
 
 function normalizeCommandWord(token) {
-  if (!token) return '';
+  if (!token) return "";
   const base = path.basename(token).toLowerCase();
-  return base.replace(/\.(cmd|exe|bat)$/i, '');
+  return base.replace(/\.(cmd|exe|bat)$/i, "");
 }
 
 function getLeadingCommandWord(segment) {
@@ -122,12 +120,12 @@ function getLeadingCommandWord(segment) {
       continue;
     }
 
-    if (token === '--') {
+    if (token === "--") {
       activeWrapper = null;
       continue;
     }
 
-    if (token === '{' || token === '}') continue;
+    if (token === "{" || token === "}") continue;
 
     if (/^[A-Za-z_][A-Za-z0-9_]*=.*/.test(token)) continue;
 
@@ -151,9 +149,9 @@ function getLeadingCommandWord(segment) {
   return null;
 }
 
-let raw = '';
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', chunk => {
+let raw = "";
+process.stdin.setEncoding("utf8");
+process.stdin.on("data", (chunk) => {
   if (raw.length < MAX_STDIN) {
     const remaining = MAX_STDIN - raw.length;
     raw += chunk.substring(0, remaining);
@@ -165,7 +163,8 @@ const TMUX_LAUNCHER = /^\s*tmux\s+(new|new-session|new-window|split-window)\b/;
 // `dev\b` matches the `dev` prefix of distinct scripts like `dev-setup` /
 // `dev-docs` / `dev-build` and wrongly blocks them. The lookahead still matches
 // the dev server (`dev`, `dev;`, `dev:ssr`, ...) but not a `dev-<suffix>` script.
-const DEV_PATTERN = /\b(npm\s+run\s+dev|pnpm(?:\s+run)?\s+dev|yarn(?:\s+run)?\s+dev|bun(?:\s+run)?\s+dev)(?![\w-])/;
+const DEV_PATTERN =
+  /\b(npm\s+run\s+dev|pnpm(?:\s+run)?\s+dev|yarn(?:\s+run)?\s+dev|bun(?:\s+run)?\s+dev)(?![\w-])/;
 
 /**
  * Collect every command-line segment we should evaluate. Returns the top-level
@@ -205,19 +204,19 @@ function isBlockedDevSegment(segment) {
   return DEV_PATTERN.test(segment) && !TMUX_LAUNCHER.test(segment);
 }
 
-process.stdin.on('end', () => {
+process.stdin.on("end", () => {
   try {
     const input = JSON.parse(raw);
-    const cmd = String(input.tool_input?.command || '');
+    const cmd = String(input.tool_input?.command || "");
 
-    if (process.platform !== 'win32') {
+    if (process.platform !== "win32") {
       const segments = collectCheckSegments(cmd);
       const hasBlockedDev = segments.some(isBlockedDevSegment);
 
       if (hasBlockedDev) {
-        console.error('[Hook] BLOCKED: Dev server must run in tmux for log access');
+        console.error("[Hook] BLOCKED: Dev server must run in tmux for log access");
         console.error('[Hook] Use: tmux new-session -d -s dev "npm run dev"');
-        console.error('[Hook] Then: tmux attach -t dev');
+        console.error("[Hook] Then: tmux attach -t dev");
         process.exit(2);
       }
     }

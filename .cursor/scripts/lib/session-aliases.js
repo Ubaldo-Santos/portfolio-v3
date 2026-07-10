@@ -3,23 +3,18 @@
  * Manages session aliases stored in $ECC_AGENT_DATA_HOME/session-aliases.json (default ~/.claude).
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const {
-  getClaudeDir,
-  ensureDir,
-  readFile,
-  log
-} = require('./utils');
+const { getClaudeDir, ensureDir, readFile, log } = require("./utils");
 
 // Aliases file path
 function getAliasesPath() {
-  return path.join(getClaudeDir(), 'session-aliases.json');
+  return path.join(getClaudeDir(), "session-aliases.json");
 }
 
 // Current alias storage format version
-const ALIAS_VERSION = '1.0';
+const ALIAS_VERSION = "1.0";
 
 /**
  * Default aliases file structure
@@ -30,8 +25,8 @@ function getDefaultAliases() {
     aliases: {},
     metadata: {
       totalCount: 0,
-      lastUpdated: new Date().toISOString()
-    }
+      lastUpdated: new Date().toISOString(),
+    },
   };
 }
 
@@ -55,8 +50,8 @@ function loadAliases() {
     const data = JSON.parse(content);
 
     // Validate structure
-    if (!data.aliases || typeof data.aliases !== 'object') {
-      log('[Aliases] Invalid aliases file structure, resetting');
+    if (!data.aliases || typeof data.aliases !== "object") {
+      log("[Aliases] Invalid aliases file structure, resetting");
       return getDefaultAliases();
     }
 
@@ -69,7 +64,7 @@ function loadAliases() {
     if (!data.metadata) {
       data.metadata = {
         totalCount: Object.keys(data.aliases).length,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     }
 
@@ -87,14 +82,14 @@ function loadAliases() {
  */
 function saveAliases(aliases) {
   const aliasesPath = getAliasesPath();
-  const tempPath = aliasesPath + '.tmp';
-  const backupPath = aliasesPath + '.bak';
+  const tempPath = aliasesPath + ".tmp";
+  const backupPath = aliasesPath + ".bak";
 
   try {
     // Update metadata
     aliases.metadata = {
       totalCount: Object.keys(aliases.aliases).length,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
 
     const content = JSON.stringify(aliases, null, 2);
@@ -108,12 +103,12 @@ function saveAliases(aliases) {
     }
 
     // Atomic write: write to temp file, then rename
-    fs.writeFileSync(tempPath, content, 'utf8');
+    fs.writeFileSync(tempPath, content, "utf8");
 
     // On Windows, rename fails with EEXIST if destination exists, so delete first.
     // On Unix/macOS, rename(2) atomically replaces the destination — skip the
     // delete to avoid an unnecessary non-atomic window between unlink and rename.
-    if (process.platform === 'win32' && fs.existsSync(aliasesPath)) {
+    if (process.platform === "win32" && fs.existsSync(aliasesPath)) {
       fs.unlinkSync(aliasesPath);
     }
     fs.renameSync(tempPath, aliasesPath);
@@ -131,7 +126,7 @@ function saveAliases(aliases) {
     if (fs.existsSync(backupPath)) {
       try {
         fs.copyFileSync(backupPath, aliasesPath);
-        log('[Aliases] Restored from backup');
+        log("[Aliases] Restored from backup");
       } catch (restoreErr) {
         log(`[Aliases] Failed to restore backup: ${restoreErr.message}`);
       }
@@ -174,7 +169,7 @@ function resolveAlias(alias) {
     alias,
     sessionPath: aliasData.sessionPath,
     createdAt: aliasData.createdAt,
-    title: aliasData.title || null
+    title: aliasData.title || null,
   };
 }
 
@@ -188,24 +183,27 @@ function resolveAlias(alias) {
 function setAlias(alias, sessionPath, title = null) {
   // Validate alias name
   if (!alias || alias.length === 0) {
-    return { success: false, error: 'Alias name cannot be empty' };
+    return { success: false, error: "Alias name cannot be empty" };
   }
 
   // Validate session path
-  if (!sessionPath || typeof sessionPath !== 'string' || sessionPath.trim().length === 0) {
-    return { success: false, error: 'Session path cannot be empty' };
+  if (!sessionPath || typeof sessionPath !== "string" || sessionPath.trim().length === 0) {
+    return { success: false, error: "Session path cannot be empty" };
   }
 
   if (alias.length > 128) {
-    return { success: false, error: 'Alias name cannot exceed 128 characters' };
+    return { success: false, error: "Alias name cannot exceed 128 characters" };
   }
 
   if (!/^[a-zA-Z0-9_-]+$/.test(alias)) {
-    return { success: false, error: 'Alias name must contain only letters, numbers, dashes, and underscores' };
+    return {
+      success: false,
+      error: "Alias name must contain only letters, numbers, dashes, and underscores",
+    };
   }
 
   // Reserved alias names
-  const reserved = ['list', 'help', 'remove', 'delete', 'create', 'set'];
+  const reserved = ["list", "help", "remove", "delete", "create", "set"];
   if (reserved.includes(alias.toLowerCase())) {
     return { success: false, error: `'${alias}' is a reserved alias name` };
   }
@@ -218,7 +216,7 @@ function setAlias(alias, sessionPath, title = null) {
     sessionPath,
     createdAt: existing ? existing.createdAt : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    title: title || null
+    title: title || null,
   };
 
   if (saveAliases(data)) {
@@ -227,11 +225,11 @@ function setAlias(alias, sessionPath, title = null) {
       isNew,
       alias,
       sessionPath,
-      title: data.aliases[alias].title
+      title: data.aliases[alias].title,
     };
   }
 
-  return { success: false, error: 'Failed to save alias' };
+  return { success: false, error: "Failed to save alias" };
 }
 
 /**
@@ -250,18 +248,23 @@ function listAliases(options = {}) {
     sessionPath: info.sessionPath,
     createdAt: info.createdAt,
     updatedAt: info.updatedAt,
-    title: info.title
+    title: info.title,
   }));
 
   // Sort by updated time (newest first)
-  aliases.sort((a, b) => (new Date(b.updatedAt || b.createdAt || 0).getTime() || 0) - (new Date(a.updatedAt || a.createdAt || 0).getTime() || 0));
+  aliases.sort(
+    (a, b) =>
+      (new Date(b.updatedAt || b.createdAt || 0).getTime() || 0) -
+      (new Date(a.updatedAt || a.createdAt || 0).getTime() || 0),
+  );
 
   // Apply search filter
   if (search) {
     const searchLower = search.toLowerCase();
-    aliases = aliases.filter(a =>
-      a.name.toLowerCase().includes(searchLower) ||
-      (a.title && a.title.toLowerCase().includes(searchLower))
+    aliases = aliases.filter(
+      (a) =>
+        a.name.toLowerCase().includes(searchLower) ||
+        (a.title && a.title.toLowerCase().includes(searchLower)),
     );
   }
 
@@ -292,11 +295,11 @@ function deleteAlias(alias) {
     return {
       success: true,
       alias,
-      deletedSessionPath: deleted.sessionPath
+      deletedSessionPath: deleted.sessionPath,
     };
   }
 
-  return { success: false, error: 'Failed to delete alias' };
+  return { success: false, error: "Failed to delete alias" };
 }
 
 /**
@@ -314,18 +317,21 @@ function renameAlias(oldAlias, newAlias) {
 
   // Validate new alias name (same rules as setAlias)
   if (!newAlias || newAlias.length === 0) {
-    return { success: false, error: 'New alias name cannot be empty' };
+    return { success: false, error: "New alias name cannot be empty" };
   }
 
   if (newAlias.length > 128) {
-    return { success: false, error: 'New alias name cannot exceed 128 characters' };
+    return { success: false, error: "New alias name cannot exceed 128 characters" };
   }
 
   if (!/^[a-zA-Z0-9_-]+$/.test(newAlias)) {
-    return { success: false, error: 'New alias name must contain only letters, numbers, dashes, and underscores' };
+    return {
+      success: false,
+      error: "New alias name must contain only letters, numbers, dashes, and underscores",
+    };
   }
 
-  const reserved = ['list', 'help', 'remove', 'delete', 'create', 'set'];
+  const reserved = ["list", "help", "remove", "delete", "create", "set"];
   if (reserved.includes(newAlias.toLowerCase())) {
     return { success: false, error: `'${newAlias}' is a reserved alias name` };
   }
@@ -345,7 +351,7 @@ function renameAlias(oldAlias, newAlias) {
       success: true,
       oldAlias,
       newAlias,
-      sessionPath: aliasData.sessionPath
+      sessionPath: aliasData.sessionPath,
     };
   }
 
@@ -354,7 +360,7 @@ function renameAlias(oldAlias, newAlias) {
   delete data.aliases[newAlias];
   // Attempt to persist the rollback
   saveAliases(data);
-  return { success: false, error: 'Failed to save renamed alias — rolled back to original' };
+  return { success: false, error: "Failed to save renamed alias — rolled back to original" };
 }
 
 /**
@@ -380,8 +386,8 @@ function resolveSessionAlias(aliasOrId) {
  * @returns {object} Result with success status
  */
 function updateAliasTitle(alias, title) {
-  if (title !== null && typeof title !== 'string') {
-    return { success: false, error: 'Title must be a string or null' };
+  if (title !== null && typeof title !== "string") {
+    return { success: false, error: "Title must be a string or null" };
   }
 
   const data = loadAliases();
@@ -397,11 +403,11 @@ function updateAliasTitle(alias, title) {
     return {
       success: true,
       alias,
-      title
+      title,
     };
   }
 
-  return { success: false, error: 'Failed to update alias title' };
+  return { success: false, error: "Failed to update alias title" };
 }
 
 /**
@@ -418,7 +424,7 @@ function getAliasesForSession(sessionPath) {
       aliases.push({
         name,
         createdAt: info.createdAt,
-        title: info.title
+        title: info.title,
       });
     }
   }
@@ -432,8 +438,13 @@ function getAliasesForSession(sessionPath) {
  * @returns {object} Cleanup result
  */
 function cleanupAliases(sessionExists) {
-  if (typeof sessionExists !== 'function') {
-    return { totalChecked: 0, removed: 0, removedAliases: [], error: 'sessionExists must be a function' };
+  if (typeof sessionExists !== "function") {
+    return {
+      totalChecked: 0,
+      removed: 0,
+      removedAliases: [],
+      error: "sessionExists must be a function",
+    };
   }
 
   const data = loadAliases();
@@ -447,13 +458,13 @@ function cleanupAliases(sessionExists) {
   }
 
   if (removed.length > 0 && !saveAliases(data)) {
-    log('[Aliases] Failed to save after cleanup');
+    log("[Aliases] Failed to save after cleanup");
     return {
       success: false,
       totalChecked: Object.keys(data.aliases).length + removed.length,
       removed: removed.length,
       removedAliases: removed,
-      error: 'Failed to save after cleanup'
+      error: "Failed to save after cleanup",
     };
   }
 
@@ -461,7 +472,7 @@ function cleanupAliases(sessionExists) {
     success: true,
     totalChecked: Object.keys(data.aliases).length + removed.length,
     removed: removed.length,
-    removedAliases: removed
+    removedAliases: removed,
   };
 }
 
@@ -477,5 +488,5 @@ module.exports = {
   resolveSessionAlias,
   updateAliasTitle,
   getAliasesForSession,
-  cleanupAliases
+  cleanupAliases,
 };

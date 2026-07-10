@@ -1,37 +1,76 @@
 # Ubaldo Santos Patón
 
-> Ingeniero de software full-stack con 6+ años de experiencia en producto. Especializado en TypeScript, PHP/Laravel, Vue y edtech (MathType Integrations, Nubric/Assessment). Actualmente en Wiris, Barcelona.
+> Full-stack engineer with 6+ years of experience. @WIRIS. Building Nubric with the Assessment team. Previously on the MathType Integrations team.
 
-Portfolio personal de Ubaldo Santos Patón. Toda la información es pública, verificable y está pensada para ser leída tanto por humanos como por agentes de IA y motores de búsqueda. El sitio está disponible en español, catalán e inglés.
+Full-Stack Software Engineer with 6+ years of product experience. Specialized in TypeScript/JavaScript and PHP/Laravel, focused on maintainable architecture (hexagonal, DDD, SOLID), code quality and performance. At Wiris I'm building Nubric with the Assessment team; previously on the MathType Integrations team, I integrated MathType across Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author and more editors. At Rotrafu I scaled the main application to 50,000+ active services, cut load times by 35% and led ROTRAFU 2.0.
 
-## Identidad
+## Identity
 
-- Nombre: Ubaldo Santos Patón
-- Rol: Full-Stack Software Engineer
-- Ubicación: Barcelona, España
-- Empresa actual: Wiris (Assessment — Nubric; antes MathType Integrations en Google Workspace, Office add-ins, Moodle y editores WYSIWYG)
+- Name: Ubaldo Santos Patón
+- Role: Full-Stack Software Engineer · TypeScript · PHP · Laravel · Vue
+- Location: Badalona, Barcelona · Spain
+- Experience: 6+ years (since 2020-06)
+- Current: Wiris — Software Engineer · Assessment (Apr 2025 — Present)
 - Email: u.santospaton@gmail.com
+- Phone: +34 654 455 339
 - Web: https://ubaldo.is-a.dev
-- GitHub: https://github.com/Ubaldo-Santos
-- LinkedIn: https://www.linkedin.com/in/ubaldo-santos-paton/
+- LinkedIn: https://www.linkedin.com/in/ubaldo-santos
+- GitHub: https://github.com/usantos-at-wiris
 
-## Páginas
+## Experience
 
-- [Inicio](https://ubaldo.is-a.dev/): resumen del portfolio, proyectos destacados y enlaces principales.
-- [Experiencia](https://ubaldo.is-a.dev/experience): trayectoria profesional — Wiris, Rotrafu (+50K servicios, −35% load time), Prime IT, iThinkUPC.
-- [Proyectos](https://ubaldo.is-a.dev/projects): Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 y otros proyectos verificables en GitHub.
-- [Skills](https://ubaldo.is-a.dev/skills): stack técnico verificado — TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), arquitectura hexagonal, DevOps e IA aplicada (Copilot, Cursor, OpenRouter, MCP).
-- [Contacto](https://ubaldo.is-a.dev/contact): email, teléfono, LinkedIn y GitHub.
+- **Wiris — Software Engineer · Assessment (Apr 2025 — Present)**
+  Product team focused on math assessment. I build Nubric (formerly Learning Lemur), a PHP/Laravel platform to create, auto-grade and programmatically rule exercises with embedded MathType, used by educational institutions.
+  Tech: PHP, Laravel, MathType, Docker, Git
+- **Wiris — Software Engineer · MathType Integrations (Mar 2024 — Apr 2025)**
+  Built MathType integrations across the edtech ecosystem: Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author and other WYSIWYG editors. Includes the cross-platform SDK and each product connector, with modular TypeScript/Deno architecture.
+  Tech: TypeScript, JavaScript, Deno, Vue.js, CKEditor, TinyMCE, Froala, Moodle, Oxygen Web Author, Google Workspace, Office Add-ins, Docker, Git
+- **Rotrafu — Full-Stack Developer · IT Lead (Jun 2020 — Mar 2024)**
+  IT lead and full-stack engineer designing, building and maintaining web applications for end-to-end funeral paperwork management. Led the company's digital transformation with custom PHP/Laravel solutions, in parallel with consulting at Prime IT (Jun–Dec 2023).
+  Tech: PHP, Laravel, MySQL, JavaScript, REST APIs, Git, Docker, Agile
+- **Prime IT — Senior Full-Stack Developer · PHP Consulting (Jun 2023 — Dec 2023)**
+  Senior PHP consultant on staff, delivering solutions for clients across sectors while maintaining my role at Rotrafu. Applied scalable architectures, SOLID and agile methods in cross-functional teams.
+  Tech: PHP, Laravel, REST APIs, MySQL, Git, Docker, Scrum
 
-## Stack principal
+## Projects
 
-- Lenguajes: TypeScript, JavaScript, PHP, SQL
-- Frontend: Vue, React, TanStack Start, Tailwind CSS
-- Backend: Laravel, Node.js, arquitectura hexagonal
-- Edtech: MathType Integrations (Google Workspace, Office, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author), Nubric/Assessment
-- Herramientas IA: GitHub Copilot, Cursor, OpenRouter, MCP, Claude, GPT
+- **Nubric (Learning Lemur)** — https://www.wiris.com/en/nubric/: Math assessment platform in Laravel: create, auto-grade and programmatically rule exercises with embedded MathType, used by educational institutions.
+- **MathType Integrations** — https://www.wiris.com/en/solutions/integrations/: MathType integrations across Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author and more editors. Cross-platform SDK with hexagonal TypeScript/Deno architecture and up to 30% load-time reduction on optimized integrations.
+- **MathType Add-in for Microsoft Office** — https://www.wiris.com/en/mathtype/office-tools/: Add-in for Word and PowerPoint using Office APIs and the MathType SDK, built with Vue.js as part of the Wiris integrations ecosystem.
+- **ROTRAFU 2.0** — https://www.rotrafu.net/: Complete rebuild of the funeral-management app in Laravel: UX, scalability and security. 50,000+ active services and −35% load time.
 
-## Opcional
+## Core stack
+
+- Primary: PHP, Laravel · TypeScript, Vue
+- Languages: TypeScript, JavaScript, PHP, C#
+- Backend: Laravel, Deno, Node, REST, OpenAPI, AI
+- Frontend: Vue, HTML5, CSS3, Tailwind CSS
+- Edtech: MathType, Google Workspace, Office Add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author
+- Practices: Arquitectura Hexagonal, DDD, SOLID, Design Patterns, TDD
+- DevOps: Docker, Git, GitHub Actions, CI/CD, Unit Testing, Integration Testing
+- Ribbon: TypeScript, PHP, Laravel, Vue, Deno, Node, AI, Docker, Git, MathType, Moodle, Tailwind, Hexagonal, TDD, CI/CD, OpenAPI, Electron
+
+## Education & languages
+
+- Education: Universitat Oberta de Catalunya — Software Engineering (BSc in Computer Engineering, 2025)
+- Languages: Spanish (Native), Catalan (Native), English (Advanced (B2))
+
+## Topics
+
+- knowsAbout: TypeScript, PHP, Laravel, Vue, React, Edtech, MathType, Nubric, Arquitectura hexagonal, DevOps, IA aplicada
+- AI workflow: GitHub Copilot (org), Cursor CLI, OpenRouter, MCP, Agent Skills
+
+Personal portfolio of Ubaldo Santos Patón. All information is public, verifiable and intended for both humans and AI agents / search engines. Available in Spanish, Catalan and English.
+
+## Pages
+
+- [Home](https://ubaldo.is-a.dev/): portfolio summary, featured work and main links.
+- [Experience](https://ubaldo.is-a.dev/experience): full career timeline — Wiris, Rotrafu, Prime IT, internships.
+- [Projects](https://ubaldo.is-a.dev/projects): Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 and verifiable work.
+- [Skills](https://ubaldo.is-a.dev/skills): verified stack, engineering practices and languages.
+- [Contact](https://ubaldo.is-a.dev/contact): email, phone, LinkedIn and GitHub.
+
+## Optional
 
 - [Sitemap XML](https://ubaldo.is-a.dev/sitemap.xml)
 - [robots.txt](https://ubaldo.is-a.dev/robots.txt)

@@ -269,10 +269,7 @@ hotzone.addEventListener("click", () => {
 
 // 4. Keyboard shortcut (E key, skip when editing text)
 document.addEventListener("keydown", (e) => {
-  if (
-    (e.key === "e" || e.key === "E") &&
-    !e.target.getAttribute("contenteditable")
-  ) {
+  if ((e.key === "e" || e.key === "E") && !e.target.getAttribute("contenteditable")) {
     editor.toggleEditMode();
   }
 });
@@ -361,11 +358,7 @@ Save processed images with `_processed` suffix. Never overwrite originals.
 
 ```html
 <img src="assets/logo_round.png" alt="Logo" class="slide-image logo" />
-<img
-  src="assets/screenshot.png"
-  alt="Screenshot"
-  class="slide-image screenshot"
-/>
+<img src="assets/screenshot.png" alt="Screenshot" class="slide-image screenshot" />
 ```
 
 ```css

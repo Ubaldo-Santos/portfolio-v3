@@ -1,31 +1,33 @@
-'use strict';
+"use strict";
 
 const DEFAULT_FAILURE_THRESHOLD = 3;
 const DEFAULT_WINDOW_SIZE = 50;
 
-const FAILURE_OUTCOMES = new Set(['failure', 'failed', 'error']);
+const FAILURE_OUTCOMES = new Set(["failure", "failed", "error"]);
 
 /**
  * Normalize a failure reason string for grouping.
  * Strips timestamps, UUIDs, file paths, and numeric suffixes.
  */
 function normalizeFailureReason(reason) {
-  if (!reason || typeof reason !== 'string') {
-    return 'unknown';
+  if (!reason || typeof reason !== "string") {
+    return "unknown";
   }
 
-  return reason
-    .trim()
-    .toLowerCase()
-    // Strip ISO timestamps (note: already lowercased, so t/z not T/Z)
-    .replace(/\d{4}-\d{2}-\d{2}[t ]\d{2}:\d{2}:\d{2}[.\dz]*/g, '<timestamp>')
-    // Strip UUIDs (already lowercased)
-    .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g, '<uuid>')
-    // Strip file paths
-    .replace(/\/[\w./-]+/g, '<path>')
-    // Collapse whitespace
-    .replace(/\s+/g, ' ')
-    .trim();
+  return (
+    reason
+      .trim()
+      .toLowerCase()
+      // Strip ISO timestamps (note: already lowercased, so t/z not T/Z)
+      .replace(/\d{4}-\d{2}-\d{2}[t ]\d{2}:\d{2}:\d{2}[.\dz]*/g, "<timestamp>")
+      // Strip UUIDs (already lowercased)
+      .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g, "<uuid>")
+      // Strip file paths
+      .replace(/\/[\w./-]+/g, "<path>")
+      // Collapse whitespace
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 }
 
 /**
@@ -38,7 +40,7 @@ function groupFailures(skillRuns) {
   const groups = new Map();
 
   for (const run of skillRuns) {
-    const outcome = String(run.outcome || '').toLowerCase();
+    const outcome = String(run.outcome || "").toLowerCase();
     if (!FAILURE_OUTCOMES.has(outcome)) {
       continue;
     }
@@ -78,17 +80,17 @@ function detectPatterns(skillRuns, options = {}) {
       continue;
     }
 
-    const sortedRuns = [...group.runs].sort(
-      (a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')
+    const sortedRuns = [...group.runs].sort((a, b) =>
+      (b.createdAt || "").localeCompare(a.createdAt || ""),
     );
 
     const firstSeen = sortedRuns[sortedRuns.length - 1].createdAt || null;
     const lastSeen = sortedRuns[0].createdAt || null;
-    const sessionIds = [...new Set(sortedRuns.map(r => r.sessionId).filter(Boolean))];
-    const versions = [...new Set(sortedRuns.map(r => r.skillVersion).filter(Boolean))];
+    const sessionIds = [...new Set(sortedRuns.map((r) => r.sessionId).filter(Boolean))];
+    const versions = [...new Set(sortedRuns.map((r) => r.skillVersion).filter(Boolean))];
 
     // Collect unique raw failure reasons for this normalized group
-    const rawReasons = [...new Set(sortedRuns.map(r => r.failureReason).filter(Boolean))];
+    const rawReasons = [...new Set(sortedRuns.map((r) => r.failureReason).filter(Boolean))];
 
     patterns.push({
       skillId: group.skillId,
@@ -99,14 +101,14 @@ function detectPatterns(skillRuns, options = {}) {
       sessionIds,
       versions,
       rawReasons,
-      runIds: sortedRuns.map(r => r.id),
+      runIds: sortedRuns.map((r) => r.id),
     });
   }
 
   // Sort by count descending, then by lastSeen descending
   return patterns.sort((a, b) => {
     if (b.count !== a.count) return b.count - a.count;
-    return (b.lastSeen || '').localeCompare(a.lastSeen || '');
+    return (b.lastSeen || "").localeCompare(a.lastSeen || "");
   });
 }
 
@@ -124,23 +126,23 @@ function generateReport(patterns, options = {}) {
   if (patterns.length === 0) {
     return {
       generatedAt,
-      status: 'clean',
+      status: "clean",
       patternCount: 0,
       patterns: [],
-      summary: 'No recurring failure patterns detected.',
+      summary: "No recurring failure patterns detected.",
     };
   }
 
   const totalFailures = patterns.reduce((sum, p) => sum + p.count, 0);
-  const affectedSkills = [...new Set(patterns.map(p => p.skillId))];
+  const affectedSkills = [...new Set(patterns.map((p) => p.skillId))];
 
   return {
     generatedAt,
-    status: 'attention_needed',
+    status: "attention_needed",
     patternCount: patterns.length,
     totalFailures,
     affectedSkills,
-    patterns: patterns.map(p => ({
+    patterns: patterns.map((p) => ({
       skillId: p.skillId,
       normalizedReason: p.normalizedReason,
       count: p.count,
@@ -161,23 +163,23 @@ function generateReport(patterns, options = {}) {
 function suggestAction(pattern) {
   const reason = pattern.normalizedReason;
 
-  if (reason.includes('timeout')) {
-    return 'Increase timeout or optimize skill execution time.';
+  if (reason.includes("timeout")) {
+    return "Increase timeout or optimize skill execution time.";
   }
-  if (reason.includes('permission') || reason.includes('denied') || reason.includes('auth')) {
-    return 'Check tool permissions and authentication configuration.';
+  if (reason.includes("permission") || reason.includes("denied") || reason.includes("auth")) {
+    return "Check tool permissions and authentication configuration.";
   }
-  if (reason.includes('not found') || reason.includes('missing')) {
-    return 'Verify required files/dependencies exist before skill execution.';
+  if (reason.includes("not found") || reason.includes("missing")) {
+    return "Verify required files/dependencies exist before skill execution.";
   }
-  if (reason.includes('parse') || reason.includes('syntax') || reason.includes('json')) {
-    return 'Review input/output format expectations and add validation.';
+  if (reason.includes("parse") || reason.includes("syntax") || reason.includes("json")) {
+    return "Review input/output format expectations and add validation.";
   }
   if (pattern.versions.length > 1) {
-    return 'Failure spans multiple versions. Consider rollback to last stable version.';
+    return "Failure spans multiple versions. Consider rollback to last stable version.";
   }
 
-  return 'Investigate root cause and consider adding error handling.';
+  return "Investigate root cause and consider adding error handling.";
 }
 
 /**

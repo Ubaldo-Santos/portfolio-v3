@@ -12,13 +12,17 @@
  * Prettier / Go / Python checks.
  */
 
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
-const { spawnSync } = require('child_process');
+const fs = require("fs");
+const path = require("path");
+const { spawnSync } = require("child_process");
 
-const { findProjectRoot, detectFormatter, resolveFormatterBin } = require('../lib/resolve-formatter');
+const {
+  findProjectRoot,
+  detectFormatter,
+  resolveFormatterBin,
+} = require("../lib/resolve-formatter");
 
 const MAX_STDIN = 1024 * 1024;
 
@@ -33,9 +37,9 @@ const MAX_STDIN = 1024 * 1024;
 function exec(command, args, cwd = process.cwd()) {
   return spawnSync(command, args, {
     cwd,
-    encoding: 'utf8',
+    encoding: "utf8",
     env: process.env,
-    timeout: 15000
+    timeout: 15000,
   });
 }
 
@@ -63,24 +67,24 @@ function maybeRunQualityGate(filePath) {
   filePath = path.resolve(filePath);
 
   const ext = path.extname(filePath).toLowerCase();
-  const fix = String(process.env.ECC_QUALITY_GATE_FIX || '').toLowerCase() === 'true';
-  const strict = String(process.env.ECC_QUALITY_GATE_STRICT || '').toLowerCase() === 'true';
+  const fix = String(process.env.ECC_QUALITY_GATE_FIX || "").toLowerCase() === "true";
+  const strict = String(process.env.ECC_QUALITY_GATE_STRICT || "").toLowerCase() === "true";
 
-  if (['.ts', '.tsx', '.js', '.jsx', '.json', '.md'].includes(ext)) {
+  if ([".ts", ".tsx", ".js", ".jsx", ".json", ".md"].includes(ext)) {
     const projectRoot = findProjectRoot(path.dirname(filePath));
     const formatter = detectFormatter(projectRoot);
 
-    if (formatter === 'biome') {
+    if (formatter === "biome") {
       // JS/TS already handled by post-edit-format via `biome check --write`
-      if (['.ts', '.tsx', '.js', '.jsx'].includes(ext)) {
+      if ([".ts", ".tsx", ".js", ".jsx"].includes(ext)) {
         return;
       }
 
       // .json / .md — still need quality gate
-      const resolved = resolveFormatterBin(projectRoot, 'biome');
+      const resolved = resolveFormatterBin(projectRoot, "biome");
       if (!resolved) return;
-      const args = [...resolved.prefix, 'check', filePath];
-      if (fix) args.push('--write');
+      const args = [...resolved.prefix, "check", filePath];
+      if (fix) args.push("--write");
       const result = exec(resolved.bin, args, projectRoot);
       if (result.status !== 0 && strict) {
         log(`[QualityGate] Biome check failed for ${filePath}`);
@@ -88,10 +92,10 @@ function maybeRunQualityGate(filePath) {
       return;
     }
 
-    if (formatter === 'prettier') {
-      const resolved = resolveFormatterBin(projectRoot, 'prettier');
+    if (formatter === "prettier") {
+      const resolved = resolveFormatterBin(projectRoot, "prettier");
       if (!resolved) return;
-      const args = [...resolved.prefix, fix ? '--write' : '--check', filePath];
+      const args = [...resolved.prefix, fix ? "--write" : "--check", filePath];
       const result = exec(resolved.bin, args, projectRoot);
       if (result.status !== 0 && strict) {
         log(`[QualityGate] Prettier check failed for ${filePath}`);
@@ -103,14 +107,14 @@ function maybeRunQualityGate(filePath) {
     return;
   }
 
-  if (ext === '.go') {
+  if (ext === ".go") {
     if (fix) {
-      const r = exec('gofmt', ['-w', filePath]);
+      const r = exec("gofmt", ["-w", filePath]);
       if (r.status !== 0 && strict) {
         log(`[QualityGate] gofmt failed for ${filePath}`);
       }
     } else if (strict) {
-      const r = exec('gofmt', ['-l', filePath]);
+      const r = exec("gofmt", ["-l", filePath]);
       if (r.status !== 0) {
         log(`[QualityGate] gofmt failed for ${filePath}`);
       } else if (r.stdout && r.stdout.trim()) {
@@ -120,11 +124,11 @@ function maybeRunQualityGate(filePath) {
     return;
   }
 
-  if (ext === '.py') {
-    const args = ['format'];
-    if (!fix) args.push('--check');
+  if (ext === ".py") {
+    const args = ["format"];
+    if (!fix) args.push("--check");
     args.push(filePath);
-    const r = exec('ruff', args);
+    const r = exec("ruff", args);
     if (r.status !== 0 && strict) {
       log(`[QualityGate] Ruff check failed for ${filePath}`);
     }
@@ -140,7 +144,7 @@ function maybeRunQualityGate(filePath) {
 function run(rawInput) {
   try {
     const input = JSON.parse(rawInput);
-    const filePath = String(input.tool_input?.file_path || '');
+    const filePath = String(input.tool_input?.file_path || "");
     maybeRunQualityGate(filePath);
   } catch {
     // Ignore parse errors.
@@ -150,16 +154,16 @@ function run(rawInput) {
 
 // ── stdin entry point (backwards-compatible) ────────────────────
 if (require.main === module) {
-  let raw = '';
-  process.stdin.setEncoding('utf8');
-  process.stdin.on('data', chunk => {
+  let raw = "";
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => {
     if (raw.length < MAX_STDIN) {
       const remaining = MAX_STDIN - raw.length;
       raw += chunk.substring(0, remaining);
     }
   });
 
-  process.stdin.on('end', () => {
+  process.stdin.on("end", () => {
     const result = run(raw);
     process.stdout.write(result);
   });

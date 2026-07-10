@@ -35,13 +35,13 @@
  *   Absent a writer, behavior is unchanged.
  */
 
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { ensureDir, appendFile, getClaudeDir } = require('../lib/utils');
-const { sanitizeSessionId } = require('../lib/session-bridge');
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const { ensureDir, appendFile, getClaudeDir } = require("../lib/utils");
+const { sanitizeSessionId } = require("../lib/session-bridge");
 
 const HARNESS_COST_MAX_AGE_SECONDS = 300;
 
@@ -56,7 +56,7 @@ function readHarnessCost(sessionId, maxAgeSeconds) {
   try {
     const fp = path.join(os.tmpdir(), `harness-cost-${sessionId}.json`);
     if (!fs.existsSync(fp)) return null;
-    const obj = JSON.parse(fs.readFileSync(fp, 'utf8'));
+    const obj = JSON.parse(fs.readFileSync(fp, "utf8"));
     const ts = Number(obj && obj.ts);
     const cost = Number(obj && obj.cost_usd);
     if (!Number.isFinite(ts) || !Number.isFinite(cost) || cost < 0) return null;
@@ -71,15 +71,15 @@ function readHarnessCost(sessionId, maxAgeSeconds) {
 // Approximate per-1M-token billing rates (USD).
 // Cache creation: 1.25x input rate. Cache read: 0.1x input rate.
 const RATE_TABLE = {
-  haiku:  { in: 0.80,  out: 4.0,  cacheWrite: 1.00,  cacheRead: 0.08 },
-  sonnet: { in: 3.00,  out: 15.0, cacheWrite: 3.75,  cacheRead: 0.30 },
-  opus:   { in: 15.00, out: 75.0, cacheWrite: 18.75, cacheRead: 1.50 }
+  haiku: { in: 0.8, out: 4.0, cacheWrite: 1.0, cacheRead: 0.08 },
+  sonnet: { in: 3.0, out: 15.0, cacheWrite: 3.75, cacheRead: 0.3 },
+  opus: { in: 15.0, out: 75.0, cacheWrite: 18.75, cacheRead: 1.5 },
 };
 
 function getRates(model) {
-  const m = String(model || '').toLowerCase();
-  if (m.includes('haiku')) return RATE_TABLE.haiku;
-  if (m.includes('opus'))  return RATE_TABLE.opus;
+  const m = String(model || "").toLowerCase();
+  if (m.includes("haiku")) return RATE_TABLE.haiku;
+  if (m.includes("opus")) return RATE_TABLE.opus;
   return RATE_TABLE.sonnet;
 }
 
@@ -96,7 +96,7 @@ function toNumber(v) {
 function sumUsageFromTranscript(transcriptPath) {
   let content;
   try {
-    content = fs.readFileSync(transcriptPath, 'utf8');
+    content = fs.readFileSync(transcriptPath, "utf8");
   } catch {
     return null;
   }
@@ -105,24 +105,28 @@ function sumUsageFromTranscript(transcriptPath) {
   let outputTokens = 0;
   let cacheWriteTokens = 0;
   let cacheReadTokens = 0;
-  let model = 'unknown';
+  let model = "unknown";
 
-  for (const line of content.split('\n')) {
+  for (const line of content.split("\n")) {
     if (!line.trim()) continue;
     let entry;
-    try { entry = JSON.parse(line); } catch { continue; }
+    try {
+      entry = JSON.parse(line);
+    } catch {
+      continue;
+    }
 
-    if (entry.type !== 'assistant') continue;
+    if (entry.type !== "assistant") continue;
     const msg = entry.message;
     if (!msg || !msg.usage) continue;
 
     const u = msg.usage;
-    inputTokens      += toNumber(u.input_tokens);
-    outputTokens     += toNumber(u.output_tokens);
+    inputTokens += toNumber(u.input_tokens);
+    outputTokens += toNumber(u.output_tokens);
     cacheWriteTokens += toNumber(u.cache_creation_input_tokens);
-    cacheReadTokens  += toNumber(u.cache_read_input_tokens);
+    cacheReadTokens += toNumber(u.cache_read_input_tokens);
 
-    if (msg.model && msg.model !== 'unknown') model = msg.model;
+    if (msg.model && msg.model !== "unknown") model = msg.model;
   }
 
   return { inputTokens, outputTokens, cacheWriteTokens, cacheReadTokens, model };
@@ -132,11 +136,11 @@ function sumUsageFromTranscript(transcriptPath) {
 // last_assistant_message, which routinely exceeded the old 64KB cap and
 // made this hook echo a JSON document cut mid-stream (#2090).
 const MAX_STDIN = 1024 * 1024;
-let raw = '';
+let raw = "";
 let truncated = false;
 
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', chunk => {
+process.stdin.setEncoding("utf8");
+process.stdin.on("data", (chunk) => {
   if (raw.length < MAX_STDIN) {
     const remaining = MAX_STDIN - raw.length;
     raw += chunk.substring(0, remaining);
@@ -146,19 +150,20 @@ process.stdin.on('data', chunk => {
   }
 });
 
-process.stdin.on('end', () => {
+process.stdin.on("end", () => {
   try {
     const input = raw.trim() ? JSON.parse(raw) : {};
 
-    const transcriptPath = (typeof input.transcript_path === 'string' && input.transcript_path)
-      ? input.transcript_path
-      : process.env.CLAUDE_TRANSCRIPT_PATH || null;
+    const transcriptPath =
+      typeof input.transcript_path === "string" && input.transcript_path
+        ? input.transcript_path
+        : process.env.CLAUDE_TRANSCRIPT_PATH || null;
 
     const sessionId =
       sanitizeSessionId(input.session_id) ||
       sanitizeSessionId(process.env.ECC_SESSION_ID) ||
       sanitizeSessionId(process.env.CLAUDE_SESSION_ID) ||
-      'default';
+      "default";
 
     let usageTotals = null;
     if (transcriptPath && fs.existsSync(transcriptPath)) {
@@ -170,16 +175,18 @@ process.stdin.on('end', () => {
       outputTokens = 0,
       cacheWriteTokens = 0,
       cacheReadTokens = 0,
-      model = 'unknown'
+      model = "unknown",
     } = usageTotals || {};
 
     const rates = getRates(model);
-    const transcriptCostUsd = Math.round((
-      (inputTokens      / 1e6) * rates.in +
-      (outputTokens     / 1e6) * rates.out +
-      (cacheWriteTokens / 1e6) * rates.cacheWrite +
-      (cacheReadTokens  / 1e6) * rates.cacheRead
-    ) * 1e6) / 1e6;
+    const transcriptCostUsd =
+      Math.round(
+        ((inputTokens / 1e6) * rates.in +
+          (outputTokens / 1e6) * rates.out +
+          (cacheWriteTokens / 1e6) * rates.cacheWrite +
+          (cacheReadTokens / 1e6) * rates.cacheRead) *
+          1e6,
+      ) / 1e6;
 
     // Prefer the harness's authoritative `cost.total_cost_usd` when the
     // statusline has written it to the per-session cache (see contract in
@@ -187,26 +194,25 @@ process.stdin.on('end', () => {
     // (correct rates, 1h-cache 2x, >200K tier 2x) and is per-process so it
     // does not drift across `--resume`. Cache miss → transcript-sum.
     const harnessCost = readHarnessCost(sessionId, HARNESS_COST_MAX_AGE_SECONDS);
-    const estimatedCostUsd = harnessCost !== null
-      ? Math.round(harnessCost * 1e6) / 1e6
-      : transcriptCostUsd;
+    const estimatedCostUsd =
+      harnessCost !== null ? Math.round(harnessCost * 1e6) / 1e6 : transcriptCostUsd;
 
-    const metricsDir = path.join(getClaudeDir(), 'metrics');
+    const metricsDir = path.join(getClaudeDir(), "metrics");
     ensureDir(metricsDir);
 
     const row = {
-      timestamp:          new Date().toISOString(),
-      session_id:         sessionId,
-      transcript_path:    transcriptPath || '',
+      timestamp: new Date().toISOString(),
+      session_id: sessionId,
+      transcript_path: transcriptPath || "",
       model,
-      input_tokens:       inputTokens,
-      output_tokens:      outputTokens,
+      input_tokens: inputTokens,
+      output_tokens: outputTokens,
       cache_write_tokens: cacheWriteTokens,
-      cache_read_tokens:  cacheReadTokens,
-      estimated_cost_usd: estimatedCostUsd
+      cache_read_tokens: cacheReadTokens,
+      estimated_cost_usd: estimatedCostUsd,
     };
 
-    appendFile(path.join(metricsDir, 'costs.jsonl'), `${JSON.stringify(row)}\n`);
+    appendFile(path.join(metricsDir, "costs.jsonl"), `${JSON.stringify(row)}\n`);
   } catch {
     // Non-blocking — never fail the Stop hook.
   }
@@ -214,7 +220,9 @@ process.stdin.on('end', () => {
   // Pass stdin through (ECC hook convention) — but never echo truncated
   // stdin: invalid JSON on stdout is reported as a Stop hook failure (#2090).
   if (truncated) {
-    process.stderr.write('[Hook] cost-tracker: stdin exceeded 1MB; suppressing pass-through (fail-open)\n');
+    process.stderr.write(
+      "[Hook] cost-tracker: stdin exceeded 1MB; suppressing pass-through (fail-open)\n",
+    );
     return;
   }
   process.stdout.write(raw);

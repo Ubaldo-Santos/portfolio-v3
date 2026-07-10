@@ -2,7 +2,7 @@ import { createIsomorphicFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { type Lang, SUPPORTED_LANGS, detectClientLang } from "@/i18n";
 
-function parseLangCookie(cookie: string): Lang | null {
+export function parseLangCookie(cookie: string): Lang | null {
   const match = cookie.match(/(?:^|;\s*)lang=(es|ca|en)(?:;|$)/);
   if (match && (SUPPORTED_LANGS as readonly string[]).includes(match[1])) {
     return match[1] as Lang;
@@ -18,13 +18,16 @@ function detectFromAcceptLanguage(header: string): Lang {
   return "es";
 }
 
+export function detectLangFromRequest(request: Request): Lang {
+  const fromCookie = parseLangCookie(request.headers.get("cookie") ?? "");
+  if (fromCookie) return fromCookie;
+  return detectFromAcceptLanguage(request.headers.get("accept-language") ?? "");
+}
+
 export const detectLang = createIsomorphicFn()
   .server(() => {
     try {
-      const request = getRequest();
-      const fromCookie = parseLangCookie(request.headers.get("cookie") ?? "");
-      if (fromCookie) return fromCookie;
-      return detectFromAcceptLanguage(request.headers.get("accept-language") ?? "");
+      return detectLangFromRequest(getRequest());
     } catch {
       return "es";
     }

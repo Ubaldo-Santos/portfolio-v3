@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function renderControlPaneHtml() {
   return `<!doctype html>
@@ -692,5 +692,5 @@ function renderControlPaneHtml() {
 }
 
 module.exports = {
-  renderControlPaneHtml
+  renderControlPaneHtml,
 };

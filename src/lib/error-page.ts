@@ -1,10 +1,11 @@
+import { type Lang } from "@/i18n";
 import { translations } from "@/i18n/translations";
 
-export function renderErrorPage(): string {
-  const copy = translations.es.errors;
+export function renderErrorPage(lang: Lang = "es"): string {
+  const copy = translations[lang].errors;
 
   return `<!doctype html>
-<html lang="es">
+<html lang="${lang}">
   <head>
     <meta charset="utf-8" />
     <title>${copy.loadTitle}</title>
