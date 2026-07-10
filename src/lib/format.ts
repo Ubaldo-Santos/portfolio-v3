@@ -32,6 +32,10 @@ export function cvSummary(lang: Lang, asOf: Date = new Date()): string {
   return withYears(cv.basics.summary[lang], asOf);
 }
 
+export function cvSummaryPrint(lang: Lang, asOf: Date = new Date()): string {
+  return withYears(cv.basics.summaryPrint[lang], asOf);
+}
+
 export function workAnchorId(item: { name: string; startDate: string }): string {
   const slug = item.name
     .toLowerCase()

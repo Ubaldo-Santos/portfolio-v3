@@ -47,6 +47,8 @@ export interface ProjectItem {
   startDate: string;
   endDate: string | null;
   active: boolean;
+  /** Shown on home-adjacent surfaces and printable CV when space is limited. */
+  featured?: boolean;
 }
 
 export interface EducationItem {
@@ -56,6 +58,8 @@ export interface EducationItem {
   startDate: string;
   endDate: string;
   summary: LocalizedString;
+  /** Shown on printable CV; full list remains on /skills. */
+  featured?: boolean;
 }
 
 export type CvMetaPage = "home" | "experience" | "projects" | "skills" | "contact" | "cv";
@@ -72,9 +76,9 @@ export const cv = {
     givenName: "Ubaldo",
     familyName: "Santos Patón",
     label: {
-      es: "Ingeniero de Software Full-Stack · TypeScript · PHP · Laravel · Vue",
-      ca: "Enginyer de Programari Full-Stack · TypeScript · PHP · Laravel · Vue",
-      en: "Full-Stack Software Engineer · TypeScript · PHP · Laravel · Vue",
+      es: "Ingeniero de Software Full-Stack · TypeScript · PHP · Laravel · Vue · Electron · SDK",
+      ca: "Enginyer de Programari Full-Stack · TypeScript · PHP · Laravel · Vue · Electron · SDK",
+      en: "Full-Stack Software Engineer · TypeScript · PHP · Laravel · Vue · Electron · SDK",
     } satisfies LocalizedString,
     /** First professional role — used to compute years of experience automatically. */
     careerStartDate: "2020-06-01",
@@ -92,15 +96,21 @@ export const cv = {
         en: "@WIRIS. Building Nubric with the Assessment team. Previously on the MathType Integrations team.",
       } satisfies LocalizedString,
       detail: {
-        es: "En Wiris estoy construyendo Nubric con el equipo Assessment. Previamente en el equipo de integraciones de MathType, integré MathType en Google Workspace, Office add-ins, Moodle y editores WYSIWYG. Anteriormente lideré la transformación digital en Rotrafu (+50K servicios, −35% load time).",
-        ca: "A Wiris estic construint Nubric amb l'equip Assessment. Prèviament a l'equip d'integracions de MathType, vaig integrar MathType a Google Workspace, Office add-ins, Moodle i editors WYSIWYG. Anteriorment vaig liderar la transformació digital a Rotrafu (+50K serveis, −35% temps de càrrega).",
-        en: "At Wiris I'm building Nubric with the Assessment team. Previously on the MathType Integrations team, I integrated MathType across Google Workspace, Office add-ins, Moodle and WYSIWYG editors. Earlier I led digital transformation at Rotrafu (50K+ services, −35% load time).",
+        es: "En Wiris desarrollo Nubric (Assessment). Antes, integraciones MathType en LMS y editores. En Rotrafu: plataforma a 50.000+ servicios y −35% en tiempos de carga.",
+        ca: "A Wiris desenvolupo Nubric (Assessment). Abans, integracions MathType en LMS i editors. A Rotrafu: plataforma a 50.000+ serveis i −35% en temps de càrrega.",
+        en: "At Wiris I build Nubric (Assessment). Before that, MathType integrations across LMS and editors. At Rotrafu: platform scaled to 50,000+ services and −35% load times.",
       } satisfies LocalizedString,
     },
     summary: {
-      es: "Ingeniero de Software Full-Stack con {{years}} años de experiencia en producto. Especializado en TypeScript/JavaScript y PHP/Laravel, con foco en arquitectura mantenible (hexagonal, DDD, SOLID), calidad de código y rendimiento. En Wiris estoy construyendo Nubric con el equipo Assessment; previamente en el equipo de integraciones de MathType integré MathType en Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author y más editores. En Rotrafu escalé la aplicación principal a más de 50.000 servicios activos, reduje tiempos de carga un 35% y lideré ROTRAFU 2.0.",
-      ca: "Enginyer de Programari Full-Stack amb {{years}} anys d'experiència en producte. Especialitzat en TypeScript/JavaScript i PHP/Laravel, amb focus en arquitectura mantenible (hexagonal, DDD, SOLID), qualitat de codi i rendiment. A Wiris estic construint Nubric amb l'equip Assessment; prèviament a l'equip d'integracions de MathType vaig integrar MathType a Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author i més editors. A Rotrafu vaig escalar l'aplicació principal a més de 50.000 serveis actius, vaig reduir temps de càrrega un 35% i vaig liderar ROTRAFU 2.0.",
-      en: "Full-Stack Software Engineer with {{years}} years of product experience. Specialized in TypeScript/JavaScript and PHP/Laravel, focused on maintainable architecture (hexagonal, DDD, SOLID), code quality and performance. At Wiris I'm building Nubric with the Assessment team; previously on the MathType Integrations team, I integrated MathType across Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author and more editors. At Rotrafu I scaled the main application to 50,000+ active services, cut load times by 35% and led ROTRAFU 2.0.",
+      es: "Ingeniero Full-Stack con {{years}} años en producto. Stack principal: TypeScript, PHP/Laravel y Vue. En Wiris: Nubric (evaluación matemática) e integraciones MathType en LMS y editores WYSIWYG; refactors de arquitectura y SDK en TypeScript/Deno. En Rotrafu: 50.000+ servicios activos, −35% tiempo de carga y ROTRAFU 2.0. Arquitectura mantenible (hexagonal, DDD, SOLID), calidad de código y rendimiento.",
+      ca: "Enginyer Full-Stack amb {{years}} anys en producte. Stack principal: TypeScript, PHP/Laravel i Vue. A Wiris: Nubric (avaluació matemàtica) i integracions MathType en LMS i editors WYSIWYG; refactors d'arquitectura i SDK en TypeScript/Deno. A Rotrafu: 50.000+ serveis actius, −35% temps de càrrega i ROTRAFU 2.0. Arquitectura mantenible (hexagonal, DDD, SOLID), qualitat de codi i rendiment.",
+      en: "Full-Stack Engineer with {{years}} years in product. Core stack: TypeScript, PHP/Laravel and Vue. At Wiris: Nubric (math assessment) and MathType integrations across LMS and WYSIWYG editors; architecture refactors and SDK in TypeScript/Deno. At Rotrafu: 50,000+ active services, −35% load times and ROTRAFU 2.0. Maintainable architecture (hexagonal, DDD, SOLID), code quality and performance.",
+    } satisfies LocalizedString,
+    /** Shorter profile for printable CV (≤2 pages). Full narrative in summary. */
+    summaryPrint: {
+      es: "Ingeniero Full-Stack con {{years}} años en producto. Stack: TypeScript, PHP/Laravel y Vue. En Wiris: Nubric (evaluación matemática) e integraciones MathType. En Rotrafu: 50.000+ servicios activos y −35% tiempo de carga.",
+      ca: "Enginyer Full-Stack amb {{years}} anys en producte. Stack: TypeScript, PHP/Laravel i Vue. A Wiris: Nubric (avaluació matemàtica) i integracions MathType. A Rotrafu: 50.000+ serveis actius i −35% temps de càrrega.",
+      en: "Full-Stack Engineer with {{years}} years in product. Stack: TypeScript, PHP/Laravel and Vue. At Wiris: Nubric (math assessment) and MathType integrations. At Rotrafu: 50,000+ active services and −35% load times.",
     } satisfies LocalizedString,
     email: "u.santospaton@gmail.com",
     phone: "+34 654 455 339",
@@ -141,25 +151,25 @@ export const cv = {
       current: true,
       featured: true,
       summary: {
-        es: "Equipo de producto especializado en assessment matemático. Desarrollo Nubric (antes Learning Lemur), plataforma en PHP/Laravel para crear, autocorregir y programar reglas de ejercicios con MathType integrado, usada por instituciones educativas.",
-        ca: "Equip de producte especialitzat en assessment matemàtic. Desenvolupo Nubric (abans Learning Lemur), plataforma en PHP/Laravel per crear, autocorregir i programar regles d'exercicis amb MathType integrat, usada per institucions educatives.",
-        en: "Product team focused on math assessment. I build Nubric (formerly Learning Lemur), a PHP/Laravel platform to create, auto-grade and programmatically rule exercises with embedded MathType, used by educational institutions.",
+        es: "Equipo de producto de evaluación matemática. Desarrollo Nubric (antes Learning Lemur): plataforma PHP/Laravel para crear ejercicios, autocorregirlos y definir reglas de puntuación con MathType, usada por instituciones educativas.",
+        ca: "Equip de producte d'avaluació matemàtica. Desenvolupo Nubric (abans Learning Lemur): plataforma PHP/Laravel per crear exercicis, autocorregir-los i definir regles de puntuació amb MathType, usada per institucions educatives.",
+        en: "Math assessment product team. I build Nubric (formerly Learning Lemur): a PHP/Laravel platform to create exercises, auto-grade them and define scoring rules with MathType, used by educational institutions.",
       },
       highlights: {
         es: [
-          "Desarrollo funcionalidades de evaluación matemática en Nubric (Laravel) con foco en exactitud y rendimiento",
-          "Lideré refactors de arquitectura sobre el código heredado de Learning Lemur",
-          "Colaboración cross-funcional con producto, diseño y QA en equipo especializado en edtech",
+          "Funcionalidades de evaluación matemática en Nubric (Laravel): exactitud de corrección y rendimiento",
+          "Refactors de arquitectura sobre el código heredado de Learning Lemur",
+          "Releases con producto, diseño y QA en plataforma edtech en producción",
         ],
         ca: [
-          "Desenvolupament de funcionalitats d'avaluació matemàtica a Nubric (Laravel) amb focus en exactitud i rendiment",
-          "Vaig liderar refactors d'arquitectura sobre el codi heretat de Learning Lemur",
-          "Col·laboració cross-funcional amb producte, disseny i QA en equip especialitzat en edtech",
+          "Funcionalitats d'avaluació matemàtica a Nubric (Laravel): exactitud de correcció i rendiment",
+          "Refactors d'arquitectura sobre el codi heretat de Learning Lemur",
+          "Lliuraments amb producte, disseny i QA en plataforma edtech en producció",
         ],
         en: [
-          "Build math assessment features on Nubric (Laravel) with a focus on correctness and performance",
-          "Led architecture refactors over the legacy Learning Lemur codebase",
-          "Cross-functional collaboration with product, design and QA on an edtech-focused team",
+          "Math assessment features on Nubric (Laravel): grading accuracy and performance",
+          "Architecture refactors over the legacy Learning Lemur codebase",
+          "Shipped releases with product, design and QA on a production edtech platform",
         ],
       },
       technologies: "PHP, Laravel, MathType, Docker, Git",
@@ -187,22 +197,19 @@ export const cv = {
           "Mantuve y evolucioné integraciones MathType en Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author y más editores",
           "Diseñé el SDK de integraciones con arquitectura modular y hexagonal, mejorando escalabilidad y mantenibilidad",
           "Optimicé integraciones reduciendo tiempos de carga hasta un 30% en editores de producción",
-          "Impulsé la adopción de TypeScript y Deno en el equipo de Integraciones",
-          "Colaboración cross-funcional con producto, diseño y QA en equipo especializado en edtech",
+          "Adopción de TypeScript y Deno en el equipo de Integraciones",
         ],
         ca: [
           "Vaig mantenir i evolucionar integracions MathType a Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author i més editors",
           "Vaig dissenyar el SDK d'integracions amb arquitectura modular i hexagonal, millorant l'escalabilitat i la mantenibilitat",
           "Vaig optimitzar integracions reduint temps de càrrega fins a un 30% en editors en producció",
-          "Vaig impulsar l'adopció de TypeScript i Deno a l'equip d'Integracions",
-          "Col·laboració cross-funcional amb producte, disseny i QA en equip especialitzat en edtech",
+          "Adopció de TypeScript i Deno a l'equip d'Integracions",
         ],
         en: [
           "Maintained and evolved MathType integrations across Google Workspace, Office add-ins, Moodle, CKEditor, TinyMCE, Froala, Oxygen Web Author and more editors",
           "Designed the integrations SDK with modular hexagonal architecture, improving scalability and maintainability",
           "Optimized production editor integrations, cutting load times by up to 30%",
           "Drove TypeScript and Deno adoption on the Integrations team",
-          "Cross-functional collaboration with product, design and QA on an edtech-focused team",
         ],
       },
       technologies:
@@ -231,21 +238,21 @@ export const cv = {
           "Escalé la aplicación principal hasta más de 50.000 servicios activos sin interrupciones",
           "Reduje tiempos de carga un 35% optimizando arquitectura y consultas a base de datos",
           "Desarrollé ROTRAFU 2.0: rediseño completo mejorando UX, escalabilidad y seguridad",
-          "Automaticé procesos internos mejorando la eficiencia operativa un 50%",
+          "Automatizé procesos internos, reduciendo tareas manuales recurrentes un 50%",
           "Reduje vulnerabilidades de seguridad un 40% mediante hardening y buenas prácticas",
         ],
         ca: [
           "Vaig escalar l'aplicació principal fins a més de 50.000 serveis actius sense interrupcions",
           "Vaig reduir temps de càrrega un 35% optimitzant arquitectura i consultes a base de dades",
           "Vaig desenvolupar ROTRAFU 2.0: redisseny complet millorant UX, escalabilitat i seguretat",
-          "Vaig automatitzar processos interns millorant l'eficiència operativa un 50%",
+          "Vaig automatitzar processos interns, reduint tasques manuals recurrents un 50%",
           "Vaig reduir vulnerabilitats de seguretat un 40% mitjançant hardening i bones pràctiques",
         ],
         en: [
           "Scaled the main application to 50,000+ active services with zero downtime",
           "Cut load times by 35% through architecture and database query optimization",
           "Built ROTRAFU 2.0: full redesign improving UX, scalability and security",
-          "Automated internal processes, boosting operational efficiency by 50%",
+          "Automated internal processes, cutting recurring manual tasks by 50%",
           "Reduced security vulnerabilities by 40% through hardening and best practices",
         ],
       },
@@ -312,19 +319,19 @@ export const cv = {
       },
       highlights: {
         es: [
-          "Desarrollé funcionalidades clave en Atenea/Moodle mejorando la experiencia de usuario",
-          "Resolví incidencias técnicas y tickets de soporte en un entorno ágil",
-          "Colaboré con un equipo multidisciplinario de 13 personas en soluciones edtech",
+          "Funcionalidades en Atenea (Moodle) para la plataforma docente de la UPC",
+          "Resolución de incidencias y tickets de soporte en entorno ágil",
+          "Desarrollo en equipo de 13 personas (PHP, Moodle, MySQL)",
         ],
         ca: [
-          "Vaig desenvolupar funcionalitats clau a Atenea/Moodle millorant l'experiència d'usuari",
-          "Vaig resoldre incidències tècniques i tiquets de suport en un entorn àgil",
-          "Vaig col·laborar amb un equip multidisciplinari de 13 persones en solucions edtech",
+          "Funcionalitats a Atenea (Moodle) per a la plataforma docent de la UPC",
+          "Resolució d'incidències i tiquets de suport en entorn àgil",
+          "Desenvolupament en equip de 13 persones (PHP, Moodle, MySQL)",
         ],
         en: [
-          "Shipped key features on Atenea/Moodle, improving user experience",
-          "Resolved technical incidents and support tickets in an agile environment",
-          "Collaborated with a 13-person cross-functional team on edtech solutions",
+          "Features on Atenea (Moodle) for UPC's teaching platform",
+          "Resolved incidents and support tickets in an agile workflow",
+          "Development on a 13-person team (PHP, Moodle, MySQL)",
         ],
       },
       technologies: "PHP, Moodle, MySQL, REST APIs, Git",
@@ -424,19 +431,19 @@ export const cv = {
       },
       highlights: {
         es: [
-          "Desarrollé una app de control de incidencias en C# con interfaz Windows Forms",
-          "Configuré infraestructura de red y soluciones de conectividad para ECTARC",
-          "Trabajé en un equipo multicultural en un entorno internacional",
+          "App de gestión de incidencias en C# (Windows Forms)",
+          "Configuración de infraestructura de red para ECTARC",
+          "Experiencia en equipo multicultural en Reino Unido (Erasmus+)",
         ],
         ca: [
-          "Vaig desenvolupar una app de control d'incidències en C# amb interfície Windows Forms",
-          "Vaig configurar infraestructura de xarxa i solucions de connectivitat per a ECTARC",
-          "Vaig treballar en un equip multicultural en un entorn internacional",
+          "App de gestió d'incidències en C# (Windows Forms)",
+          "Configuració d'infraestructura de xarxa per a ECTARC",
+          "Experiència en equip multicultural al Regne Unit (Erasmus+)",
         ],
         en: [
-          "Built an incident-tracking app in C# with a Windows Forms interface",
-          "Configured network infrastructure and connectivity solutions for ECTARC",
-          "Worked in a multicultural team in an international setting",
+          "Incident-management app in C# (Windows Forms)",
+          "Network infrastructure setup for ECTARC",
+          "Multicultural team experience in the UK (Erasmus+)",
         ],
       },
       technologies: "C#, .NET, Networking",
@@ -454,9 +461,9 @@ export const cv = {
       url: "https://www.wiris.com/en/nubric/",
       active: true,
       description: {
-        es: "Plataforma de assessment matemático en Laravel: creación, autocorrección y reglas programables de ejercicios con MathType integrado, usada por instituciones educativas.",
-        ca: "Plataforma d'assessment matemàtic en Laravel: creació, autocorrecció i regles programables d'exercicis amb MathType integrat, usada per institucions educatives.",
-        en: "Math assessment platform in Laravel: create, auto-grade and programmatically rule exercises with embedded MathType, used by educational institutions.",
+        es: "Plataforma de evaluación matemática en Laravel: creación de ejercicios, autocorrección y reglas de puntuación con MathType, en uso por instituciones educativas.",
+        ca: "Plataforma d'avaluació matemàtica en Laravel: creació d'exercicis, autocorrecció i regles de puntuació amb MathType, en ús per institucions educatives.",
+        en: "Math assessment platform in Laravel: exercise creation, auto-grading and scoring rules with MathType, in use by educational institutions.",
       },
       highlights: {
         es: ["PHP/Laravel", "Assessment matemático", "Producto Wiris"],
@@ -465,6 +472,7 @@ export const cv = {
       },
       startDate: "2024-03-10",
       endDate: null,
+      featured: true,
     },
     {
       name: "MathType Integrations",
@@ -482,6 +490,7 @@ export const cv = {
       },
       startDate: "2024-03-10",
       endDate: null,
+      featured: true,
     },
     {
       name: "MathType Add-in for Microsoft Office",
@@ -516,6 +525,7 @@ export const cv = {
       },
       startDate: "2020-06-01",
       endDate: "2024-03-01",
+      featured: true,
     },
   ] satisfies ProjectItem[],
   education: [
@@ -531,8 +541,9 @@ export const cv = {
         ca: "Grau en Enginyeria Informàtica",
         en: "BSc in Computer Engineering",
       },
-      startDate: "2020-01-01",
+      startDate: "2021-01-01",
       endDate: "2025-06-01",
+      featured: true,
       summary: {
         es: "Especialización en Ingeniería de Software: arquitecturas escalables, patrones de diseño, metodologías ágiles y desarrollo full-stack aplicado a producto real.",
         ca: "Especialització en Enginyeria del Programari: arquitectures escalables, patrons de disseny, metodologies àgils i desenvolupament full-stack aplicat a producte real.",
@@ -540,7 +551,7 @@ export const cv = {
       },
     },
     {
-      institution: "INS La Pineda",
+      institution: "IES La Pineda",
       area: {
         es: "Desarrollo de Aplicaciones Web",
         ca: "Desenvolupament d'Aplicacions Web",
@@ -551,12 +562,13 @@ export const cv = {
         ca: "CFGS DAW (Dual)",
         en: "Higher Vocational Degree (Dual)",
       },
-      startDate: "2019-09-01",
+      startDate: "2020-09-01",
       endDate: "2021-06-01",
+      featured: true,
       summary: {
-        es: "Formación dual con experiencia en empresa (XMI Tech). Frameworks PHP modernos, JavaScript y desarrollo full-stack con despliegue en entornos profesionales.",
-        ca: "Formació dual amb experiència a empresa (XMI Tech). Frameworks PHP moderns, JavaScript i desenvolupament full-stack amb desplegament en entorns professionals.",
-        en: "Dual program with on-the-job experience at XMI Tech. Modern PHP frameworks, JavaScript and full-stack development with professional deployment workflows.",
+        es: "Formación dual con experiencia en empresa (XMI Tech). Proyecto fin de ciclo: videojuego 3D en Unity y C#. Frameworks PHP, JavaScript y despliegue en entornos profesionales.",
+        ca: "Formació dual amb experiència a empresa (XMI Tech). Projecte fi de cicle: videojoc 3D en Unity i C#. Frameworks PHP, JavaScript i desplegament en entorns professionals.",
+        en: "Dual program with on-the-job experience at XMI Tech. Capstone: 3D game in Unity and C#. Modern PHP frameworks, JavaScript and professional deployment workflows.",
       },
     },
     {
@@ -567,12 +579,28 @@ export const cv = {
         en: "Network Systems Administration",
       },
       studyType: { es: "CFGS ASIR", ca: "CFGS ASIR", en: "Higher Vocational Degree" },
+      startDate: "2018-09-01",
+      endDate: "2020-06-01",
+      summary: {
+        es: "Sistemas, redes, servidores y virtualización. Proyecto fin de ciclo: análisis de malware en C++.",
+        ca: "Sistemes, xarxes, servidors i virtualització. Projecte fi de cicle: anàlisi de malware en C++.",
+        en: "Systems, networking, servers and virtualization. Capstone: malware analysis in C++.",
+      },
+    },
+    {
+      institution: "IES La Pineda",
+      area: {
+        es: "Sistemas Microinformáticos y Redes",
+        ca: "Sistemes Microinformàtics i Xarxes",
+        en: "Microcomputer Systems and Networks",
+      },
+      studyType: { es: "CFGS SMR", ca: "CFGS SMR", en: "Higher Vocational Degree" },
       startDate: "2016-09-01",
       endDate: "2018-06-01",
       summary: {
-        es: "Sistemas, redes, servidores y virtualización. Base sólida en infraestructura IT que complementa el perfil full-stack y DevOps.",
-        ca: "Sistemes, xarxes, servidors i virtualització. Base sòlida en infraestructura IT que complementa el perfil full-stack i DevOps.",
-        en: "Systems, networking, servers and virtualization. Solid IT infrastructure foundation complementing a full-stack and DevOps profile.",
+        es: "Hardware, redes locales y administración de sistemas. Base formativa previa al CFGS ASIR.",
+        ca: "Maquinari, xarxes locals i administració de sistemes. Base formativa prèvia al CFGS ASIR.",
+        en: "Hardware, local networks and systems administration. Foundational training before the ASIR degree.",
       },
     },
   ] satisfies EducationItem[],
@@ -625,30 +653,30 @@ export const cv = {
     pages: {
       home: {
         selectedWorkSub: {
-          es: "Roles donde he entregado producto con impacto medible.",
-          ca: "Rols on he lliurat producte amb impacte mesurable.",
-          en: "Roles where I've shipped product with measurable impact.",
+          es: "Tres roles con producto en producción y métricas concretas.",
+          ca: "Tres rols amb producte en producció i mètriques concretes.",
+          en: "Three roles with production product and concrete metrics.",
         },
       },
       experience: {
         subtitle: {
-          es: "{{years}} años construyendo producto escalable con impacto medible.",
-          ca: "{{years}} anys construint producte escalable amb impacte mesurable.",
-          en: "{{years}} years building scalable product with measurable impact.",
+          es: "{{years}} años en producto web: edtech, integraciones y escalado en producción.",
+          ca: "{{years}} anys en producte web: edtech, integracions i escalat en producció.",
+          en: "{{years}} years in web product: edtech, integrations and production scale.",
         },
       },
       projects: {
         subtitle: {
-          es: "Producto en producción y evaluaciones técnicas verificables.",
-          ca: "Producte en producció i avaluacions tècniques verificables.",
-          en: "Production product and verifiable technical assessments.",
+          es: "Productos en producción en Wiris y Rotrafu.",
+          ca: "Productes en producció a Wiris i Rotrafu.",
+          en: "Production products at Wiris and Rotrafu.",
         },
       },
       skills: {
         subtitle: {
-          es: "Stack verificado, prácticas de ingeniería e idiomas.",
-          ca: "Stack verificat, pràctiques d'enginyeria i idiomes.",
-          en: "Verified stack, engineering practices and languages.",
+          es: "Lenguajes, frameworks y prácticas que uso en producción.",
+          ca: "Llenguatges, frameworks i pràctiques que faig servir en producció.",
+          en: "Languages, frameworks and practices I use in production.",
         },
       },
       contact: {
@@ -675,9 +703,9 @@ export const cv = {
           en: "Optimized for print and ATS parsers.",
         },
         printHint: {
-          es: "Pulsa imprimir y guarda como PDF.",
-          ca: "Prem imprimir i desa com a PDF.",
-          en: "Hit print and save as PDF.",
+          es: "Versión corta (destacados) para impresión en máx. 2 páginas A4.",
+          ca: "Versió curta (destacats) per a impressió en màx. 2 pàgines A4.",
+          en: "Short version (featured roles) for printing within 2 A4 pages.",
         },
       },
     },
@@ -714,9 +742,9 @@ export const cv = {
             en: "{{years}} years in product: Wiris (Assessment & MathType Integrations), Rotrafu (50K+ services, −35% load time), Prime IT, iThinkUPC.",
           },
           ogDescription: {
-            es: "Trayectoria en producto e ingeniería.",
-            ca: "Trajectòria en producte i enginyeria.",
-            en: "Trajectory in product and engineering.",
+            es: "Wiris (Assessment y MathType), Rotrafu, Prime IT e iThinkUPC.",
+            ca: "Wiris (Assessment i MathType), Rotrafu, Prime IT i iThinkUPC.",
+            en: "Wiris (Assessment and MathType), Rotrafu, Prime IT and iThinkUPC.",
           },
         },
         projects: {
@@ -726,14 +754,14 @@ export const cv = {
             en: "Projects — Ubaldo Santos Patón",
           },
           description: {
-            es: "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 y evaluaciones técnicas en GitHub.",
-            ca: "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 i avaluacions tècniques a GitHub.",
-            en: "Nubric, MathType Integrations, Office Add-in, ROTRAFU 2.0 and verifiable GitHub technical assessments.",
+            es: "Nubric, MathType Integrations, Office Add-in y ROTRAFU 2.0.",
+            ca: "Nubric, MathType Integrations, Office Add-in i ROTRAFU 2.0.",
+            en: "Nubric, MathType Integrations, Office Add-in and ROTRAFU 2.0.",
           },
           ogDescription: {
-            es: "Producto real y proyectos de aprendizaje verificables.",
-            ca: "Producte real i projectes d'aprenentatge verificables.",
-            en: "Production product and verifiable learning projects.",
+            es: "Cuatro productos en producción con stack y resultados documentados.",
+            ca: "Quatre productes en producció amb stack i resultats documentats.",
+            en: "Four production products with documented stack and outcomes.",
           },
         },
         skills: {
@@ -743,9 +771,9 @@ export const cv = {
             en: "Skills & AI — Ubaldo Santos Patón",
           },
           description: {
-            es: "Stack verificado: TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), arquitectura hexagonal, DevOps e IA aplicada.",
-            ca: "Stack verificat: TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), arquitectura hexagonal, DevOps i IA aplicada.",
-            en: "Verified stack: TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), hexagonal architecture, DevOps and applied AI.",
+            es: "TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), arquitectura hexagonal, DevOps e IA en flujo de trabajo.",
+            ca: "TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), arquitectura hexagonal, DevOps i IA en flux de treball.",
+            en: "TypeScript, PHP/Laravel, Vue, edtech (MathType, Moodle), hexagonal architecture, DevOps and AI in daily workflow.",
           },
           ogDescription: {
             es: "Stack, prácticas e IA aplicada en producto.",
@@ -801,9 +829,9 @@ export const cv = {
         en: "Skills + AI",
       },
       body: {
-        es: "Uso IA como copiloto a diario (GitHub Copilot a nivel organización, Cursor CLI con reglas en el repo, OpenRouter para enrutar a varios modelos con fallback, MCP para conectar el modelo a datos reales). También la he integrado en producto, no solo en mi editor.",
-        ca: "Faig servir IA com a copilot a diari (GitHub Copilot a nivell d'organització, Cursor CLI amb regles al repo, OpenRouter per enrutar a diversos models amb fallback, MCP per connectar el model a dades reals). També l'he integrada en producte, no només al meu editor.",
-        en: "I use AI as a copilot daily (GitHub Copilot at the org level, Cursor CLI with rules versioned in the repo, OpenRouter to route between models with fallback, MCP to connect the model to real data). I've also shipped AI into product, not just my editor.",
+        es: "Uso IA en el flujo diario: GitHub Copilot (organización), Cursor CLI con reglas en el repo, OpenRouter para enrutar modelos con fallback y MCP para conectar el modelo a datos reales. También la he integrado en producto, no solo en el editor.",
+        ca: "Faig servir IA en el flux diari: GitHub Copilot (organització), Cursor CLI amb regles al repo, OpenRouter per enrutar models amb fallback i MCP per connectar el model a dades reals. També l'he integrada en producte, no només a l'editor.",
+        en: "I use AI in my daily workflow: GitHub Copilot (org-wide), Cursor CLI with rules in the repo, OpenRouter for model routing with fallback, and MCP to connect models to real data. I've also integrated AI into product, not just my editor.",
       },
       tags: ["GitHub Copilot (org)", "Cursor CLI", "OpenRouter", "MCP", "Agent Skills"],
     },

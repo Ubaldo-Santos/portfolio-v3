@@ -1,8 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Printer } from "lucide-react";
-import { cv, pick, type Lang, type WorkItem } from "@/data/cv";
-import { currentLang, cvSummary, formatPeriod } from "@/lib/format";
+import { cv, type Lang, type WorkItem } from "@/data/cv";
+import { currentLang, cvSummaryPrint, formatPeriod } from "@/lib/format";
+import {
+  CV_PRINT,
+  cvPrintEducation,
+  cvPrintProjects,
+  cvPrintSkillLines,
+  cvPrintWork,
+} from "@/lib/cv-print";
 import { cvPageSubtitle, cvPrintHint } from "@/lib/cv-copy";
 import { routeHead } from "@/lib/seo";
 import { Reveal } from "@/components/reveal";
@@ -25,6 +32,10 @@ export const Route = createFileRoute("/cv")({
 function CvPage() {
   const { t, i18n } = useTranslation();
   const lang = currentLang(i18n.language);
+  const printWork = cvPrintWork();
+  const printEducation = cvPrintEducation();
+  const printProjects = cvPrintProjects();
+  const printSkillLines = cvPrintSkillLines(lang);
   const contactItems = [
     cv.basics.email,
     cv.basics.phone,
@@ -92,17 +103,17 @@ function CvPage() {
             </header>
 
             <Section title={t("cv.profile")}>
-              <p className="leading-relaxed">{cvSummary(lang)}</p>
+              <p className="leading-relaxed">{cvSummaryPrint(lang)}</p>
             </Section>
 
             <Section title={t("cv.experience")}>
-              {cv.work.slice(0, 3).map((w) => (
+              {printWork.map((w) => (
                 <Job key={w.name + w.startDate} w={w} lang={lang} />
               ))}
             </Section>
 
             <Section title={t("cv.education")}>
-              {cv.education.map((ed) => (
+              {printEducation.map((ed) => (
                 <div key={ed.institution + ed.startDate} className="cv-block mb-3 last:mb-0">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h3>
@@ -113,7 +124,6 @@ function CvPage() {
                     </span>
                   </div>
                   <div className="cv-meta">{ed.area[lang]}</div>
-                  <p className="mt-1">{ed.summary[lang]}</p>
                 </div>
               ))}
             </Section>
@@ -121,26 +131,16 @@ function CvPage() {
             <Section title={t("cv.skills")}>
               <ul className="space-y-1">
                 <li>
-                  <strong>{t("skills.languages")}:</strong> {cv.skills.languages.join(", ")}
+                  <strong>{t("skills.languages")}:</strong> {printSkillLines[0]}
                 </li>
                 <li>
-                  <strong>{t("skills.backend")}:</strong> {cv.skills.backend.join(", ")}
+                  <strong>{t("skills.primaryStack")}:</strong> {printSkillLines[1]}
                 </li>
                 <li>
-                  <strong>{t("skills.frontend")}:</strong> {cv.skills.frontend.join(", ")}
+                  <strong>{t("skills.edtech")}:</strong> {printSkillLines[2]}
                 </li>
                 <li>
-                  <strong>{t("skills.edtech")}:</strong> {cv.skills.edtech.join(", ")}
-                </li>
-                <li>
-                  <strong>{t("skills.practices")}:</strong>{" "}
-                  {pick(cv.skills.practices, lang).join(", ")}
-                </li>
-                <li>
-                  <strong>{t("skills.devops")}:</strong> {cv.skills.devops.join(", ")}
-                </li>
-                <li>
-                  <strong>{t("skills.other")}:</strong> {cv.skills.other.join(", ")}
+                  <strong>{t("skills.practices")}:</strong> {printSkillLines[3]}
                 </li>
               </ul>
             </Section>
@@ -150,7 +150,7 @@ function CvPage() {
             </Section>
 
             <Section title={t("cv.projects")}>
-              {cv.projects.map((p) => (
+              {printProjects.map((p) => (
                 <div key={p.name} className="cv-block mb-2 last:mb-0">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h3>
@@ -202,7 +202,7 @@ function Job({ w, lang }: { w: WorkItem; lang: ReturnType<typeof currentLang> })
       </div>
       <p className="mt-1">{w.summary[lang]}</p>
       <ul className="mt-2 list-disc space-y-0.5 pl-5">
-        {w.highlights[lang].map((h, i) => (
+        {w.highlights[lang].slice(0, CV_PRINT.maxHighlightsPerJob).map((h, i) => (
           <li key={i}>{h}</li>
         ))}
       </ul>
